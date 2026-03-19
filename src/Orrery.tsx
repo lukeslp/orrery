@@ -190,12 +190,10 @@ interface FocusTarget {
 // ─── 3D Components ───────────────────────────────────────────────────────────
 
 function Skybox() {
-  const tex = useLoader(THREE.TextureLoader, TEX.starfield);
   const { scene } = useThree();
   useEffect(() => {
-    tex.mapping = THREE.EquirectangularReflectionMapping;
-    scene.background = tex;
-  }, [tex, scene]);
+    scene.background = new THREE.Color('#000000');
+  }, [scene]);
   return null;
 }
 
