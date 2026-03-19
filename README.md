@@ -1,73 +1,59 @@
-# React + TypeScript + Vite
+# Orrery — Interactive 3D Solar System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A browser-based mechanical orrery built with **React 19 + Three.js (R3F)** and live NASA data feeds.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Feature | Detail |
+|---|---|
+| **8 planets** | NASA texture maps (Solar System Scope, CC BY 4.0) |
+| **Accurate positions** | JPL J2000 Keplerian elements with secular rates |
+| **Milky Way skybox** | Equirectangular star field background |
+| **Planet click-to-focus** | Camera flies to orbit any selected planet |
+| **Planet info cards** | Type, moons, temperature, gravity, orbital elements |
+| **Time animation** | Variable playback from 1x real-time to 1 yr/s |
+| **Live NEO data** | NASA NeoWs API — today's near-Earth objects |
+| **Asteroid orbits** | Full orbital ellipses via NASA SBDB API on demand |
+| **7 camera presets** | Inner, System, Earth, Top, Ecliptic, Jupiter, Cinematic |
+| **Smooth transitions** | lerp-based camera with OrbitControls damping |
+| **Moon phase** | Accurate lunar phase indicator |
 
-## React Compiler
+## Keyboard Shortcuts
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Key | Action |
+|---|---|
+| 1–7 | Camera presets |
+| Space | Pause / resume simulation |
+| H | Toggle simulation HUD |
+| N | Toggle NEO panel |
+| F | Toggle fullscreen |
+| Esc | Deselect / release focus |
+| Click planet | Focus camera on planet |
+| Click NEO | Show orbital elements + draw orbit |
 
-## Expanding the ESLint configuration
+## Data Sources
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Planetary positions** — JPL Horizons Keplerian elements (J2000 epoch)
+- **Textures** — Solar System Scope (CC BY 4.0)
+- **Near-Earth Objects** — NASA NeoWs API
+- **Asteroid orbital elements** — NASA JPL SBDB API
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Tech Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- React 19 + TypeScript
+- Three.js via @react-three/fiber + @react-three/drei
+- Vite 6 for development and bundling
+- No backend required — all data from public NASA APIs
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Getting Started
+
+```bash
+pnpm install
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open http://localhost:5173
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## License
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+MIT — textures are CC BY 4.0 (Solar System Scope). NASA data is public domain.
