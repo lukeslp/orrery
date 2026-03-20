@@ -7,7 +7,7 @@
  * Theme-aware: all accent colors come from the active theme.
  */
 
-import type { NEO, FocusTarget } from '../lib/kepler';
+import type { NEO, FocusTarget, CamPreset } from '../lib/kepler';
 import { ALL_BODIES } from '../data/planets';
 import { getMoonsForPlanet } from '../data/moons';
 import { useTheme } from '../lib/themes';
@@ -142,6 +142,9 @@ export interface PanelProps {
   navigateToLevel: (level: number) => void;
   selMoonIdx: number | null;
   cameraDistance: number;
+  cams: CamPreset[];
+  camIdx: number;
+  onPresetSelect: (i: number) => void;
 }
 
 export default function Panels(props: PanelProps) {
@@ -158,6 +161,7 @@ export default function Panels(props: PanelProps) {
     cinematic, setCinematic,
     navStack, navigateBack, navigateToLevel,
     selMoonIdx, cameraDistance,
+    cams, camIdx, onPresetSelect,
   } = props;
 
   const { theme } = useTheme();
