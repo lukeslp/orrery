@@ -26,7 +26,7 @@ export default function LoadingScreen({ ready }: { ready: boolean }) {
         background: '#000',
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
-        fontFamily: "'JetBrains Mono', monospace",
+        fontFamily: "'Cormorant Garamond', 'Garamond', serif",
         opacity: ready ? 0 : 1,
         transition: 'opacity 0.5s ease',
         pointerEvents: ready ? 'none' : 'auto',

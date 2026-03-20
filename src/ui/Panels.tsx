@@ -143,7 +143,7 @@ export default function Panels(props: PanelProps) {
           <button
             aria-label={`Focused on ${ALL_BODIES[focusTarget.planetIdx].name}. Click to release.`}
             onClick={() => { setFocusTarget(null); setSelPlanet(null); }}
-            style={{ ...glass, padding: mobile ? '6px 10px' : '3px 8px', fontSize: mobile ? 10 : 9, cursor: 'pointer', fontFamily: 'inherit', color: '#00ffcc', borderColor: 'rgba(0,255,204,0.4)', background: 'rgba(0,255,204,0.1)', minHeight: mobile ? 44 : 'auto', whiteSpace: 'nowrap' }}
+            style={{ ...glass, padding: mobile ? '8px 12px' : '4px 10px', fontSize: mobile ? 12 : 11, cursor: 'pointer', fontFamily: 'inherit', color: '#00ffcc', borderColor: 'rgba(0,255,204,0.4)', background: 'rgba(0,255,204,0.1)', minHeight: mobile ? 44 : 'auto', whiteSpace: 'nowrap' }}
           >
             {ALL_BODIES[focusTarget.planetIdx].name} \u2715
           </button>
