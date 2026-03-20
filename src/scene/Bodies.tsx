@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import { TEX } from '../data/planets';
 import type { PlanetDef } from '../lib/kepler';
 import { planetXYZ, orbitPath } from '../lib/kepler';
+import { useTheme } from '../lib/themes';
 
 // ─── Sun ────────────────────────────────────────────────────────────────────────
 

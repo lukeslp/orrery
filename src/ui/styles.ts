@@ -10,7 +10,7 @@ export const glass: React.CSSProperties = {
   background: 'rgba(0,0,0,0.6)',
   backdropFilter: 'blur(12px)',
   WebkitBackdropFilter: 'blur(12px)',
-  border: '1px solid rgba(255,255,255,0.08)',
+  border: '1px solid var(--panel-border, rgba(255,255,255,0.08))',
   borderRadius: 6,
 };
 
