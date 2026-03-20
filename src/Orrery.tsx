@@ -151,7 +151,7 @@ function OrreryInner() {
 
   return (
     <div style={{
-      width: '100vw', height: '100vh', background: '#000',
+      width: '100vw', height: '100dvh', background: '#000',
       position: 'relative', overflow: 'hidden',
       fontFamily: "'Cormorant Garamond','Garamond','Baskerville','Georgia',serif",
     }}>
@@ -198,5 +198,13 @@ function OrreryInner() {
         positionsRef={positionsRef}
       />
     </div>
+  );
+}
+
+export default function Orrery() {
+  return (
+    <ThemeProvider>
+      <OrreryInner />
+    </ThemeProvider>
   );
 }
