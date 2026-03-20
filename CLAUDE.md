@@ -11,49 +11,61 @@ pnpm lint         # ESLint with typescript-eslint + react-hooks
 pnpm preview      # Serve production build locally
 ```
 
-## Architecture
+Deployed at: `https://dr.eamer.dev/orrery/`
 
-Single-file React Three Fiber application. All logic lives in `src/Orrery.tsx` (~900 lines).
+## Architecture
 
 **Stack**: React 19 + TypeScript + Three.js (@react-three/fiber + @react-three/drei) + Vite 8
 
-### File Structure
+### Module Structure
 
-- `src/Orrery.tsx` — Entire application: orbital mechanics, 3D scene, camera system, UI overlays, NASA API integration
-- `src/App.tsx` — Thin wrapper, just renders `<Orrery />`
-- `src/main.tsx` — React entry point
-- `src/index.css` — Global reset + scrollbar styling
-- `public/favicon.svg`, `public/icons.svg` — SVG assets
+```
+src/
+  lib/kepler.ts         # Orbital mechanics: Kepler solver, Julian dates, heliocentric XYZ, moon phase
+  data/planets.ts       # Planet/dwarf planet data (JPL J2000 elements), texture URLs, camera presets
+  scene/
+    Scene.tsx           # 3D scene composition: camera controller, AU grid, background, lighting
+    Bodies.tsx           # Sun, Planet, EarthClouds, Moon, OrbitRing, SaturnRings (procedural shader)
+    Asteroids.tsx       # AsteroidBelt (3000 instanced particles), NeoDot, AsteroidOrbitLine
+  ui/
+    Panels.tsx          # All HUD overlays: TopBar, CameraPresets, TimeControls, PlanetCard, NeoPanel, HUD
+    LoadingScreen.tsx   # Loading overlay with fade transition
+    styles.ts           # Shared glass style, useIsMobile hook
+  Orrery.tsx            # Main component: state, effects (time tick, NASA API, keyboard), Canvas wrapper
+  App.tsx               # Thin wrapper
+  main.tsx              # Entry point
+  index.css             # Global reset, a11y (focus-visible, sr-only, prefers-reduced-motion), safe areas
+```
 
-### Key Sections in Orrery.tsx
+### Data Flow
 
-The file is organized with comment headers (`// ───`):
-
-1. **TEX** — CDN URLs for planet texture maps (Solar System Scope, CC BY 4.0)
-2. **PLANETS array** — JPL J2000 Keplerian elements with secular rates for all 8 planets, plus display metadata (radius, description, moon count, etc.)
-3. **Math helpers** — Julian date conversion, Kepler's equation solver (Newton-Raphson), heliocentric XYZ from orbital elements, orbit path generation
-4. **3D Components** — `Skybox`, `Sun`, `Planet`, `Moon`, `OrbitRing`, `AsteroidOrbitLine`, `AUGrid`, `NeoDot`
-5. **CamCtrl** — Camera controller with lerp-based smooth transitions, OrbitControls integration, planet follow mode
-6. **Scene** — Composes all 3D components, manages hover state and planet positions
-7. **Orrery (default export)** — Main component: time simulation loop, NASA NeoWs/SBDB API fetching, keyboard shortcuts, all HUD panels
+All state lives in `Orrery.tsx`, passed down via props:
+- `Orrery` → `Scene` (3D rendering) + `Panels` (HTML overlays) + `LoadingScreen`
+- `Scene` → `Bodies` (planets/sun/moon) + `Asteroids` (belt/NEOs) + `CamCtrl`
+- Planet positions computed in `Scene` from `lib/kepler.ts` math, bubbled up via `onPositionsUpdate`
 
 ### Coordinate System
 
-Heliocentric ecliptic coordinates transformed to Three.js: `[x, z, -y]` where y-up is the ecliptic normal. Distances are in AU (1 AU = 1 unit in scene space).
+Heliocentric ecliptic → Three.js: `[x, z, -y]` where y-up is ecliptic normal. Distances in AU (1 AU = 1 scene unit).
 
-### External APIs (no auth except DEMO_KEY)
+### External APIs
 
-- **NASA NeoWs** (`api.nasa.gov/neo/rest/v1/feed`) — Fetches today's near-Earth objects on mount
-- **NASA SBDB** (`ssd-api.jpl.nasa.gov/sbdb.api`) — Fetches asteroid orbital elements on-demand when a NEO is clicked
+- **NASA NeoWs** (`api.nasa.gov/neo/rest/v1/feed`) — Today's near-Earth objects, fetched on mount. Uses `DEMO_KEY`.
+- **NASA SBDB** (`ssd-api.jpl.nasa.gov/sbdb.api`) — Asteroid orbital elements, fetched on-demand when NEO clicked. Returns `ma` (mean anomaly) and `epoch` for position propagation.
 
-### Camera System
+### Key Patterns
 
-7 preset camera positions (`CAMS` array) selectable via keyboard 1-7. Planet click-to-focus overrides presets with a `FocusTarget` that tracks the planet's position each frame. All transitions use `Vector3.lerp(target, 0.03)`.
+- **Procedural Saturn rings**: Custom `ShaderMaterial` in `Bodies.tsx` with vertex UV-based ring bands (C Ring, B Ring, Cassini Division, A Ring, Encke Gap)
+- **Asteroid belt**: `InstancedMesh` with 3000 icosahedrons, Kirkwood gaps at 2.50/2.82/2.95 AU
+- **NEO positioning**: Once SBDB data loads, computes heliocentric position via `neoXYZ()` using mean anomaly propagation. Falls back to hash-based placement before data loads.
+- **Camera**: 8 presets + planet click-to-focus. All transitions use `Vector3.lerp(target, 0.03)`.
+- **Mobile**: `useIsMobile()` hook drives responsive inline styles. Touch targets 44px+, bottom sheets, safe areas.
+- **Accessibility**: ARIA labels, focus-visible, sr-only announcements, prefers-reduced-motion
 
-### UI Pattern
+### Planet Data
 
-All HUD elements are absolutely-positioned HTML overlays on top of the Canvas. Glassmorphism style via a shared `glass` CSS-in-JS object (`backdrop-filter: blur(12px)`). JetBrains Mono font throughout.
+`PLANETS` (8) + `DWARF_PLANETS` (Ceres, Pluto, Eris) combined as `ALL_BODIES`. JPL J2000 Keplerian elements with secular rates (rates zero for dwarfs). Toggled via "DWF" button.
 
-## Keyboard Shortcuts
+### Deployment
 
-`1-7` camera presets, `H` HUD, `N` NEO panel, `F` fullscreen, `Space` pause/resume, `Esc` deselect, click planet to focus.
+Vite `base: '/orrery/'`. Built to `dist/`. Served by Caddy as static files at `dr.eamer.dev/orrery/*`.
