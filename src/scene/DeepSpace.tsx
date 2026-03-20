@@ -57,6 +57,15 @@ export function ScaleMarkers() {
 const OORT_COUNT = 8000;
 
 export function OortCloud() {
+  const ref = useRef<THREE.Points>(null);
+  const { camera } = useThree();
+
+  // Only show when zoomed out enough
+  useFrame(() => {
+    if (!ref.current) return;
+    ref.current.visible = camera.position.length() > 200;
+  });
+
   const geometry = useMemo(() => {
     const positions = new Float32Array(OORT_COUNT * 3);
     const sizes = new Float32Array(OORT_COUNT);
@@ -83,7 +92,7 @@ export function OortCloud() {
   }, []);
 
   return (
-    <points geometry={geometry}>
+    <points ref={ref} geometry={geometry} visible={false}>
       <shaderMaterial
         vertexShader={`
           void main() {
