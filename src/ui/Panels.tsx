@@ -7,8 +7,9 @@
  * Theme-aware: all accent colors come from the active theme.
  */
 
-import type { NEO, CamPreset, FocusTarget } from '../lib/kepler';
+import type { NEO, FocusTarget } from '../lib/kepler';
 import { ALL_BODIES } from '../data/planets';
+import { getMoonsForPlanet } from '../data/moons';
 import { useTheme } from '../lib/themes';
 import { glass, useIsMobile } from './styles';
 
@@ -54,6 +55,69 @@ function speedLabel(s: number) {
 function fmtDate(d: Date) { return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }); }
 function fmtTime(d: Date) { return d.toLocaleTimeString('en-US', { hour12: false }); }
 
+// ─── Scale indicator labels ─────────────────────────────────────────────────────
+
+const SCALE_LANDMARKS = [
+  { dist: 2, label: 'Inner' },
+  { dist: 10, label: 'Outer' },
+  { dist: 50, label: 'Kuiper' },
+  { dist: 5000, label: 'Oort' },
+  { dist: 60000, label: 'Galaxy' },
+];
+
+function ScaleIndicator({ cameraDistance }: { cameraDistance: number }) {
+  // Map camera distance to a position on a vertical bar (log scale)
+  const minLog = Math.log10(0.1);
+  const maxLog = Math.log10(200000);
+  const range = maxLog - minLog;
+
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'absolute', left: 8, top: '20%', bottom: '20%',
+        width: 24, zIndex: 5, pointerEvents: 'none',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+      }}
+    >
+      {/* Vertical line */}
+      <div style={{
+        position: 'absolute', left: 10, top: 0, bottom: 0, width: 1,
+        background: 'rgba(255,255,255,0.08)',
+      }} />
+
+      {/* Current position marker */}
+      <div style={{
+        position: 'absolute', left: 6, width: 9, height: 2,
+        background: 'rgba(255,255,255,0.4)',
+        borderRadius: 1,
+        top: `${Math.max(0, Math.min(100, ((Math.log10(Math.max(0.1, cameraDistance)) - minLog) / range) * 100))}%`,
+        transition: 'top 0.3s ease-out',
+      }} />
+
+      {/* Landmark labels */}
+      {SCALE_LANDMARKS.map(lm => {
+        const pct = ((Math.log10(lm.dist) - minLog) / range) * 100;
+        return (
+          <div key={lm.label} style={{
+            position: 'absolute', left: 16, top: `${pct}%`,
+            transform: 'translateY(-50%)',
+            fontSize: 8, color: 'rgba(255,255,255,0.15)',
+            whiteSpace: 'nowrap', fontWeight: 300, letterSpacing: 0.5,
+          }}>
+            {/* tick */}
+            <span style={{
+              position: 'absolute', left: -8, top: '50%', width: 5, height: 1,
+              background: 'rgba(255,255,255,0.1)',
+            }} />
+            {lm.label}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ─── Panel props ────────────────────────────────────────────────────────────────
 
 export interface PanelProps {
@@ -61,13 +125,10 @@ export interface PanelProps {
   moon: { name: string; emoji: string; ill: number };
   speed: number; setSpeed: (fn: (s: number) => number) => void;
   playing: boolean; setPlaying: (fn: (p: boolean) => boolean) => void;
-  camIdx: number; setCamIdx: (i: number) => void;
-  cams: CamPreset[];
   focusTarget: FocusTarget | null; setFocusTarget: (f: FocusTarget | null) => void;
   selPlanet: number | null; setSelPlanet: (i: number | null) => void;
   neos: NEO[]; selNeo: NEO | null; setSelNeo: (n: NEO | null) => void;
   showNeo: boolean; setShowNeo: (fn: (p: boolean) => boolean) => void;
-  showHud: boolean; setShowHud: (fn: (p: boolean) => boolean) => void;
   showDwarf: boolean; setShowDwarf: (fn: (p: boolean) => boolean) => void;
   showStars: boolean; setShowStars: (fn: (p: boolean) => boolean) => void;
   showConstellations: boolean; setShowConstellations: (fn: (p: boolean) => boolean) => void;
@@ -75,26 +136,86 @@ export interface PanelProps {
   setSimTime: (fn: (d: Date) => Date) => void;
   jd: number; T: number;
   positionsRef: React.MutableRefObject<Map<number, [number, number, number]>>;
+  cinematic: boolean;
+  setCinematic: (c: boolean) => void;
+  navStack: string[];
+  navigateBack: () => void;
+  navigateToLevel: (level: number) => void;
+  selMoonIdx: number | null;
+  cameraDistance: number;
 }
 
 export default function Panels(props: PanelProps) {
   const {
     simTime, moon, speed, setSpeed, playing, setPlaying,
-    camIdx, setCamIdx, cams, focusTarget, setFocusTarget,
+    focusTarget, setFocusTarget,
     selPlanet, setSelPlanet, neos, selNeo, setSelNeo,
-    showNeo, setShowNeo, showHud, setShowHud,
+    showNeo, setShowNeo,
     showDwarf, setShowDwarf,
     showStars, setShowStars,
     showConstellations, setShowConstellations,
     showPlanetList, setShowPlanetList,
     setSimTime, jd, T, positionsRef,
+    cinematic, setCinematic,
+    navStack, navigateBack, navigateToLevel,
+    selMoonIdx, cameraDistance,
   } = props;
 
-  const { theme, cycleTheme } = useTheme();
+  const { theme } = useTheme();
   const accent = theme.uiAccent;
   const accentRgb = theme.uiAccentRgb;
   const mobile = useIsMobile();
   const sp = selPlanet !== null ? ALL_BODIES[selPlanet] : null;
+
+  // Selected moon info
+  const selectedMoon = selPlanet !== null && selMoonIdx !== null
+    ? getMoonsForPlanet(selPlanet)[selMoonIdx]
+    : null;
+
+  // ─── Cinematic clock mode ──────────────────────────────────────────────────
+  if (cinematic) {
+    return (
+      <div
+        style={{
+          position: 'absolute', inset: 0, zIndex: 20,
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer',
+        }}
+      >
+        <div style={{
+          fontSize: mobile ? 64 : 96, fontWeight: 200, letterSpacing: 6,
+          color: '#fff', fontFamily: "'Cormorant Garamond','Garamond','Baskerville','Georgia',serif",
+          textShadow: '0 0 40px rgba(0,0,0,0.8)',
+        }}>
+          {fmtTime(simTime)}
+        </div>
+        <div style={{
+          fontSize: mobile ? 14 : 18, fontWeight: 300, letterSpacing: 3,
+          color: 'rgba(255,255,255,0.4)', marginTop: 8,
+          fontStyle: 'italic',
+        }}>
+          {fmtDate(simTime)}
+        </div>
+        <div style={{
+          fontSize: mobile ? 16 : 20, marginTop: 12,
+          display: 'flex', alignItems: 'center', gap: 8,
+          color: 'rgba(255,255,255,0.3)',
+        }}>
+          <span>{moon.emoji}</span>
+          <span style={{ fontSize: 12, fontWeight: 300, fontStyle: 'italic' }}>{moon.name}</span>
+        </div>
+        {/* Faint watermark */}
+        <div style={{
+          position: 'absolute', bottom: mobile ? 24 : 32,
+          color: 'rgba(255,255,255,0.06)', fontSize: 11,
+          letterSpacing: 6, textTransform: 'uppercase', fontWeight: 300,
+        }}>
+          Orrery
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -116,55 +237,69 @@ export default function Panels(props: PanelProps) {
         {speed !== 1 && <span style={{ color: accent, fontSize: 11, fontWeight: 400 }}>{speedLabel(speed)}</span>}
       </div>
 
-      {/* ── Camera preset pills ── */}
+      {/* ── Breadcrumb navigation ── */}
       <nav
         role="navigation"
-        aria-label="Camera presets"
+        aria-label="Solar system navigation"
         style={{
           position: 'absolute', top: mobile ? 52 : 56,
           left: '50%', transform: 'translateX(-50%)',
-          display: 'flex', gap: 3, zIndex: 10,
+          display: 'flex', alignItems: 'center', gap: 0, zIndex: 10,
           maxWidth: mobile ? 'calc(100vw - 24px)' : 'none',
           overflowX: mobile ? 'auto' : 'visible',
           WebkitOverflowScrolling: 'touch',
-          msOverflowStyle: 'none',
           scrollbarWidth: 'none',
+          ...glass, padding: mobile ? '6px 12px' : '4px 12px',
         }}
       >
-        {cams.map((c, i) => (
-          <button
-            key={c.key}
-            aria-label={`Camera: ${c.label}`}
-            aria-pressed={camIdx === i && !focusTarget}
-            onClick={() => { setCamIdx(i); setFocusTarget(null); setSelPlanet(null); }}
-            style={{
-              ...glass, padding: mobile ? '8px 12px' : '4px 10px',
-              fontSize: mobile ? 12 : 11, cursor: 'pointer', fontFamily: 'inherit',
-              whiteSpace: 'nowrap', fontWeight: 400, letterSpacing: 0.5,
-              minHeight: mobile ? 44 : 'auto',
-              color: camIdx === i && !focusTarget ? accent : 'rgba(255,255,255,0.4)',
-              borderColor: camIdx === i && !focusTarget ? `rgba(${accentRgb},0.4)` : 'rgba(255,255,255,0.07)',
-              background: camIdx === i && !focusTarget ? `rgba(${accentRgb},0.1)` : 'rgba(0,0,0,0.5)',
-              transition: 'all 0.15s',
-            }}
-          >
-            {c.key ? `${c.key} ` : ''}{c.label}
-          </button>
+        {navStack.map((segment, i) => (
+          <span key={i} style={{ display: 'flex', alignItems: 'center' }}>
+            {i > 0 && (
+              <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11, margin: '0 6px', fontWeight: 300 }}>{'\u203a'}</span>
+            )}
+            <button
+              onClick={() => navigateToLevel(i)}
+              aria-label={`Navigate to ${segment}`}
+              aria-current={i === navStack.length - 1 ? 'location' : undefined}
+              style={{
+                background: 'none', border: 'none', cursor: i < navStack.length - 1 ? 'pointer' : 'default',
+                color: i === navStack.length - 1 ? accent : 'rgba(255,255,255,0.4)',
+                fontSize: mobile ? 12 : 12, fontFamily: "'Cormorant Garamond', serif",
+                fontWeight: i === navStack.length - 1 ? 500 : 300,
+                padding: '2px 4px', minHeight: mobile ? 36 : 'auto',
+                letterSpacing: 0.5, whiteSpace: 'nowrap',
+                transition: 'color 0.15s',
+              }}
+            >
+              {segment}
+            </button>
+          </span>
         ))}
-        {focusTarget !== null && (
-          <button
-            aria-label={`Focused on ${ALL_BODIES[focusTarget.planetIdx].name}. Click to release.`}
-            onClick={() => { setFocusTarget(null); setSelPlanet(null); }}
-            style={{ ...glass, padding: mobile ? '8px 12px' : '4px 10px', fontSize: mobile ? 12 : 11, cursor: 'pointer', fontFamily: 'inherit', color: accent, borderColor: `rgba(${accentRgb},0.4)`, background: `rgba(${accentRgb},0.1)`, minHeight: mobile ? 44 : 'auto', whiteSpace: 'nowrap' }}
-          >
-            {ALL_BODIES[focusTarget.planetIdx].name} {'\u2715'}
-          </button>
-        )}
       </nav>
 
+      {/* ── Mobile back button ── */}
+      {mobile && navStack.length > 1 && (
+        <button
+          onClick={navigateBack}
+          aria-label="Navigate back"
+          style={{
+            position: 'absolute', top: 90, left: 8,
+            ...glass, padding: '8px 14px',
+            fontSize: 18, cursor: 'pointer',
+            color: 'rgba(255,255,255,0.5)',
+            minWidth: 48, minHeight: 48,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 10, fontFamily: 'inherit', fontWeight: 300,
+          }}
+        >
+          {'\u2190'}
+        </button>
+      )}
+
+      {/* ── Scale indicator ── */}
+      <ScaleIndicator cameraDistance={cameraDistance} />
+
       {/* ── Toggle buttons ── */}
-      {/* Mobile: full-width scroll row above time controls */}
-      {/* Desktop: bottom-right cluster */}
       <div
         role="toolbar"
         aria-label="Display toggles"
@@ -179,15 +314,17 @@ export default function Panels(props: PanelProps) {
             : {}),
         }}
       >
-        {[
-          { l: 'HUD', on: showHud, fn: () => setShowHud(p => !p), a: 'Toggle simulation HUD' },
+        {(mobile ? [
+          { l: 'NEO', on: showNeo, fn: () => setShowNeo(p => !p), a: 'Toggle near-Earth objects panel' },
+          { l: 'STR', on: showStars, fn: () => setShowStars(p => !p), a: 'Toggle star field' },
+          { l: 'CON', on: showConstellations, fn: () => setShowConstellations(p => !p), a: 'Toggle constellation lines' },
+        ] : [
           { l: 'NEO', on: showNeo, fn: () => setShowNeo(p => !p), a: 'Toggle near-Earth objects panel' },
           { l: 'DWF', on: showDwarf, fn: () => setShowDwarf(p => !p), a: 'Toggle dwarf planets' },
           { l: 'STR', on: showStars, fn: () => setShowStars(p => !p), a: 'Toggle star field' },
           { l: 'CON', on: showConstellations, fn: () => setShowConstellations(p => !p), a: 'Toggle constellation lines' },
-          { l: theme.name.slice(0, 3).toUpperCase(), on: false, fn: cycleTheme, a: `Theme: ${theme.name}. Click to cycle.` },
           { l: '\u26f6', on: false, fn: () => document.documentElement.requestFullscreen?.(), a: 'Toggle fullscreen' },
-        ].map(b => (
+        ]).map(b => (
           <button
             key={b.l}
             onClick={b.fn}
@@ -196,7 +333,7 @@ export default function Panels(props: PanelProps) {
             style={{
               ...glass,
               padding: mobile ? '8px 12px' : '5px 10px',
-              fontSize: mobile ? 11 : 11,
+              fontSize: 11,
               cursor: 'pointer', fontFamily: 'inherit',
               whiteSpace: 'nowrap',
               flexShrink: 0,
@@ -238,6 +375,15 @@ export default function Panels(props: PanelProps) {
           {speedLabel(speed)}
         </span>
         <Btn onClick={() => { setSimTime(() => new Date()); setSpeed(() => 1); }} style={{ color: '#ffcc44', marginLeft: 4 }} label="Reset to current time">NOW</Btn>
+        {!mobile && (
+          <Btn
+            onClick={() => setCinematic(true)}
+            label="Enter cinematic clock mode"
+            style={{ color: 'rgba(255,255,255,0.3)', marginLeft: 4, fontSize: 11 }}
+          >
+            {'\u{1F570}'}
+          </Btn>
+        )}
       </div>
 
       {/* ── Planet list panel ── */}
@@ -292,8 +438,35 @@ export default function Panels(props: PanelProps) {
         </div>
       )}
 
+      {/* ── Selected moon info card ── */}
+      {selectedMoon && !showPlanetList && (
+        <div
+          role="dialog"
+          aria-label={`${selectedMoon.name} information`}
+          style={{
+            position: 'absolute',
+            ...(mobile
+              ? { bottom: 80, left: 8, right: 8, width: 'auto' }
+              : { top: 96, left: 14, width: 205 }),
+            ...glass, padding: '12px 14px', zIndex: 20,
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+            <span style={{ color: '#fff', fontSize: 16, fontWeight: 600, letterSpacing: 1.5 }}>{selectedMoon.name}</span>
+            <Btn onClick={navigateBack} label="Back to planet">{'\u2715'}</Btn>
+          </div>
+          <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, lineHeight: 1.6, marginBottom: 8, fontStyle: 'italic', fontWeight: 300 }}>{selectedMoon.desc}</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 10px' }}>
+            <Stat label="Parent" val={sp?.name || ''} />
+            <Stat label="Orbit period" val={`${selectedMoon.period.toFixed(2)} days`} />
+            <Stat label="Distance" val={`${selectedMoon.a} AU`} />
+            {selectedMoon.i !== undefined && <Stat label="Inclination" val={`${selectedMoon.i}\u00b0`} />}
+          </div>
+        </div>
+      )}
+
       {/* ── Selected planet info card ── */}
-      {sp && !showPlanetList && (
+      {sp && !selectedMoon && !showPlanetList && (
         <div
           role="dialog"
           aria-label={`${sp.name} information`}
@@ -441,25 +614,6 @@ export default function Panels(props: PanelProps) {
         </div>
       )}
 
-      {/* ── Simulation HUD ── */}
-      {showHud && (
-        <div
-          role="region"
-          aria-label="Simulation data"
-          style={{ position: 'absolute', bottom: mobile ? 80 : 56, left: mobile ? 8 : 14, ...glass, padding: '10px 14px', fontSize: 11, zIndex: 15 }}
-        >
-          <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 10, letterSpacing: 2, marginBottom: 6, textTransform: 'uppercase', fontWeight: 300 }}>Simulation</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px 14px' }}>
-            <Stat label="Julian Date" val={jd.toFixed(2)} />
-            <Stat label="T (centuries)" val={T.toFixed(4)} />
-            <Stat label="Sim speed" val={speedLabel(speed)} />
-            <Stat label="Moon phase" val={`${moon.name} ${moon.ill}%`} />
-            <Stat label="NEOs loaded" val={neos.length} />
-            <Stat label="Playing" val={playing ? 'Yes' : 'Paused'} c={playing ? accent : '#ff6644'} />
-          </div>
-        </div>
-      )}
-
       {/* ── Keyboard hints (desktop only) ── */}
       {!mobile && (
         <div style={{
@@ -467,9 +621,9 @@ export default function Panels(props: PanelProps) {
           color: 'rgba(255,255,255,0.12)', fontSize: 9, lineHeight: 1.8, textAlign: 'right', fontStyle: 'italic', fontWeight: 300,
           transition: 'right 0.3s', zIndex: 10,
         }}>
-          <div>1{'\u2013'}0 cameras · click planet to focus · P planet list</div>
-          <div>S stars · C constellations · T theme · D dwarf</div>
-          <div>H hud · N neo · F fullscreen · Space pause</div>
+          <div>click planet to focus · Escape back · P planet list</div>
+          <div>S stars · C constellations · D dwarf · N neo</div>
+          <div>F cinematic clock · Space pause</div>
         </div>
       )}
 
@@ -484,7 +638,9 @@ export default function Panels(props: PanelProps) {
       {/* ── Screen reader announcements ── */}
       <div aria-live="polite" className="sr-only" role="status">
         {sp ? `Selected ${sp.name}, ${sp.type}. ${sp.desc}` : ''}
+        {selectedMoon ? `Selected moon ${selectedMoon.name}. ${selectedMoon.desc}` : ''}
         {selNeo ? `Selected asteroid ${selNeo.name}. Miss distance: ${selNeo.missLunar.toFixed(1)} lunar distances.` : ''}
+        {navStack.length > 1 ? `Navigated to ${navStack[navStack.length - 1]}` : ''}
       </div>
     </>
   );
