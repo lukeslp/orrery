@@ -198,10 +198,7 @@ export default function Scene({
   const focusedMoons = selPlanet !== null ? getMoonsForPlanet(selPlanet) : [];
   const focusedParentPos = selPlanet !== null ? positions.get(selPlanet) : null;
 
-  const handleCameraDistance = (d: number) => {
-    setCamDist(d);
-    if (onCameraDistance) onCameraDistance(d);
-  };
+  const handleCameraDistance = onCameraDistance;
 
   return (
     <>
