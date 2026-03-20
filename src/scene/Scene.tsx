@@ -50,25 +50,22 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, onCameraDistanc
   const settling = useRef(true);
   const prevTrackPos = useRef(new THREE.Vector3());
 
-  // Trigger transition on focus changes
+  // Trigger transition on focus or preset changes
   useEffect(() => {
     settling.current = true;
     if (focusTarget !== null) {
       const pp = positions.get(focusTarget.planetIdx);
       if (pp) {
         if (focusTarget.moonIdx !== undefined) {
-          // Moon drill-down: compute moon position and zoom close
           const moons = getMoonsForPlanet(focusTarget.planetIdx);
           const moon = moons[focusTarget.moonIdx];
           if (moon) {
             const offset = moon.radius * 15;
-            // Approximate moon position for camera target
             tLook.current.set(...pp);
             tPos.current.set(pp[0] + offset, pp[1] + offset * 0.4, pp[2] + offset);
             prevTrackPos.current.set(...pp);
           }
         } else {
-          // Planet drill-down
           const planet = ALL_BODIES[focusTarget.planetIdx];
           const offset = planet.radius * 8 + planet.a * 0.15;
           tLook.current.set(...pp);
@@ -76,11 +73,14 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, onCameraDistanc
           prevTrackPos.current.set(...pp);
         }
       }
+    } else if (camPreset) {
+      tPos.current.set(...camPreset.pos);
+      tLook.current.set(...camPreset.tgt);
     } else {
       tPos.current.set(...HOME_POS);
       tLook.current.set(...HOME_TGT);
     }
-  }, [focusTarget]);
+  }, [focusTarget, camPreset]);
 
   // Stop transition when user grabs orbit controls
   useEffect(() => {
@@ -146,8 +146,8 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, onCameraDistanc
       dampingFactor={0.06}
       minDistance={0.05}
       maxDistance={100000}
-      autoRotate={cinematic || (!focusTarget)}
-      autoRotateSpeed={cinematic ? 0.15 : 0}
+      autoRotate={cinematic || camPreset?.autoRotate || false}
+      autoRotateSpeed={cinematic ? 0.15 : camPreset?.autoRotate ? 0.15 : 0}
     />
   );
 }
@@ -167,13 +167,14 @@ export interface SceneProps {
   onMoonSelect?: (planetIdx: number, moonIdx: number) => void;
   selMoonIdx?: number | null;
   onCameraDistance?: (d: number) => void;
+  camPreset?: CamPreset | null;
 }
 
 export default function Scene({
   jd, T, neos, selNeo, setSelNeo, selPlanet, setSelPlanet,
   focusTarget, onPositionsUpdate, showDwarf,
   showStars, showConstellations, cinematic,
-  onMoonSelect, selMoonIdx, onCameraDistance,
+  onMoonSelect, selMoonIdx, onCameraDistance, camPreset,
 }: SceneProps) {
   const [hov, setHov] = useState<number | null>(null);
   const [hovMoon, setHovMoon] = useState<number | null>(null);
