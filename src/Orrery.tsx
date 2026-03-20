@@ -275,6 +275,7 @@ function OrreryInner() {
             onMoonSelect={handleMoonSelect}
             selMoonIdx={selMoonIdx}
             onCameraDistance={setCameraDistance}
+            camPreset={camPreset}
           />
         </Suspense>
       </Canvas>
@@ -302,6 +303,9 @@ function OrreryInner() {
         navigateToLevel={navigateToLevel}
         selMoonIdx={selMoonIdx}
         cameraDistance={cameraDistance}
+        cams={CAMS}
+        camIdx={camIdx}
+        onPresetSelect={handlePresetSelect}
       />
     </div>
   );
