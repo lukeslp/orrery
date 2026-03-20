@@ -10,7 +10,7 @@ import { useState } from 'react';
 import type { NEO, FocusTarget, CamPreset } from '../lib/kepler';
 import { ALL_BODIES } from '../data/planets';
 import { getMoonsForPlanet } from '../data/moons';
-import { useTheme, THEMES } from '../lib/themes';
+import { useTheme } from '../lib/themes';
 import { glass, useIsMobile } from './styles';
 
 // ─── Tiny UI primitives ─────────────────────────────────────────────────────────
