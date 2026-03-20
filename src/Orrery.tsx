@@ -11,11 +11,13 @@ import * as THREE from 'three';
 import { CAMS } from './data/planets';
 import type { NEO, FocusTarget } from './lib/kepler';
 import { julianDate, moonPhase } from './lib/kepler';
+import { ThemeProvider, useTheme } from './lib/themes';
 import Scene from './scene/Scene';
 import Panels from './ui/Panels';
 import LoadingScreen from './ui/LoadingScreen';
 
-export default function Orrery() {
+function OrreryInner() {
+  const { cycleTheme } = useTheme();
   const [neos, setNeos] = useState<NEO[]>([]);
   const [selNeo, setSelNeo] = useState<NEO | null>(null);
   const [selPlanet, setSelPlanet] = useState<number | null>(null);
@@ -23,6 +25,9 @@ export default function Orrery() {
   const [showNeo, setShowNeo] = useState(false);
   const [showHud, setShowHud] = useState(false);
   const [showDwarf, setShowDwarf] = useState(true);
+  const [showStars, setShowStars] = useState(true);
+  const [showConstellations, setShowConstellations] = useState(true);
+  const [showPlanetList, setShowPlanetList] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [simTime, setSimTime] = useState(new Date());
   const [playing, setPlaying] = useState(true);
@@ -119,8 +124,12 @@ export default function Orrery() {
       if (k === 'h') setShowHud(p => !p);
       if (k === 'n') setShowNeo(p => !p);
       if (k === 'd') setShowDwarf(p => !p);
+      if (k === 's') setShowStars(p => !p);
+      if (k === 'c') setShowConstellations(p => !p);
+      if (k === 't') cycleTheme();
+      if (k === 'p') setShowPlanetList(p => !p);
       if (k === 'f') document.documentElement.requestFullscreen?.();
-      if (k === 'escape') { setSelPlanet(null); setSelNeo(null); setFocusTarget(null); }
+      if (k === 'escape') { setSelPlanet(null); setSelNeo(null); setFocusTarget(null); setShowPlanetList(false); }
       if (k === ' ') { e.preventDefault(); setPlaying(p => !p); }
       const num = parseInt(e.key);
       if (num >= 1 && num <= CAMS.length) { setCamIdx(num - 1); setFocusTarget(null); }
