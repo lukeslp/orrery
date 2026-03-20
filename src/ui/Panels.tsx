@@ -3,10 +3,13 @@
  *
  * Responsive: adapts to mobile (iPhone/Android) with larger touch targets,
  * bottom sheets, and safe-area insets.
+ *
+ * Theme-aware: all accent colors come from the active theme.
  */
 
 import type { NEO, CamPreset, FocusTarget } from '../lib/kepler';
 import { ALL_BODIES } from '../data/planets';
+import { useTheme, THEMES } from '../lib/themes';
 import { glass, useIsMobile } from './styles';
 
 // ─── Tiny UI primitives ─────────────────────────────────────────────────────────
@@ -66,6 +69,9 @@ export interface PanelProps {
   showNeo: boolean; setShowNeo: (fn: (p: boolean) => boolean) => void;
   showHud: boolean; setShowHud: (fn: (p: boolean) => boolean) => void;
   showDwarf: boolean; setShowDwarf: (fn: (p: boolean) => boolean) => void;
+  showStars: boolean; setShowStars: (fn: (p: boolean) => boolean) => void;
+  showConstellations: boolean; setShowConstellations: (fn: (p: boolean) => boolean) => void;
+  showPlanetList: boolean; setShowPlanetList: (fn: (p: boolean) => boolean) => void;
   setSimTime: (fn: (d: Date) => Date) => void;
   jd: number; T: number;
   positionsRef: React.MutableRefObject<Map<number, [number, number, number]>>;
@@ -78,9 +84,15 @@ export default function Panels(props: PanelProps) {
     selPlanet, setSelPlanet, neos, selNeo, setSelNeo,
     showNeo, setShowNeo, showHud, setShowHud,
     showDwarf, setShowDwarf,
+    showStars, setShowStars,
+    showConstellations, setShowConstellations,
+    showPlanetList, setShowPlanetList,
     setSimTime, jd, T, positionsRef,
   } = props;
 
+  const { theme, cycleTheme } = useTheme();
+  const accent = theme.uiAccent;
+  const accentRgb = theme.uiAccentRgb;
   const mobile = useIsMobile();
   const sp = selPlanet !== null ? ALL_BODIES[selPlanet] : null;
 
@@ -101,7 +113,7 @@ export default function Panels(props: PanelProps) {
         <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: mobile ? 10 : 12, fontStyle: 'italic', fontWeight: 300 }}>{fmtDate(simTime)}</span>
         <span style={{ fontSize: mobile ? 13 : 15 }}>{moon.emoji}</span>
         {!mobile && <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, fontStyle: 'italic', fontWeight: 300 }}>{moon.name} · {moon.ill}%</span>}
-        {speed !== 1 && <span style={{ color: '#00ffcc', fontSize: 11, fontWeight: 400 }}>{speedLabel(speed)}</span>}
+        {speed !== 1 && <span style={{ color: accent, fontSize: 11, fontWeight: 400 }}>{speedLabel(speed)}</span>}
       </div>
 
       {/* ── Camera preset pills ── */}
@@ -130,9 +142,9 @@ export default function Panels(props: PanelProps) {
               fontSize: mobile ? 12 : 11, cursor: 'pointer', fontFamily: 'inherit',
               whiteSpace: 'nowrap', fontWeight: 400, letterSpacing: 0.5,
               minHeight: mobile ? 44 : 'auto',
-              color: camIdx === i && !focusTarget ? '#00ffcc' : 'rgba(255,255,255,0.4)',
-              borderColor: camIdx === i && !focusTarget ? 'rgba(0,255,204,0.4)' : 'rgba(255,255,255,0.07)',
-              background: camIdx === i && !focusTarget ? 'rgba(0,255,204,0.1)' : 'rgba(0,0,0,0.5)',
+              color: camIdx === i && !focusTarget ? accent : 'rgba(255,255,255,0.4)',
+              borderColor: camIdx === i && !focusTarget ? `rgba(${accentRgb},0.4)` : 'rgba(255,255,255,0.07)',
+              background: camIdx === i && !focusTarget ? `rgba(${accentRgb},0.1)` : 'rgba(0,0,0,0.5)',
               transition: 'all 0.15s',
             }}
           >
@@ -143,9 +155,9 @@ export default function Panels(props: PanelProps) {
           <button
             aria-label={`Focused on ${ALL_BODIES[focusTarget.planetIdx].name}. Click to release.`}
             onClick={() => { setFocusTarget(null); setSelPlanet(null); }}
-            style={{ ...glass, padding: mobile ? '8px 12px' : '4px 10px', fontSize: mobile ? 12 : 11, cursor: 'pointer', fontFamily: 'inherit', color: '#00ffcc', borderColor: 'rgba(0,255,204,0.4)', background: 'rgba(0,255,204,0.1)', minHeight: mobile ? 44 : 'auto', whiteSpace: 'nowrap' }}
+            style={{ ...glass, padding: mobile ? '8px 12px' : '4px 10px', fontSize: mobile ? 12 : 11, cursor: 'pointer', fontFamily: 'inherit', color: accent, borderColor: `rgba(${accentRgb},0.4)`, background: `rgba(${accentRgb},0.1)`, minHeight: mobile ? 44 : 'auto', whiteSpace: 'nowrap' }}
           >
-            {ALL_BODIES[focusTarget.planetIdx].name} \u2715
+            {ALL_BODIES[focusTarget.planetIdx].name} {'\u2715'}
           </button>
         )}
       </nav>
@@ -166,7 +178,7 @@ export default function Panels(props: PanelProps) {
         <Btn
           onClick={() => setPlaying(p => !p)}
           label={playing ? 'Pause simulation' : 'Resume simulation'}
-          style={{ color: playing ? '#00ffcc' : '#ff6644', fontSize: 14, padding: '0 8px', fontWeight: 600 }}
+          style={{ color: playing ? accent : '#ff6644', fontSize: 14, padding: '0 8px', fontWeight: 600 }}
         >
           {playing ? 'II' : '\u25b6'}
         </Btn>
@@ -184,6 +196,7 @@ export default function Panels(props: PanelProps) {
         style={{
           position: 'absolute', bottom: mobile ? 20 : 14, right: mobile ? 8 : 14,
           display: 'flex', gap: 3, zIndex: 10,
+          flexWrap: 'wrap', justifyContent: 'flex-end',
           paddingBottom: mobile ? 'env(safe-area-inset-bottom)' : 0,
         }}
       >
@@ -191,6 +204,9 @@ export default function Panels(props: PanelProps) {
           { l: 'HUD', on: showHud, fn: () => setShowHud(p => !p), a: 'Toggle simulation HUD' },
           { l: 'NEO', on: showNeo, fn: () => setShowNeo(p => !p), a: 'Toggle near-Earth objects panel' },
           { l: 'DWF', on: showDwarf, fn: () => setShowDwarf(p => !p), a: 'Toggle dwarf planets' },
+          { l: 'STR', on: showStars, fn: () => setShowStars(p => !p), a: 'Toggle star field' },
+          { l: 'CON', on: showConstellations, fn: () => setShowConstellations(p => !p), a: 'Toggle constellation lines' },
+          { l: theme.name.slice(0, 3).toUpperCase(), on: false, fn: cycleTheme, a: `Theme: ${theme.name}. Click to cycle.` },
           { l: '\u26f6', on: false, fn: () => document.documentElement.requestFullscreen?.(), a: 'Toggle fullscreen' },
         ].map(b => (
           <button
@@ -205,9 +221,9 @@ export default function Panels(props: PanelProps) {
               cursor: 'pointer', fontFamily: 'inherit',
               minWidth: mobile ? 44 : 'auto',
               minHeight: mobile ? 44 : 'auto',
-              color: b.on ? '#00ffcc' : 'rgba(255,255,255,0.35)',
-              borderColor: b.on ? 'rgba(0,255,204,0.35)' : 'rgba(255,255,255,0.07)',
-              background: b.on ? 'rgba(0,255,204,0.08)' : 'rgba(0,0,0,0.5)',
+              color: b.on ? accent : 'rgba(255,255,255,0.35)',
+              borderColor: b.on ? `rgba(${accentRgb},0.35)` : 'rgba(255,255,255,0.07)',
+              background: b.on ? `rgba(${accentRgb},0.08)` : 'rgba(0,0,0,0.5)',
               transition: 'all 0.15s',
             }}
           >
@@ -216,8 +232,60 @@ export default function Panels(props: PanelProps) {
         ))}
       </div>
 
+      {/* ── Planet list panel ── */}
+      {showPlanetList && (
+        <div
+          role="navigation"
+          aria-label="Planet list"
+          style={{
+            position: 'absolute',
+            ...(mobile
+              ? { left: 0, right: 0, bottom: 0, top: 'auto', maxHeight: '50vh', borderRadius: '12px 12px 0 0' }
+              : { top: 96, left: 14, width: 180 }),
+            ...glass, padding: '10px 10px', zIndex: 20,
+            overflowY: 'auto',
+            paddingBottom: mobile ? 'max(10px, env(safe-area-inset-bottom))' : '10px',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', fontWeight: 300 }}>Bodies</span>
+            <Btn onClick={() => setShowPlanetList(p => !p)} label="Close planet list">{'\u2715'}</Btn>
+          </div>
+          {ALL_BODIES.map((body, idx) => (
+            <button
+              key={body.name}
+              onClick={() => { setSelPlanet(idx); setShowPlanetList(() => false); }}
+              aria-label={`Focus on ${body.name}`}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                width: '100%', padding: mobile ? '10px 8px' : '5px 8px',
+                background: selPlanet === idx ? `rgba(${accentRgb},0.07)` : 'transparent',
+                border: selPlanet === idx ? `1px solid rgba(${accentRgb},0.2)` : '1px solid transparent',
+                borderRadius: 4, cursor: 'pointer', fontFamily: 'inherit',
+                minHeight: mobile ? 44 : 'auto',
+                transition: 'all 0.15s',
+              }}
+            >
+              <span style={{
+                width: 8, height: 8, borderRadius: '50%',
+                background: body.color, flexShrink: 0,
+              }} />
+              <span style={{ color: '#fff', fontSize: mobile ? 12 : 11, textAlign: 'left' }}>
+                {body.name}
+              </span>
+              {body.isDwarf && (
+                <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 8, marginLeft: 'auto', fontStyle: 'italic' }}>dwarf</span>
+              )}
+              <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 9, marginLeft: body.isDwarf ? 0 : 'auto' }}>
+                {body.distAU} AU
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* ── Selected planet info card ── */}
-      {sp && (
+      {sp && !showPlanetList && (
         <div
           role="dialog"
           aria-label={`${sp.name} information`}
@@ -253,9 +321,9 @@ export default function Panels(props: PanelProps) {
             aria-label={focusTarget?.planetIdx === selPlanet ? 'Release camera focus' : `Focus camera on ${sp.name}`}
             style={{
               marginTop: 10, width: '100%', padding: mobile ? '10px 0' : '6px 0', fontSize: 11, cursor: 'pointer',
-              fontFamily: 'inherit', borderRadius: 3, border: '1px solid rgba(0,255,204,0.3)',
-              background: focusTarget?.planetIdx === selPlanet ? 'rgba(0,255,204,0.15)' : 'transparent',
-              color: '#00ffcc', transition: 'all 0.15s',
+              fontFamily: 'inherit', borderRadius: 3, border: `1px solid rgba(${accentRgb},0.3)`,
+              background: focusTarget?.planetIdx === selPlanet ? `rgba(${accentRgb},0.15)` : 'transparent',
+              color: accent, transition: 'all 0.15s',
               minHeight: mobile ? 44 : 'auto',
             }}
           >
@@ -283,10 +351,10 @@ export default function Panels(props: PanelProps) {
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', fontWeight: 300 }}>Near-Earth Objects</span>
-          <span style={{ color: '#00ffcc', fontSize: 11 }}>{neos.length} today</span>
+          <span style={{ color: accent, fontSize: 11 }}>{neos.length} today</span>
         </div>
         {neos.length === 0 && (
-          <div style={{ color: 'rgba(255,255,255,0.25)', fontSize: 11, textAlign: 'center', marginTop: 20, fontStyle: 'italic' }}>Loading NASA data\u2026</div>
+          <div style={{ color: 'rgba(255,255,255,0.25)', fontSize: 11, textAlign: 'center', marginTop: 20, fontStyle: 'italic' }}>Loading NASA data{'\u2026'}</div>
         )}
         {neos.map(neo => (
           <div
@@ -298,8 +366,8 @@ export default function Panels(props: PanelProps) {
             onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelNeo(selNeo?.id === neo.id ? null : neo); } }}
             style={{
               padding: mobile ? '10px 10px' : '6px 7px', marginBottom: 2, borderRadius: 4, cursor: 'pointer',
-              background: selNeo?.id === neo.id ? 'rgba(0,255,204,0.07)' : 'transparent',
-              border: selNeo?.id === neo.id ? '1px solid rgba(0,255,204,0.2)' : '1px solid transparent',
+              background: selNeo?.id === neo.id ? `rgba(${accentRgb},0.07)` : 'transparent',
+              border: selNeo?.id === neo.id ? `1px solid rgba(${accentRgb},0.2)` : '1px solid transparent',
               transition: 'all 0.15s',
               minHeight: mobile ? 44 : 'auto',
             }}
@@ -307,10 +375,10 @@ export default function Panels(props: PanelProps) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
               {neo.hazardous && <span style={{ color: '#ff4444', fontSize: 7 }} aria-label="Potentially hazardous">{'\u25cf'}</span>}
               <span style={{ color: '#fff', fontSize: mobile ? 12 : 11 }}>{neo.name.replace(/[()]/g, '')}</span>
-              {neo.orbit?.loaded && <span style={{ color: '#00ffcc', fontSize: 9, marginLeft: 'auto', fontStyle: 'italic' }}>orbit</span>}
+              {neo.orbit?.loaded && <span style={{ color: accent, fontSize: 9, marginLeft: 'auto', fontStyle: 'italic' }}>orbit</span>}
             </div>
             <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 10, marginTop: 2, fontWeight: 300 }}>
-              {neo.missLunar.toFixed(1)} LD · {neo.velKms.toFixed(1)} km/s · {Math.round(neo.dMin)}–{Math.round(neo.dMax)} m
+              {neo.missLunar.toFixed(1)} LD · {neo.velKms.toFixed(1)} km/s · {Math.round(neo.dMin)}{'\u2013'}{Math.round(neo.dMax)} m
             </div>
           </div>
         ))}
@@ -334,7 +402,7 @@ export default function Panels(props: PanelProps) {
             <Btn onClick={() => setSelNeo(null)} label="Close NEO details">{'\u2715'}</Btn>
           </div>
           {selNeo.hazardous && (
-            <div style={{ color: '#ff4444', fontSize: 10, letterSpacing: 1.5, marginTop: 2, textTransform: 'uppercase', fontWeight: 400 }}>⚠ Potentially Hazardous</div>
+            <div style={{ color: '#ff4444', fontSize: 10, letterSpacing: 1.5, marginTop: 2, textTransform: 'uppercase', fontWeight: 400 }}>Potentially Hazardous</div>
           )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px', marginTop: 8 }}>
             <Stat label="Diameter" val={`${Math.round(selNeo.dMin)}\u2013${Math.round(selNeo.dMax)} m`} />
@@ -343,21 +411,21 @@ export default function Panels(props: PanelProps) {
             <Stat label="Close approach" val={selNeo.date} />
             {selNeo.orbit?.loaded && (
               <>
-                <Stat label="Semi-major axis" val={`${selNeo.orbit.a.toFixed(3)} AU`} c="#00ffcc" />
-                <Stat label="Eccentricity" val={selNeo.orbit.e.toFixed(4)} c="#00ffcc" />
-                <Stat label="Inclination" val={`${selNeo.orbit.i.toFixed(2)}\u00b0`} c="#00ffcc" />
-                <Stat label="Orbit shown" val="in scene" c="#00ffcc" />
+                <Stat label="Semi-major axis" val={`${selNeo.orbit.a.toFixed(3)} AU`} c={accent} />
+                <Stat label="Eccentricity" val={selNeo.orbit.e.toFixed(4)} c={accent} />
+                <Stat label="Inclination" val={`${selNeo.orbit.i.toFixed(2)}\u00b0`} c={accent} />
+                <Stat label="Orbit shown" val="in scene" c={accent} />
               </>
             )}
             {selNeo.orbit && !selNeo.orbit.loaded && (
-              <div style={{ gridColumn: '1/-1', color: 'rgba(255,255,255,0.3)', fontSize: 9 }}>Loading orbital elements\u2026</div>
+              <div style={{ gridColumn: '1/-1', color: 'rgba(255,255,255,0.3)', fontSize: 9 }}>Loading orbital elements{'\u2026'}</div>
             )}
           </div>
           <a
             href={selNeo.url}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ display: 'inline-block', marginTop: 8, color: '#00ffcc', fontSize: 9, textDecoration: 'none', borderBottom: '1px solid rgba(0,255,204,0.3)' }}
+            style={{ display: 'inline-block', marginTop: 8, color: accent, fontSize: 9, textDecoration: 'none', borderBottom: `1px solid rgba(${accentRgb},0.3)` }}
           >
             View on NASA JPL {'\u2192'}
           </a>
@@ -378,7 +446,7 @@ export default function Panels(props: PanelProps) {
             <Stat label="Sim speed" val={speedLabel(speed)} />
             <Stat label="Moon phase" val={`${moon.name} ${moon.ill}%`} />
             <Stat label="NEOs loaded" val={neos.length} />
-            <Stat label="Playing" val={playing ? 'Yes' : 'Paused'} c={playing ? '#00ffcc' : '#ff6644'} />
+            <Stat label="Playing" val={playing ? 'Yes' : 'Paused'} c={playing ? accent : '#ff6644'} />
           </div>
         </div>
       )}
@@ -390,8 +458,9 @@ export default function Panels(props: PanelProps) {
           color: 'rgba(255,255,255,0.12)', fontSize: 9, lineHeight: 1.8, textAlign: 'right', fontStyle: 'italic', fontWeight: 300,
           transition: 'right 0.3s', zIndex: 10,
         }}>
-          <div>1\u20138 cameras \u00b7 click planet to focus</div>
-          <div>H hud \u00b7 N neo \u00b7 D dwarf \u00b7 F fullscreen \u00b7 Space pause</div>
+          <div>1{'\u2013'}8 cameras · click planet to focus · P planet list</div>
+          <div>S stars · C constellations · T theme · D dwarf</div>
+          <div>H hud · N neo · F fullscreen · Space pause</div>
         </div>
       )}
 
