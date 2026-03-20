@@ -7,13 +7,18 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { ALL_BODIES } from '../data/planets';
-import type { PlanetDef, NEO, CamPreset, FocusTarget } from '../lib/kepler';
+import { getMoonsForPlanet } from '../data/moons';
+import type { PlanetDef, NEO, FocusTarget } from '../lib/kepler';
 import { planetXYZ } from '../lib/kepler';
-import { Sun, Planet, Moon, OrbitRing } from './Bodies';
+import { Sun, Planet, OrbitRing, Satellite, SatelliteOrbit } from './Bodies';
 import { AsteroidBelt, NeoDot, AsteroidOrbitLine } from './Asteroids';
 import { StarField, ConstellationLines, ConstellationLabels, MilkyWayBand } from './Stars';
 import { ScaleMarkers, OortCloud, GalaxyDisc } from './DeepSpace';
 import { useTheme } from '../lib/themes';
+
+// Default home camera position (replaces CAMS[1] "System" view)
+const HOME_POS: [number, number, number] = [0, 30, 40];
+const HOME_TGT: [number, number, number] = [0, 0, 0];
 
 // ─── AU reference grid ──────────────────────────────────────────────────────────
 
@@ -32,45 +37,50 @@ function AUGrid() {
 
 // ─── Camera controller ──────────────────────────────────────────────────────────
 
-function CamCtrl({ preset, focusTarget, positions }: {
-  preset: CamPreset;
+function CamCtrl({ focusTarget, positions, cinematic, onCameraDistance }: {
   focusTarget: FocusTarget | null;
   positions: Map<number, [number, number, number]>;
+  cinematic: boolean;
+  onCameraDistance?: (d: number) => void;
 }) {
   const { camera } = useThree();
   const ctrlRef = useRef<any>(null);
-  const tPos = useRef(new THREE.Vector3(...preset.pos));
-  const tLook = useRef(new THREE.Vector3(...preset.tgt));
+  const tPos = useRef(new THREE.Vector3(...HOME_POS));
+  const tLook = useRef(new THREE.Vector3(...HOME_TGT));
   const settling = useRef(true);
   const prevTrackPos = useRef(new THREE.Vector3());
 
-  // Trigger transition on preset or focus changes (NOT on position updates)
+  // Trigger transition on focus changes
   useEffect(() => {
     settling.current = true;
     if (focusTarget !== null) {
       const pp = positions.get(focusTarget.planetIdx);
       if (pp) {
-        const planet = ALL_BODIES[focusTarget.planetIdx];
-        const offset = planet.radius * 8 + planet.a * 0.15;
-        tLook.current.set(...pp);
-        tPos.current.set(pp[0] + offset, pp[1] + offset * 0.4, pp[2] + offset);
-        prevTrackPos.current.set(...pp);
-      }
-    } else {
-      const p = new THREE.Vector3(...preset.pos);
-      const l = new THREE.Vector3(...preset.tgt);
-      if (preset.follow !== undefined) {
-        const pp = positions.get(preset.follow);
-        if (pp) {
-          l.set(...pp);
-          p.copy(l).add(new THREE.Vector3(0.3, 0.25, 0.5));
+        if (focusTarget.moonIdx !== undefined) {
+          // Moon drill-down: compute moon position and zoom close
+          const moons = getMoonsForPlanet(focusTarget.planetIdx);
+          const moon = moons[focusTarget.moonIdx];
+          if (moon) {
+            const offset = moon.radius * 15;
+            // Approximate moon position for camera target
+            tLook.current.set(...pp);
+            tPos.current.set(pp[0] + offset, pp[1] + offset * 0.4, pp[2] + offset);
+            prevTrackPos.current.set(...pp);
+          }
+        } else {
+          // Planet drill-down
+          const planet = ALL_BODIES[focusTarget.planetIdx];
+          const offset = planet.radius * 8 + planet.a * 0.15;
+          tLook.current.set(...pp);
+          tPos.current.set(pp[0] + offset, pp[1] + offset * 0.4, pp[2] + offset);
           prevTrackPos.current.set(...pp);
         }
       }
-      tPos.current.copy(p);
-      tLook.current.copy(l);
+    } else {
+      tPos.current.set(...HOME_POS);
+      tLook.current.set(...HOME_TGT);
     }
-  }, [preset, focusTarget]);
+  }, [focusTarget]);
 
   // Stop transition when user grabs orbit controls
   useEffect(() => {
@@ -83,8 +93,7 @@ function CamCtrl({ preset, focusTarget, positions }: {
 
   useFrame(() => {
     const ctrl = ctrlRef.current;
-    // Determine which planet (if any) we're tracking
-    const trackIdx = focusTarget?.planetIdx ?? preset.follow ?? null;
+    const trackIdx = focusTarget?.planetIdx ?? null;
 
     if (trackIdx !== null) {
       const pp = positions.get(trackIdx);
@@ -92,8 +101,7 @@ function CamCtrl({ preset, focusTarget, positions }: {
         const newTarget = new THREE.Vector3(...pp);
 
         if (settling.current) {
-          // Smooth transition to planet view
-          if (focusTarget !== null) {
+          if (focusTarget !== null && focusTarget.moonIdx === undefined) {
             const planet = ALL_BODIES[trackIdx];
             const offset = planet.radius * 8 + planet.a * 0.15;
             tPos.current.set(pp[0] + offset, pp[1] + offset * 0.4, pp[2] + offset);
@@ -105,8 +113,6 @@ function CamCtrl({ preset, focusTarget, positions }: {
             settling.current = false;
           }
         } else {
-          // After settling: translate camera+target by planet motion delta
-          // so user's orbit angle is preserved while tracking the planet
           const delta = newTarget.clone().sub(prevTrackPos.current);
           if (delta.length() > 0.00001) {
             camera.position.add(delta);
@@ -116,7 +122,6 @@ function CamCtrl({ preset, focusTarget, positions }: {
         prevTrackPos.current.copy(newTarget);
       }
     } else {
-      // Static preset — only lerp during settling
       if (settling.current) {
         camera.position.lerp(tPos.current, 0.03);
         if (ctrl) ctrl.target.lerp(tLook.current, 0.03);
@@ -124,6 +129,11 @@ function CamCtrl({ preset, focusTarget, positions }: {
           settling.current = false;
         }
       }
+    }
+
+    // Report camera distance for UI (scale indicator)
+    if (onCameraDistance) {
+      onCameraDistance(camera.position.length());
     }
 
     if (ctrl) ctrl.update();
@@ -136,8 +146,8 @@ function CamCtrl({ preset, focusTarget, positions }: {
       dampingFactor={0.06}
       minDistance={0.05}
       maxDistance={100000}
-      autoRotate={!focusTarget && !!preset.autoRotate}
-      autoRotateSpeed={0.25}
+      autoRotate={cinematic || (!focusTarget)}
+      autoRotateSpeed={cinematic ? 0.15 : 0}
     />
   );
 }
@@ -148,24 +158,29 @@ export interface SceneProps {
   jd: number; T: number;
   neos: NEO[]; selNeo: NEO | null; setSelNeo: (n: NEO | null) => void;
   selPlanet: number | null; setSelPlanet: (i: number | null) => void;
-  camPreset: CamPreset;
   focusTarget: FocusTarget | null;
   onPositionsUpdate: (m: Map<number, [number, number, number]>) => void;
   showDwarf: boolean;
   showStars: boolean;
   showConstellations: boolean;
+  cinematic: boolean;
+  onMoonSelect?: (planetIdx: number, moonIdx: number) => void;
+  selMoonIdx?: number | null;
+  onCameraDistance?: (d: number) => void;
 }
 
 export default function Scene({
   jd, T, neos, selNeo, setSelNeo, selPlanet, setSelPlanet,
-  camPreset, focusTarget, onPositionsUpdate, showDwarf,
-  showStars, showConstellations,
+  focusTarget, onPositionsUpdate, showDwarf,
+  showStars, showConstellations, cinematic,
+  onMoonSelect, selMoonIdx, onCameraDistance,
 }: SceneProps) {
   const [hov, setHov] = useState<number | null>(null);
+  const [hovMoon, setHovMoon] = useState<number | null>(null);
   const { scene } = useThree();
   const { theme } = useTheme();
+  const [camDist, setCamDist] = useState(50);
 
-  // Set black background
   useEffect(() => { scene.background = new THREE.Color('#000000'); }, [scene]);
 
   const positions = useMemo(() => {
@@ -178,18 +193,27 @@ export default function Scene({
 
   const ep = (positions.get(2) || [1, 0, 0]) as [number, number, number];
 
-  // Filter bodies based on dwarf toggle
   const visibleBodies = showDwarf ? ALL_BODIES : ALL_BODIES.filter(b => !b.isDwarf);
+
+  // Moons for the focused planet (only rendered when planet is selected)
+  const focusedMoons = selPlanet !== null ? getMoonsForPlanet(selPlanet) : [];
+  const focusedParentPos = selPlanet !== null ? positions.get(selPlanet) : null;
+
+  // Auto-hide constellations at deep zoom (>200 AU)
+  const constellationsVisible = showConstellations && camDist < 200;
+
+  const handleCameraDistance = (d: number) => {
+    setCamDist(d);
+    if (onCameraDistance) onCameraDistance(d);
+  };
 
   return (
     <>
       <ambientLight intensity={0.05} />
       <Sun />
-      <Moon earthPos={ep} jd={jd} />
       <AUGrid />
       <AsteroidBelt />
       {visibleBodies.map((p) => {
-        // Map back to ALL_BODIES index for consistent selection
         const bodyIdx = ALL_BODIES.indexOf(p);
         return (
           <group key={p.name}>
@@ -208,6 +232,28 @@ export default function Scene({
           </group>
         );
       })}
+      {/* Render moons for focused planet */}
+      {focusedParentPos && focusedMoons.map((moon, mIdx) => (
+        <group key={moon.name}>
+          <SatelliteOrbit moon={moon} parentPos={focusedParentPos} />
+          <Satellite
+            moon={moon}
+            parentPos={focusedParentPos}
+            jd={jd}
+            selected={selMoonIdx === mIdx}
+            onSelect={onMoonSelect ? () => onMoonSelect(selPlanet!, mIdx) : undefined}
+            hovered={hovMoon === mIdx}
+            onHover={h => setHovMoon(h ? mIdx : null)}
+          />
+        </group>
+      ))}
+      {/* Always render Earth's Moon even when Earth isn't focused */}
+      {selPlanet !== 2 && (() => {
+        const earthMoons = getMoonsForPlanet(2);
+        return earthMoons.map(moon => (
+          <Satellite key={moon.name} moon={moon} parentPos={ep} jd={jd} />
+        ));
+      })()}
       {neos.map(neo => (
         <group key={neo.id}>
           <NeoDot
@@ -219,13 +265,18 @@ export default function Scene({
         </group>
       ))}
       <StarField visible={showStars} />
-      <ConstellationLines visible={showConstellations} theme={theme} />
-      <ConstellationLabels visible={showConstellations} />
+      <ConstellationLines visible={constellationsVisible} theme={theme} />
+      <ConstellationLabels visible={constellationsVisible} />
       <MilkyWayBand visible={showStars} theme={theme} />
       <ScaleMarkers />
       <OortCloud />
       <GalaxyDisc />
-      <CamCtrl preset={camPreset} focusTarget={focusTarget} positions={positions} />
+      <CamCtrl
+        focusTarget={focusTarget}
+        positions={positions}
+        cinematic={cinematic}
+        onCameraDistance={handleCameraDistance}
+      />
     </>
   );
 }
