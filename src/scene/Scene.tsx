@@ -132,7 +132,7 @@ export default function Scene({
       <Moon earthPos={ep} jd={jd} />
       <AUGrid />
       <AsteroidBelt />
-      {visibleBodies.map((p, i) => {
+      {visibleBodies.map((p) => {
         // Map back to ALL_BODIES index for consistent selection
         const bodyIdx = ALL_BODIES.indexOf(p);
         return (

@@ -5,7 +5,7 @@
  * bottom sheets, and safe-area insets.
  */
 
-import type { PlanetDef, NEO, CamPreset, FocusTarget } from '../lib/kepler';
+import type { NEO, CamPreset, FocusTarget } from '../lib/kepler';
 import { ALL_BODIES } from '../data/planets';
 import { glass, useIsMobile } from './styles';
 

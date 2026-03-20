@@ -8,7 +8,7 @@
 import { useEffect, useState, useRef, useMemo, useCallback, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import * as THREE from 'three';
-import { ALL_BODIES, CAMS } from './data/planets';
+import { CAMS } from './data/planets';
 import type { NEO, FocusTarget } from './lib/kepler';
 import { julianDate, moonPhase } from './lib/kepler';
 import Scene from './scene/Scene';
