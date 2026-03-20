@@ -168,6 +168,10 @@ export default function Scene({
           {selNeo?.id === neo.id && <AsteroidOrbitLine neo={neo} />}
         </group>
       ))}
+      <StarField visible={showStars} />
+      <ConstellationLines visible={showConstellations} theme={theme} />
+      <ConstellationLabels visible={showConstellations} />
+      <MilkyWayBand visible={showStars} theme={theme} />
       <CamCtrl preset={camPreset} focusTarget={focusTarget} positions={positions} />
     </>
   );
