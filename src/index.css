@@ -49,5 +49,6 @@ a:focus-visible,
   html { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
 }
 
-/* Hide scrollbar on camera pills nav */
+/* Hide scrollbar on scrolling nav elements */
 nav[aria-label="Camera presets"]::-webkit-scrollbar { display: none; }
+[aria-label="Display toggles"]::-webkit-scrollbar { display: none; }
