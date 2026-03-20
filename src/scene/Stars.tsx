@@ -144,7 +144,7 @@ export function StarField({ visible }: { visible: boolean }) {
     transparent: true,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
-    depthTest: false,
+    depthTest: true,
   }), []);
 
   if (!geometry) return null;
