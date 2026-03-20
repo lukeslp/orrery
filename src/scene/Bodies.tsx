@@ -119,6 +119,7 @@ export function Planet({ planet, T, selected, onSelect, hovered, onHover }: {
   const ref = useRef<THREE.Mesh>(null);
   const pos = useMemo(() => planetXYZ(planet, T), [planet, T]);
   const tex = useLoader(THREE.TextureLoader, TEX[planet.tex]);
+  const { theme } = useTheme();
   const r = planet.radius;
 
   useFrame((_, dt) => {
@@ -141,7 +142,7 @@ export function Planet({ planet, T, selected, onSelect, hovered, onHover }: {
       {selected && (
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <ringGeometry args={[r * 2.1, r * 2.35, 64]} />
-          <meshBasicMaterial color="#00ffcc" transparent opacity={0.7} side={THREE.DoubleSide} />
+          <meshBasicMaterial color={theme.selectedRing} transparent opacity={0.7} side={THREE.DoubleSide} />
         </mesh>
       )}
       {hovered && !selected && (
