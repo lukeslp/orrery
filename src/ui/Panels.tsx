@@ -162,7 +162,7 @@ export default function Panels(props: PanelProps) {
           paddingBottom: mobile ? 'max(8px, env(safe-area-inset-bottom))' : '5px',
         }}
       >
-        <Btn onClick={() => setSpeed(s => Math.max(1, s / 10))} label="Slow down">\u00ab</Btn>
+        <Btn onClick={() => setSpeed(s => Math.max(1, s / 10))} label="Slow down">{'\u25c0'}</Btn>
         <Btn
           onClick={() => setPlaying(p => !p)}
           label={playing ? 'Pause simulation' : 'Resume simulation'}
@@ -170,7 +170,7 @@ export default function Panels(props: PanelProps) {
         >
           {playing ? '\u23f8' : '\u25b6'}
         </Btn>
-        <Btn onClick={() => setSpeed(s => Math.min(86400 * 365, s * 10))} label="Speed up">\u00bb</Btn>
+        <Btn onClick={() => setSpeed(s => Math.min(86400 * 365, s * 10))} label="Speed up">{'\u25b6'}</Btn>
         <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: mobile ? 12 : 11, minWidth: 56, textAlign: 'center', fontWeight: 300 }}>
           {speedLabel(speed)}
         </span>
