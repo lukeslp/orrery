@@ -776,9 +776,8 @@ function MoonCard({ moon, parentName, onClose, mobile }: {
   );
 }
 
-function PlanetCard({ planet, selPlanet, moons, focusTarget, setFocusTarget, setSelPlanet, positionsRef, accent, accentRgb, mobile }: {
+function PlanetCard({ planet, selPlanet, focusTarget, setFocusTarget, setSelPlanet, positionsRef, accent, accentRgb, mobile }: {
   planet: typeof ALL_BODIES[0]; selPlanet: number;
-  moons: ReturnType<typeof getMoonsForPlanet>;
   focusTarget: FocusTarget | null; setFocusTarget: (f: FocusTarget | null) => void;
   setSelPlanet: (i: number | null) => void;
   positionsRef: React.MutableRefObject<Map<number, [number, number, number]>>;
