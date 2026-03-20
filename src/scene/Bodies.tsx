@@ -163,22 +163,94 @@ export function Planet({ planet, T, selected, onSelect, hovered, onHover }: {
   );
 }
 
-// ─── Earth's Moon ───────────────────────────────────────────────────────────────
+// ─── Satellite (generic moon) ──────────────────────────────────────────────────
 
-export function Moon({ earthPos, jd }: { earthPos: [number, number, number]; jd: number }) {
-  const tex = useLoader(THREE.TextureLoader, TEX.moon);
+export function Satellite({ moon, parentPos, jd, selected, onSelect, hovered, onHover }: {
+  moon: MoonDef; parentPos: [number, number, number]; jd: number;
+  selected?: boolean; onSelect?: () => void;
+  hovered?: boolean; onHover?: (h: boolean) => void;
+}) {
   const ref = useRef<THREE.Mesh>(null);
-  const angle = ((jd - 2451545) / 27.322) * Math.PI * 2;
-  const d = 0.09;
+  const { theme } = useTheme();
+  const angle = ((jd - 2451545) / moon.period) * Math.PI * 2;
+  const inc = (moon.i || 0) * (Math.PI / 180);
+
+  const isEarthMoon = moon.name === 'Moon' && moon.parent === 2;
+  const tex = useLoader(THREE.TextureLoader, isEarthMoon ? TEX.moon : TEX.mercury);
+
+  const pos: [number, number, number] = [
+    parentPos[0] + moon.a * Math.cos(angle),
+    parentPos[1] + moon.a * Math.sin(inc) * Math.sin(angle),
+    parentPos[2] + moon.a * Math.sin(angle) * Math.cos(inc),
+  ];
+
   useFrame((_, dt) => { if (ref.current) ref.current.rotation.y += dt * 0.05; });
+
   return (
-    <mesh
-      ref={ref}
-      position={[earthPos[0] + d * Math.cos(angle), earthPos[1], earthPos[2] + d * Math.sin(angle)]}
-    >
-      <sphereGeometry args={[0.015, 24, 24]} />
-      <meshStandardMaterial map={tex} roughness={0.9} />
-    </mesh>
+    <group>
+      <mesh
+        ref={ref}
+        position={pos}
+        renderOrder={11}
+        onClick={onSelect ? (e) => { e.stopPropagation(); onSelect(); } : undefined}
+        onPointerEnter={onHover ? () => onHover(true) : undefined}
+        onPointerLeave={onHover ? () => onHover(false) : undefined}
+      >
+        <sphereGeometry args={[moon.radius, 24, 24]} />
+        {isEarthMoon ? (
+          <meshStandardMaterial map={tex} roughness={0.9} depthWrite={true} />
+        ) : (
+          <meshStandardMaterial color={moon.color} roughness={0.9} depthWrite={true} />
+        )}
+      </mesh>
+      {selected && (
+        <mesh position={pos} rotation={[Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[moon.radius * 2.1, moon.radius * 2.5, 32]} />
+          <meshBasicMaterial color={theme.selectedRing} transparent opacity={0.7} side={THREE.DoubleSide} />
+        </mesh>
+      )}
+      {hovered && !selected && (
+        <group position={pos}>
+          <Html distanceFactor={5} style={{ pointerEvents: 'none' }}>
+            <div style={{
+              color: '#fff', fontSize: 10, fontFamily: 'JetBrains Mono, monospace',
+              background: 'rgba(0,0,0,0.8)', padding: '2px 8px', borderRadius: 3,
+              whiteSpace: 'nowrap', transform: 'translateY(-20px)',
+              border: '1px solid rgba(255,255,255,0.15)',
+            }}>
+              {moon.name}
+            </div>
+          </Html>
+        </group>
+      )}
+    </group>
+  );
+}
+
+/** Orbit ring for a satellite around its parent */
+export function SatelliteOrbit({ moon, parentPos }: { moon: MoonDef; parentPos: [number, number, number] }) {
+  const inc = (moon.i || 0) * (Math.PI / 180);
+  const pts = useMemo(() => {
+    const points: THREE.Vector3[] = [];
+    for (let i = 0; i <= 64; i++) {
+      const theta = (i / 64) * Math.PI * 2;
+      points.push(new THREE.Vector3(
+        parentPos[0] + moon.a * Math.cos(theta),
+        parentPos[1] + moon.a * Math.sin(inc) * Math.sin(theta),
+        parentPos[2] + moon.a * Math.sin(theta) * Math.cos(inc),
+      ));
+    }
+    return points;
+  }, [moon, parentPos, inc]);
+
+  return (
+    <Line
+      points={pts}
+      color="rgba(255,255,255,0.15)"
+      lineWidth={0.4}
+      transparent
+      opacity={0.15}
+    />
   );
 }
 
