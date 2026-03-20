@@ -185,9 +185,6 @@ export default function Panels(props: PanelProps) {
     ? getMoonsForPlanet(selPlanet)[selMoonIdx]
     : null;
 
-  // Moons for selected planet
-  const moons = selPlanet !== null ? getMoonsForPlanet(selPlanet) : [];
-
   const toggleSection = (s: 'views' | 'bodies' | 'layers') => {
     setExpandedSection(prev => prev === s ? null : s);
   };
