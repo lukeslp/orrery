@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#000"/>
+
+  <!-- Subtle star field -->
+  <g opacity="0.3">
+    <circle cx="100" cy="80" r="1" fill="#fff"/>
+    <circle cx="250" cy="150" r="0.8" fill="#fff"/>
+    <circle cx="400" cy="50" r="1.2" fill="#fff"/>
+    <circle cx="550" cy="200" r="0.6" fill="#fff"/>
+    <circle cx="700" cy="100" r="1" fill="#fff"/>
+    <circle cx="850" cy="180" r="0.8" fill="#fff"/>
+    <circle cx="1000" cy="60" r="1" fill="#fff"/>
+    <circle cx="1100" cy="140" r="0.7" fill="#fff"/>
+    <circle cx="150" cy="400" r="0.9" fill="#fff"/>
+    <circle cx="350" cy="500" r="1.1" fill="#fff"/>
+    <circle cx="600" cy="550" r="0.8" fill="#fff"/>
+    <circle cx="800" cy="480" r="1" fill="#fff"/>
+    <circle cx="950" cy="520" r="0.7" fill="#fff"/>
+    <circle cx="1050" cy="400" r="0.9" fill="#fff"/>
+    <circle cx="200" cy="300" r="0.5" fill="#fff"/>
+    <circle cx="1100" cy="350" r="0.6" fill="#fff"/>
+  </g>
+
+  <!-- Orbit rings -->
+  <g fill="none" stroke-width="0.5" opacity="0.15">
+    <ellipse cx="480" cy="340" rx="60" ry="55" stroke="#b0a090"/>
+    <ellipse cx="480" cy="340" rx="95" ry="88" stroke="#e8c870"/>
+    <ellipse cx="480" cy="340" rx="130" ry="120" stroke="#4488cc"/>
+    <ellipse cx="480" cy="340" rx="170" ry="157" stroke="#cc6644"/>
+    <ellipse cx="480" cy="340" rx="260" ry="240" stroke="#cc9966"/>
+    <ellipse cx="480" cy="340" rx="340" ry="314" stroke="#ddbb77"/>
+  </g>
+
+  <!-- Sun -->
+  <circle cx="480" cy="340" r="14" fill="#ff9933"/>
+  <circle cx="480" cy="340" r="18" fill="#ffaa33" opacity="0.15"/>
+  <circle cx="480" cy="340" r="24" fill="#ff8800" opacity="0.06"/>
+
+  <!-- Planets (approximate positions on orbits) -->
+  <circle cx="535" cy="315" r="3" fill="#b0a090"/> <!-- Mercury -->
+  <circle cx="395" cy="370" r="4.5" fill="#e8c870"/> <!-- Venus -->
+  <circle cx="600" cy="290" r="5" fill="#4488cc"/> <!-- Earth -->
+  <circle cx="350" cy="250" r="4" fill="#cc6644"/> <!-- Mars -->
+  <circle cx="720" cy="370" r="12" fill="#cc9966"/> <!-- Jupiter -->
+
+  <!-- Saturn with ring -->
+  <circle cx="280" cy="120" r="10" fill="#ddbb77"/>
+  <ellipse cx="280" cy="120" rx="20" ry="6" fill="none" stroke="#c8a86e" stroke-width="2" opacity="0.6"/>
+
+  <!-- Asteroid belt dots -->
+  <g fill="#887766" opacity="0.3">
+    <circle cx="320" cy="210" r="1"/>
+    <circle cx="340" cy="195" r="0.8"/>
+    <circle cx="360" cy="215" r="1.2"/>
+    <circle cx="380" cy="190" r="0.7"/>
+    <circle cx="310" cy="230" r="0.9"/>
+    <circle cx="650" cy="420" r="1"/>
+    <circle cx="630" cy="440" r="0.8"/>
+    <circle cx="670" cy="410" r="1.1"/>
+    <circle cx="610" cy="450" r="0.7"/>
+    <circle cx="660" cy="435" r="0.9"/>
+  </g>
+
+  <!-- Title -->
+  <text x="870" y="300" font-family="'JetBrains Mono', monospace" font-size="42" font-weight="600" fill="#fff" letter-spacing="8" opacity="0.9">ORRERY</text>
+  <text x="870" y="340" font-family="'JetBrains Mono', monospace" font-size="13" fill="rgba(255,255,255,0.35)" letter-spacing="2">INTERACTIVE SOLAR SYSTEM</text>
+
+  <!-- Accent line -->
+  <rect x="870" y="355" width="60" height="1" fill="#00ffcc" opacity="0.5"/>
+
+  <!-- Feature badges -->
+  <text x="870" y="390" font-family="'JetBrains Mono', monospace" font-size="10" fill="rgba(255,255,255,0.25)" letter-spacing="1">LIVE NASA DATA · JPL ORBITAL MECHANICS</text>
+</svg>
