@@ -170,6 +170,8 @@ function OrreryInner() {
             focusTarget={focusTarget}
             onPositionsUpdate={handlePositionsUpdate}
             showDwarf={showDwarf}
+            showStars={showStars}
+            showConstellations={showConstellations}
           />
         </Suspense>
       </Canvas>
@@ -183,11 +185,14 @@ function OrreryInner() {
         camIdx={camIdx} setCamIdx={setCamIdx}
         cams={CAMS}
         focusTarget={focusTarget} setFocusTarget={setFocusTarget}
-        selPlanet={selPlanet} setSelPlanet={setSelPlanet}
+        selPlanet={selPlanet} setSelPlanet={handlePlanetSelect}
         neos={neos} selNeo={selNeo} setSelNeo={setSelNeo}
         showNeo={showNeo} setShowNeo={setShowNeo}
         showHud={showHud} setShowHud={setShowHud}
         showDwarf={showDwarf} setShowDwarf={setShowDwarf}
+        showStars={showStars} setShowStars={setShowStars}
+        showConstellations={showConstellations} setShowConstellations={setShowConstellations}
+        showPlanetList={showPlanetList} setShowPlanetList={setShowPlanetList}
         setSimTime={setSimTime}
         jd={jd} T={T}
         positionsRef={positionsRef}
