@@ -82,4 +82,6 @@ export const CAMS: CamPreset[] = [
   { key: '6', label: 'Jupiter',   pos: [0, 2, 7],        tgt: [0, 0, 5.2], follow: 4 },
   { key: '7', label: 'Cinematic', pos: [4, 2.5, 6],      tgt: [0, 0, 0],   autoRotate: true },
   { key: '8', label: 'Outer',     pos: [0, 60, 90],      tgt: [0, 0, 0] },
+  { key: '9', label: 'Deep',      pos: [0, 80, 120],     tgt: [0, 0, 0] },
+  { key: '0', label: 'Kuiper',    pos: [0, 120, 180],    tgt: [0, 0, 0] },
 ];
