@@ -23,7 +23,7 @@ export default function Orrery() {
   const [showNeo, setShowNeo] = useState(false);
   const [showHud, setShowHud] = useState(false);
   const [showDwarf, setShowDwarf] = useState(true);
-  const [speed, setSpeed] = useState(3600);
+  const [speed, setSpeed] = useState(1);
   const [simTime, setSimTime] = useState(new Date());
   const [playing, setPlaying] = useState(true);
   const [focusTarget, setFocusTarget] = useState<FocusTarget | null>(null);

@@ -174,7 +174,7 @@ export default function Panels(props: PanelProps) {
         <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: mobile ? 12 : 11, minWidth: 56, textAlign: 'center', fontWeight: 300 }}>
           {speedLabel(speed)}
         </span>
-        <Btn onClick={() => { setSimTime(() => new Date()); setSpeed(() => 3600); }} style={{ color: '#ffcc44', marginLeft: 4 }} label="Reset to current time">NOW</Btn>
+        <Btn onClick={() => { setSimTime(() => new Date()); setSpeed(() => 1); }} style={{ color: '#ffcc44', marginLeft: 4 }} label="Reset to current time">NOW</Btn>
       </div>
 
       {/* ── Toggle buttons (bottom right) ── */}
