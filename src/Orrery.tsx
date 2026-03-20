@@ -213,9 +213,14 @@ function OrreryInner() {
 
       const k = e.key.toLowerCase();
 
-      // In cinematic mode, any key exits
       if (cinematic) {
         setCinematic(false);
+        return;
+      }
+
+      // Camera presets 1-8
+      if (e.key >= '1' && e.key <= '8') {
+        handlePresetSelect(parseInt(e.key) - 1);
         return;
       }
 
@@ -234,7 +239,7 @@ function OrreryInner() {
     };
     window.addEventListener('keydown', fn);
     return () => window.removeEventListener('keydown', fn);
-  }, [cinematic, navigateBack]);
+  }, [cinematic, navigateBack, handlePresetSelect]);
 
   // Exit cinematic mode on click
   const handleCinematicClick = useCallback(() => {
