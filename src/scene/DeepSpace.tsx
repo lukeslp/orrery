@@ -56,7 +56,7 @@ export function ScaleMarkers() {
 
 // ─── Oort Cloud (sparse spherical shell of faint points) ─────────────────────
 
-const OORT_COUNT = 8000;
+const OORT_COUNT = 5000;
 
 export function OortCloud() {
   const ref = useRef<THREE.Points>(null);
@@ -66,10 +66,10 @@ export function OortCloud() {
     if (!ref.current) return;
     const dist = camera.position.length();
     ref.current.visible = dist > 200;
-    // Fade in 200-1000
+    // Fade in 200-2000, cap at 0.25
     if (ref.current.material && 'opacity' in ref.current.material) {
       (ref.current.material as THREE.PointsMaterial).opacity =
-        dist < 1000 ? Math.min(0.4, (dist - 200) / 800 * 0.4) : 0.4;
+        dist < 2000 ? Math.min(0.25, (dist - 200) / 1800 * 0.25) : 0.25;
     }
   });
 
@@ -77,13 +77,15 @@ export function OortCloud() {
     const positions = new Float32Array(OORT_COUNT * 3);
 
     for (let i = 0; i < OORT_COUNT; i++) {
-      const r = 2000 + Math.random() * 48000;
+      // Wider radial spread to avoid clumping
+      const r = 2000 + Math.pow(Math.random(), 0.7) * 48000;
       const theta = Math.acos(2 * Math.random() - 1);
-      const flatTheta = theta * 0.7 + (Math.PI / 2) * 0.3;
+      // More spherical distribution (less disc-like)
+      const flatTheta = theta * 0.85 + (Math.PI / 2) * 0.15;
       const phi = Math.random() * Math.PI * 2;
 
       positions[i * 3] = r * Math.sin(flatTheta) * Math.cos(phi);
-      positions[i * 3 + 1] = r * Math.cos(flatTheta) * 0.4;
+      positions[i * 3 + 1] = r * Math.cos(flatTheta) * 0.6;
       positions[i * 3 + 2] = r * Math.sin(flatTheta) * Math.sin(phi);
     }
 
@@ -96,9 +98,9 @@ export function OortCloud() {
     <points ref={ref} geometry={geometry} visible={false}>
       <pointsMaterial
         color="#8899bb"
-        size={2}
+        size={1.2}
         transparent
-        opacity={0.4}
+        opacity={0.25}
         depthWrite={false}
         depthTest={true}
         sizeAttenuation={false}
