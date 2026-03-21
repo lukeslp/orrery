@@ -38,6 +38,7 @@ function OrreryInner() {
   const [focusTarget, setFocusTarget] = useState<FocusTarget | null>(null);
   const [sceneReady, setSceneReady] = useState(false);
   const [cinematic, setCinematic] = useState(false);
+  const [cinematicAngle, setCinematicAngle] = useState<{ angle: number; elevation: number; distMult: number } | undefined>(undefined);
   const [navStack, setNavStack] = useState<string[]>(isMobileInit ? ['Solar System'] : ['Solar System', 'Earth']);
   const [selMoonIdx, setSelMoonIdx] = useState<number | null>(null);
   const [cameraDistance, setCameraDistance] = useState(50);

@@ -291,6 +291,7 @@ export default function Scene({
         cinematic={cinematic}
         camPreset={camPreset}
         onCameraDistance={handleCameraDistance}
+        cinematicAngle={cinematicAngle}
       />
     </>
   );
