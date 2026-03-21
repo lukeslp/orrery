@@ -82,6 +82,8 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, onCameraDistanc
   };
 
   // Trigger transition on focus or preset changes
+  // Both cinematic and interactive use the same settling approach so the
+  // zoom feel is identical (snappy lerp instead of floaty two-stage drift).
   useEffect(() => {
     settling.current = true;
     if (focusTarget !== null) {
@@ -89,32 +91,17 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, onCameraDistanc
       if (pp) {
         const off = computeFocusOffset(pp);
         if (off) {
-          if (cinematic) {
-            goalLook.current.set(...off.look);
-            goalPos.current.set(...off.pos);
-          } else {
-            tLook.current.set(...off.look);
-            tPos.current.set(...off.pos);
-            prevTrackPos.current.set(...pp);
-          }
+          tLook.current.set(...off.look);
+          tPos.current.set(...off.pos);
+          prevTrackPos.current.set(...pp);
         }
       }
     } else if (camPreset) {
-      if (cinematic) {
-        goalPos.current.set(...camPreset.pos);
-        goalLook.current.set(...camPreset.tgt);
-      } else {
-        tPos.current.set(...camPreset.pos);
-        tLook.current.set(...camPreset.tgt);
-      }
+      tPos.current.set(...camPreset.pos);
+      tLook.current.set(...camPreset.tgt);
     } else {
-      if (cinematic) {
-        goalPos.current.set(...HOME_POS);
-        goalLook.current.set(...HOME_TGT);
-      } else {
-        tPos.current.set(...HOME_POS);
-        tLook.current.set(...HOME_TGT);
-      }
+      tPos.current.set(...HOME_POS);
+      tLook.current.set(...HOME_TGT);
     }
   }, [focusTarget, camPreset, cinematic]);
 
