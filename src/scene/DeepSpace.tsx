@@ -1,8 +1,11 @@
 /*
- * Deep space visuals — heliopause boundary, Oort Cloud, galaxy disc
+ * Deep space visuals — scale markers, Oort Cloud, galaxy disc
  *
- * These components render at extreme distances (100+ AU to 100,000+ AU)
+ * These render at extreme distances (100+ AU to 100,000+ AU)
  * and rely on logarithmic depth buffer for z-precision.
+ *
+ * All use depthTest: true and normal blending to avoid
+ * the additive "blur mess" that happens with depthTest: false.
  */
 
 import { useMemo, useRef } from 'react';
@@ -26,7 +29,6 @@ export function ScaleMarkers() {
     { r: 50000, minDist: 3000 },
   ], []);
 
-  // Show each marker only when camera is zoomed out enough to see it
   useFrame(() => {
     if (!ref.current) return;
     const dist = camera.position.length();
@@ -54,65 +56,52 @@ export function ScaleMarkers() {
 
 // ─── Oort Cloud (sparse spherical shell of faint points) ─────────────────────
 
-const OORT_COUNT = 20000;
+const OORT_COUNT = 8000;
 
 export function OortCloud() {
   const ref = useRef<THREE.Points>(null);
   const { camera } = useThree();
 
-  // Only show when zoomed out enough
   useFrame(() => {
     if (!ref.current) return;
-    ref.current.visible = camera.position.length() > 200;
+    const dist = camera.position.length();
+    ref.current.visible = dist > 200;
+    // Fade in 200-1000
+    if (ref.current.material && 'opacity' in ref.current.material) {
+      (ref.current.material as THREE.PointsMaterial).opacity =
+        dist < 1000 ? Math.min(0.4, (dist - 200) / 800 * 0.4) : 0.4;
+    }
   });
 
   const geometry = useMemo(() => {
     const positions = new Float32Array(OORT_COUNT * 3);
-    const sizes = new Float32Array(OORT_COUNT);
 
     for (let i = 0; i < OORT_COUNT; i++) {
-      // Spherical shell between 2000 and 50000 AU
       const r = 2000 + Math.random() * 48000;
-      // Slightly flattened — more concentration near ecliptic
       const theta = Math.acos(2 * Math.random() - 1);
-      const flatTheta = theta * 0.7 + (Math.PI / 2) * 0.3; // bias toward equator
+      const flatTheta = theta * 0.7 + (Math.PI / 2) * 0.3;
       const phi = Math.random() * Math.PI * 2;
 
       positions[i * 3] = r * Math.sin(flatTheta) * Math.cos(phi);
-      positions[i * 3 + 1] = r * Math.cos(flatTheta) * 0.4; // flatten y
+      positions[i * 3 + 1] = r * Math.cos(flatTheta) * 0.4;
       positions[i * 3 + 2] = r * Math.sin(flatTheta) * Math.sin(phi);
-
-      sizes[i] = 20 + Math.random() * 40;
     }
 
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
     return geo;
   }, []);
 
   return (
     <points ref={ref} geometry={geometry} visible={false}>
-      <shaderMaterial
-        vertexShader={`
-          void main() {
-            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-            gl_PointSize = 2.0;
-            gl_Position = projectionMatrix * mvPosition;
-          }
-        `}
-        fragmentShader={`
-          void main() {
-            float d = length(gl_PointCoord - vec2(0.5));
-            if (d > 0.5) discard;
-            float alpha = 0.15 * smoothstep(0.5, 0.1, d);
-            gl_FragColor = vec4(0.533, 0.6, 0.733, alpha);
-          }
-        `}
-        transparent={true}
-        blending={THREE.AdditiveBlending}
+      <pointsMaterial
+        color="#8899bb"
+        size={2}
+        transparent
+        opacity={0.4}
         depthWrite={false}
-        depthTest={false}
+        depthTest={true}
+        sizeAttenuation={false}
       />
     </points>
   );
@@ -131,22 +120,17 @@ const galaxyVertexShader = `
 const galaxyFragmentShader = `
   varying vec2 vUv;
 
-  // Simple hash for pseudo-random noise
   float hash(vec2 p) {
     return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
   }
 
   void main() {
-    vec2 uv = vUv * 2.0 - 1.0; // -1 to 1
+    vec2 uv = vUv * 2.0 - 1.0;
     float dist = length(uv);
 
-    // Falloff from center
     float falloff = exp(-dist * 2.5);
-
-    // Central bulge
     float bulge = exp(-dist * 8.0) * 0.6;
 
-    // Spiral arms (2 main arms + 2 minor)
     float angle = atan(uv.y, uv.x);
     float spiral1 = sin(angle * 2.0 - dist * 12.0) * 0.5 + 0.5;
     float spiral2 = sin(angle * 2.0 - dist * 12.0 + 3.14159) * 0.5 + 0.5;
@@ -158,30 +142,25 @@ const galaxyFragmentShader = `
 
     float arms = max(spiral1, spiral2) + minorSpiral;
 
-    // Add noise for star density variation
     float noise = hash(uv * 50.0) * 0.3;
     float fineNoise = hash(uv * 200.0) * 0.15;
 
     float alpha = (arms + bulge) * (1.0 + noise + fineNoise);
-
-    // Clip to disc shape
     alpha *= smoothstep(1.0, 0.85, dist);
 
-    // Color: warm center, cooler arms
     vec3 centerColor = vec3(1.0, 0.9, 0.7);
     vec3 armColor = vec3(0.7, 0.8, 1.0);
     vec3 color = mix(armColor, centerColor, bulge / (bulge + 0.1));
 
-    // Solar system marker — tiny bright dot near edge
-    // Sun is ~26,500 ly from center in a galaxy ~50,000 ly radius
-    // In UV: about 0.53 from center along one arm
+    // Solar system marker
     vec2 sunPos = vec2(0.53, 0.0);
     float sunDist = length(uv - sunPos);
     float sunDot = exp(-sunDist * 80.0) * 2.0;
     color += vec3(1.0, 0.95, 0.5) * sunDot;
     alpha += sunDot;
 
-    gl_FragColor = vec4(color, alpha * 0.35);
+    // Lower overall alpha to avoid washing out the scene
+    gl_FragColor = vec4(color, alpha * 0.2);
   }
 `;
 
@@ -195,15 +174,13 @@ export function GalaxyDisc() {
     transparent: true,
     side: THREE.DoubleSide,
     depthWrite: false,
-    blending: THREE.AdditiveBlending,
+    depthTest: true,
   }), []);
 
-  // Only show galaxy disc when camera is far enough to see it as a disc
   useFrame(() => {
     if (!ref.current) return;
     const dist = camera.position.length();
     ref.current.visible = dist > 500;
-    // Fade in smoothly between 500 and 2000 AU
     if (dist > 500 && dist < 2000) {
       material.opacity = (dist - 500) / 1500;
     } else if (dist >= 2000) {
@@ -223,7 +200,7 @@ export function GalaxyDisc() {
 
 // ─── Galaxy star points (scattered along spiral arms) ────────────────────────
 
-const GALAXY_STAR_COUNT = 15000;
+const GALAXY_STAR_COUNT = 8000;
 
 function GalaxyStars() {
   const ref = useRef<THREE.Points>(null);
@@ -232,19 +209,16 @@ function GalaxyStars() {
   const geometry = useMemo(() => {
     const positions = new Float32Array(GALAXY_STAR_COUNT * 3);
     const colors = new Float32Array(GALAXY_STAR_COUNT * 3);
-    const sizes = new Float32Array(GALAXY_STAR_COUNT);
 
     for (let i = 0; i < GALAXY_STAR_COUNT; i++) {
-      // Generate points concentrated in spiral arm pattern
-      const r = Math.pow(Math.random(), 0.6) * 90000; // concentration toward center
-      const armAngle = Math.floor(Math.random() * 2) * Math.PI; // 2 main arms
+      const r = Math.pow(Math.random(), 0.6) * 90000;
+      const armAngle = Math.floor(Math.random() * 2) * Math.PI;
       const spiralAngle = armAngle + r * 0.00008 + (Math.random() - 0.5) * 0.8;
 
       const x = r * Math.cos(spiralAngle) + (Math.random() - 0.5) * r * 0.3;
       const z = r * Math.sin(spiralAngle) + (Math.random() - 0.5) * r * 0.3;
-      const y = (Math.random() - 0.5) * Math.max(500, r * 0.05); // thin disc
+      const y = (Math.random() - 0.5) * Math.max(500, r * 0.05);
 
-      // Rotate to match galaxy disc orientation
       const rx = x;
       const ry = y * Math.cos(0.1) - z * Math.sin(0.1) - 2000;
       const rz = y * Math.sin(0.1) + z * Math.cos(0.1);
@@ -253,19 +227,15 @@ function GalaxyStars() {
       positions[i * 3 + 1] = ry;
       positions[i * 3 + 2] = rx * Math.sin(0.4) + rz * Math.cos(0.4);
 
-      // Color: blue-white for arm stars, warm for center
       const centerFactor = Math.exp(-r / 20000);
       colors[i * 3] = 0.7 + centerFactor * 0.3;
       colors[i * 3 + 1] = 0.8 + centerFactor * 0.1;
       colors[i * 3 + 2] = 1.0 - centerFactor * 0.3;
-
-      sizes[i] = 1.0 + Math.random() * 2.0;
     }
 
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
     return geo;
   }, []);
 
@@ -276,31 +246,14 @@ function GalaxyStars() {
 
   return (
     <points ref={ref} geometry={geometry} visible={false}>
-      <shaderMaterial
-        vertexShader={`
-          attribute float size;
-          attribute vec3 color;
-          varying vec3 vColor;
-          void main() {
-            vColor = color;
-            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-            gl_PointSize = size;
-            gl_Position = projectionMatrix * mvPosition;
-          }
-        `}
-        fragmentShader={`
-          varying vec3 vColor;
-          void main() {
-            float d = length(gl_PointCoord - vec2(0.5));
-            if (d > 0.5) discard;
-            float alpha = 0.6 * smoothstep(0.5, 0.15, d);
-            gl_FragColor = vec4(vColor, alpha);
-          }
-        `}
-        transparent={true}
-        blending={THREE.AdditiveBlending}
+      <pointsMaterial
+        vertexColors
+        size={1.5}
+        transparent
+        opacity={0.5}
         depthWrite={false}
-        depthTest={false}
+        depthTest={true}
+        sizeAttenuation={false}
       />
     </points>
   );
