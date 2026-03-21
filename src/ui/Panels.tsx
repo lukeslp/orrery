@@ -576,21 +576,21 @@ export default function Panels(props: PanelProps) {
           cursor: 'pointer',
         }}
       >
-        {/* Time + date — top of screen, understated */}
+        {/* Time + date — top of screen */}
         <div style={{
           marginTop: mobile ? 20 : 32,
           display: 'flex', alignItems: 'baseline', gap: mobile ? 8 : 12,
         }}>
           <span style={{
-            fontSize: mobile ? 16 : 20, fontWeight: 300, letterSpacing: 3,
-            color: 'rgba(255,255,255,0.2)',
+            fontSize: mobile ? 22 : 28, fontWeight: 300, letterSpacing: 4,
+            color: 'rgba(255,255,255,0.5)',
             fontFamily: "'Cormorant Garamond','Garamond','Baskerville','Georgia',serif",
           }}>
             {fmtTime(simTime)}
           </span>
           <span style={{
-            fontSize: mobile ? 10 : 12, fontWeight: 300, letterSpacing: 2,
-            color: 'rgba(255,255,255,0.12)',
+            fontSize: mobile ? 11 : 13, fontWeight: 300, letterSpacing: 2,
+            color: 'rgba(255,255,255,0.3)',
             fontStyle: 'italic',
           }}>
             {fmtDate(simTime)}
