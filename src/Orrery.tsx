@@ -162,6 +162,14 @@ function OrreryInner() {
 
     const advance = () => {
       cinematicIdx.current = (cinematicIdx.current + 1) % cinematicShots.length;
+      // Reset layers to bare at the start of each cycle
+      if (cinematicIdx.current === 0) {
+        setShowConstellations(() => false);
+        setShowAsteroidBelt(() => false);
+        setShowMilkyWay(() => false);
+        setShowDeepSpace(() => false);
+        setShowDwarf(() => false);
+      }
       applyCinematicShot(cinematicIdx.current);
       cinematicTimer.current = setTimeout(advance, cinematicShots[cinematicIdx.current].duration);
     };
