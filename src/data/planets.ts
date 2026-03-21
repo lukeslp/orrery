@@ -74,13 +74,14 @@ export const ALL_BODIES: PlanetDef[] = [...PLANETS, ...DWARF_PLANETS];
 // ─── Camera presets ──────────────────────────────────────────────────────────
 
 export const CAMS: CamPreset[] = [
-  { key: '1', label: 'Inner',     pos: [0, 3, 4],        tgt: [0, 0, 0] },
-  { key: '2', label: 'System',    pos: [0, 30, 40],      tgt: [0, 0, 0] },
-  { key: '3', label: 'Earth',     pos: [0, 0.4, 1.4],    tgt: [0, 0, 1],   follow: 2 },
-  { key: '4', label: 'Top',       pos: [0, 45, 0.01],    tgt: [0, 0, 0] },
-  { key: '5', label: 'Ecliptic',  pos: [10, 0.2, 0],     tgt: [0, 0, 0] },
-  { key: '6', label: 'Jupiter',   pos: [0, 2, 7],        tgt: [0, 0, 5.2], follow: 4 },
-  { key: '7', label: 'Cinematic', pos: [4, 2.5, 6],      tgt: [0, 0, 0],   autoRotate: true },
-  { key: '8', label: 'Outer',     pos: [0, 60, 90],      tgt: [0, 0, 0] },
+  { key: '1', label: 'Inner',     pos: [0, 3, 4],          tgt: [0, 0, 0] },
+  { key: '2', label: 'System',    pos: [0, 30, 40],        tgt: [0, 0, 0] },
+  { key: '3', label: 'Top',       pos: [0, 45, 0.01],      tgt: [0, 0, 0] },
+  { key: '4', label: 'Ecliptic',  pos: [10, 0.2, 0],       tgt: [0, 0, 0] },
+  { key: '5', label: 'Outer',     pos: [0, 60, 90],        tgt: [0, 0, 0] },
+  { key: '6', label: 'Kuiper',    pos: [0, 120, 180],      tgt: [0, 0, 0] },
+  { key: '7', label: 'Oort',      pos: [0, 4000, 6000],    tgt: [0, 0, 0] },
+  { key: '8', label: 'Galaxy',    pos: [0, 60000, 90000],  tgt: [0, 0, 0] },
+  { key: '9', label: 'Cinematic', pos: [4, 2.5, 6],        tgt: [0, 0, 0], autoRotate: true },
 ];
 
