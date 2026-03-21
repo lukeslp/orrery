@@ -120,12 +120,33 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, onCameraDistanc
     // Distance-adaptive lerp: faster when far from target so deep-space
     // transitions (Oort→Galaxy) don't crawl through empty blackness.
     const remainDist = camera.position.distanceTo(tPos.current);
-    const lerpFactor = remainDist > 1000 ? 0.06 : remainDist > 100 ? 0.045 : 0.03;
+    const lerpFactor = cinematic
+      ? (remainDist > 1000 ? 0.03 : remainDist > 100 ? 0.02 : 0.015)
+      : (remainDist > 1000 ? 0.06 : remainDist > 100 ? 0.045 : 0.03);
     const settleThreshold = remainDist > 1000 ? 50 : remainDist > 100 ? 5 : 0.05;
 
-    // Unified camera logic — cinematic and interactive use the same settling
-    // approach so planet zooms look identical in both modes.
-    if (trackIdx !== null) {
+    // In cinematic mode, always keep gliding (never settle)
+    if (cinematic) {
+      // Update target position for tracked planets
+      if (trackIdx !== null) {
+        const pp = positions.get(trackIdx);
+        if (pp) {
+          if (focusTarget !== null && focusTarget.moonIdx === undefined) {
+            const planet = ALL_BODIES[trackIdx];
+            const moons = getMoonsForPlanet(trackIdx);
+            const maxMoonA = moons.length > 0 ? Math.max(...moons.map(m => m.a)) : 0;
+            const d = Math.max(planet.radius * 8, maxMoonA * 2.5);
+            const [ox, oy, oz] = offsetFromAngle(d, 0.7, 0.4);
+            tPos.current.set(pp[0] + ox, pp[1] + oy, pp[2] + oz);
+          }
+          tLook.current.set(...pp);
+        }
+      }
+      // Continuously glide toward current target
+      camera.position.lerp(tPos.current, lerpFactor);
+      if (ctrl) ctrl.target.lerp(tLook.current, lerpFactor);
+    } else if (trackIdx !== null) {
+      // Interactive planet tracking
       const pp = positions.get(trackIdx);
       if (pp) {
         const newTarget = new THREE.Vector3(...pp);
