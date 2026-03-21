@@ -22,22 +22,23 @@ export function Sun() {
     <group>
       <mesh ref={ref}>
         <sphereGeometry args={[0.15, 48, 48]} />
-        <meshBasicMaterial map={tex} />
+        <meshBasicMaterial map={tex} toneMapped={false} />
       </mesh>
+      {/* Corona glow layers */}
       <mesh>
         <sphereGeometry args={[0.19, 32, 32]} />
-        <meshBasicMaterial color="#ffaa33" transparent opacity={0.08} />
+        <meshBasicMaterial color="#ffcc66" transparent opacity={0.18} toneMapped={false} />
       </mesh>
       <mesh>
-        <sphereGeometry args={[0.24, 32, 32]} />
-        <meshBasicMaterial color="#ff8800" transparent opacity={0.04} />
+        <sphereGeometry args={[0.26, 32, 32]} />
+        <meshBasicMaterial color="#ffaa33" transparent opacity={0.08} toneMapped={false} />
       </mesh>
       <mesh>
-        <sphereGeometry args={[0.30, 32, 32]} />
-        <meshBasicMaterial color="#ff6600" transparent opacity={0.02} />
+        <sphereGeometry args={[0.35, 32, 32]} />
+        <meshBasicMaterial color="#ff8800" transparent opacity={0.03} />
       </mesh>
-      <pointLight intensity={4} color="#fff5e0" distance={200} />
-      <pointLight intensity={1.5} color="#ffcc80" distance={100} />
+      <pointLight intensity={5} color="#fff5e0" distance={200} />
+      <pointLight intensity={2} color="#ffcc80" distance={100} />
     </group>
   );
 }
@@ -128,6 +129,11 @@ export function Planet({ planet, T, selected, onSelect, hovered, onHover }: {
 
   return (
     <group position={pos}>
+      {/* Soft glow behind planet for visibility */}
+      <mesh>
+        <sphereGeometry args={[r * 2.5, 24, 24]} />
+        <meshBasicMaterial color={planet.color} transparent opacity={0.06} depthWrite={false} />
+      </mesh>
       <mesh
         ref={ref}
         renderOrder={10}
@@ -140,18 +146,20 @@ export function Planet({ planet, T, selected, onSelect, hovered, onHover }: {
       </mesh>
       {planet.tex === 'earth' && <EarthClouds radius={r} />}
       {planet.hasRings && <SaturnRings radius={r} />}
-      {hovered && !selected && (
-        <Html distanceFactor={10} style={{ pointerEvents: 'none' }}>
-          <div style={{
-            color: '#fff', fontSize: 10, fontFamily: 'JetBrains Mono, monospace',
-            background: 'rgba(0,0,0,0.8)', padding: '2px 8px', borderRadius: 3,
-            whiteSpace: 'nowrap', transform: 'translateY(-20px)',
-            border: '1px solid rgba(255,255,255,0.15)',
-          }}>
-            {planet.name}
-          </div>
-        </Html>
-      )}
+      {/* Always show planet name label */}
+      <Html distanceFactor={10} style={{ pointerEvents: 'none' }}>
+        <div style={{
+          color: hovered || selected ? '#fff' : 'rgba(255,255,255,0.6)',
+          fontSize: 10, fontFamily: 'JetBrains Mono, monospace',
+          background: hovered || selected ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.4)',
+          padding: '2px 8px', borderRadius: 3,
+          whiteSpace: 'nowrap', transform: 'translateY(-20px)',
+          border: hovered || selected ? '1px solid rgba(255,255,255,0.15)' : '1px solid transparent',
+          transition: 'all 0.15s',
+        }}>
+          {planet.name}
+        </div>
+      </Html>
     </group>
   );
 }

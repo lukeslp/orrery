@@ -203,7 +203,7 @@ export default function Scene({
 
   return (
     <>
-      <ambientLight intensity={0.05} />
+      <ambientLight intensity={0.15} />
       <Sun />
       <AUGrid />
       <AsteroidBelt />
