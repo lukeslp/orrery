@@ -117,97 +117,10 @@ export function OortCloud() {
   );
 }
 
-// ─── Galaxy disc (procedural Milky Way spiral) ───────────────────────────────
-
-const galaxyVertexShader = `
-  varying vec2 vUv;
-  void main() {
-    vUv = uv;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-`;
-
-const galaxyFragmentShader = `
-  varying vec2 vUv;
-
-  float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-  }
-
-  void main() {
-    vec2 uv = vUv * 2.0 - 1.0;
-    float dist = length(uv);
-
-    float falloff = exp(-dist * 2.5);
-    float bulge = exp(-dist * 8.0) * 0.6;
-
-    float angle = atan(uv.y, uv.x);
-    float spiral1 = sin(angle * 2.0 - dist * 12.0) * 0.5 + 0.5;
-    float spiral2 = sin(angle * 2.0 - dist * 12.0 + 3.14159) * 0.5 + 0.5;
-    float minorSpiral = sin(angle * 4.0 - dist * 10.0) * 0.5 + 0.5;
-
-    spiral1 = pow(spiral1, 3.0) * falloff;
-    spiral2 = pow(spiral2, 3.0) * falloff;
-    minorSpiral = pow(minorSpiral, 4.0) * falloff * 0.3;
-
-    float arms = max(spiral1, spiral2) + minorSpiral;
-
-    float noise = hash(uv * 50.0) * 0.3;
-    float fineNoise = hash(uv * 200.0) * 0.15;
-
-    float alpha = (arms + bulge) * (1.0 + noise + fineNoise);
-    alpha *= smoothstep(1.0, 0.85, dist);
-
-    vec3 centerColor = vec3(1.0, 0.9, 0.7);
-    vec3 armColor = vec3(0.7, 0.8, 1.0);
-    vec3 color = mix(armColor, centerColor, bulge / (bulge + 0.1));
-
-    // Solar system marker
-    vec2 sunPos = vec2(0.53, 0.0);
-    float sunDist = length(uv - sunPos);
-    float sunDot = exp(-sunDist * 80.0) * 2.0;
-    color += vec3(1.0, 0.95, 0.5) * sunDot;
-    alpha += sunDot;
-
-    // Lower overall alpha to avoid washing out the scene
-    gl_FragColor = vec4(color, alpha * 0.2);
-  }
-`;
+// ─── Galaxy (star points scattered along spiral arms — no texture plane) ─────
 
 export function GalaxyDisc() {
-  const ref = useRef<THREE.Mesh>(null);
-  const { camera } = useThree();
-
-  const material = useMemo(() => new THREE.ShaderMaterial({
-    vertexShader: galaxyVertexShader,
-    fragmentShader: galaxyFragmentShader,
-    transparent: true,
-    side: THREE.DoubleSide,
-    depthWrite: false,
-    depthTest: true,
-  }), []);
-
-  useFrame(() => {
-    if (!ref.current) return;
-    const dist = camera.position.length();
-    // Show galaxy only when far enough for it to look like a galaxy, not a blurry wash.
-    // Sharper fade-in avoids the "blurry overlay" look at intermediate distances.
-    ref.current.visible = dist > 20000;
-    if (dist > 20000 && dist < 50000) {
-      material.opacity = (dist - 20000) / 30000;
-    } else if (dist >= 50000) {
-      material.opacity = 1;
-    }
-  });
-
-  return (
-    <group>
-      <mesh ref={ref} rotation={[Math.PI / 2 + 0.1, 0, 0.4]} material={material} position={[0, -2000, 0]} visible={false}>
-        <planeGeometry args={[200000, 200000]} />
-      </mesh>
-      <GalaxyStars />
-    </group>
-  );
+  return <GalaxyStars />;
 }
 
 // ─── Galaxy star points (scattered along spiral arms) ────────────────────────
