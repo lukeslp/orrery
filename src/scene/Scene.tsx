@@ -331,7 +331,7 @@ export default function Scene({
         </group>
       ))}
       <StarField visible={showStars} />
-      <ConstellationLines visible={showConstellations} theme={theme} focus={constellationFocus} />
+      <ConstellationLines visible={showConstellations} focus={constellationFocus} />
       <ConstellationLabels visible={showConstellations} focus={constellationFocus} />
       <MilkyWayBand visible={showMilkyWay} theme={theme} />
       {showDeepSpace && <ScaleMarkers />}

@@ -176,8 +176,8 @@ function hslToRgb(h: number, s: number, l: number): [number, number, number] {
 /** Golden-angle hue spread with luminance variation for colorblind safety */
 function constellationColor(index: number): [number, number, number] {
   const hue = ((index * 137.508) % 360) / 360;
-  const sat = 0.65 + (index % 3) * 0.12;
-  const light = 0.55 + (index % 5) * 0.06;
+  const sat = 0.75 + (index % 3) * 0.08;
+  const light = 0.58 + (index % 5) * 0.05;
   return hslToRgb(hue, sat, light);
 }
 
@@ -267,7 +267,7 @@ const glowPointFragmentShader = `
   }
 `;
 
-export function ConstellationLines({ visible, focus }: { visible: boolean; theme: OrreryTheme; focus?: boolean }) {
+export function ConstellationLines({ visible, focus }: { visible: boolean; focus?: boolean }) {
   const lineData = useConstellationLineData();
   const { camera } = useThree();
 
@@ -303,7 +303,7 @@ export function ConstellationLines({ visible, focus }: { visible: boolean; theme
   const lineMat = useMemo(() => new THREE.ShaderMaterial({
     vertexShader: glowLineVertexShader,
     fragmentShader: glowLineFragmentShader,
-    uniforms: { opacity: { value: 0.5 } },
+    uniforms: { opacity: { value: 0.6 } },
     transparent: true,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
