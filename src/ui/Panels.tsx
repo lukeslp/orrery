@@ -593,7 +593,7 @@ export default function Panels(props: PanelProps) {
           </span>
           <span style={{
             fontSize: mobile ? 11 : 13, fontWeight: 300, letterSpacing: 2,
-            color: 'rgba(255,255,255,0.3)', fontStyle: 'italic',
+            color: 'rgba(255,255,255,0.55)', fontStyle: 'italic',
           }}>
             {fmtDate(simTime)}
           </span>
@@ -613,27 +613,17 @@ export default function Panels(props: PanelProps) {
           <div style={{
             marginTop: mobile ? 8 : 12,
             fontSize: mobile ? 14 : 18, fontWeight: 300, letterSpacing: 4,
-            color: 'rgba(255,255,255,0.15)',
+            color: 'rgba(255,255,255,0.35)',
             textTransform: 'uppercase',
           }}>
             {cinematicLabel}
           </div>
-          {cinematicDesc && (
-            <div style={{
-              marginTop: 8, maxWidth: mobile ? '80vw' : 420,
-              fontSize: mobile ? 11 : 13, fontWeight: 300, fontStyle: 'italic',
-              color: 'rgba(255,255,255,0.2)', lineHeight: 1.6,
-              textAlign: 'center', letterSpacing: 0.3,
-            }}>
-              {cinematicDesc}
-            </div>
-          )}
         </div>
 
         {/* Exit hint */}
         <div style={{
           position: 'absolute', bottom: mobile ? 60 : 56,
-          color: 'rgba(255,255,255,0.12)', fontSize: 10,
+          color: 'rgba(255,255,255,0.3)', fontSize: 11,
           letterSpacing: 2, fontWeight: 300, fontStyle: 'italic',
         }}>
           click or press any key to explore
@@ -641,7 +631,7 @@ export default function Panels(props: PanelProps) {
         {/* Watermark */}
         <div style={{
           position: 'absolute', bottom: mobile ? 24 : 32,
-          color: 'rgba(255,255,255,0.06)', fontSize: 11,
+          color: 'rgba(255,255,255,0.12)', fontSize: 11,
           letterSpacing: 6, textTransform: 'uppercase', fontWeight: 300,
         }}>
           Orrery
