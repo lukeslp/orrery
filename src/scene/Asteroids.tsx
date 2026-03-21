@@ -75,7 +75,7 @@ export function AsteroidBelt() {
   return (
     <group ref={groupRef}>
       <instancedMesh ref={meshRef} args={[undefined, undefined, BELT_COUNT]}>
-        <sphereGeometry args={[1, 6, 6]} />
+        <sphereGeometry args={[1, 8, 8]} />
         <meshStandardMaterial color="#887766" roughness={0.9} />
       </instancedMesh>
     </group>
@@ -106,12 +106,12 @@ export function NeoDot({ neo, selected, onSelect, jd }: {
   return (
     <group position={pos}>
       <mesh onClick={e => { e.stopPropagation(); onSelect(); }}>
-        <sphereGeometry args={[r, 8, 8]} />
+        <sphereGeometry args={[r, 16, 16]} />
         <meshBasicMaterial color={col} />
       </mesh>
       {selected && (
         <mesh>
-          <sphereGeometry args={[r * 3, 8, 8]} />
+          <sphereGeometry args={[r * 3, 16, 16]} />
           <meshBasicMaterial color={col} transparent opacity={0.12} />
         </mesh>
       )}
