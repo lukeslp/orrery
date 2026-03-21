@@ -596,16 +596,18 @@ export default function Panels(props: PanelProps) {
             {fmtDate(simTime)}
           </span>
         </div>
-        {/* Current body label */}
-        {cinematicLabel && cinematicLabel !== 'Solar System' && (
-          <div style={{
-            fontSize: mobile ? 18 : 24, fontWeight: 300, letterSpacing: 4,
-            color: 'rgba(255,255,255,0.25)', marginTop: 20,
-            textTransform: 'uppercase',
-          }}>
-            {cinematicLabel}
-          </div>
-        )}
+        {/* Current body label — centered on screen */}
+        <div style={{
+          position: 'absolute', top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          fontSize: mobile ? 28 : 42, fontWeight: 300, letterSpacing: 6,
+          color: cinematicLabel === 'Solar System' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.3)',
+          textTransform: 'uppercase',
+          fontFamily: "'Cormorant Garamond','Garamond','Baskerville','Georgia',serif",
+          textShadow: '0 0 30px rgba(0,0,0,0.6)',
+        }}>
+          {cinematicLabel}
+        </div>
         {/* Exit hint */}
         <div style={{
           position: 'absolute', bottom: mobile ? 60 : 56,

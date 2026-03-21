@@ -43,6 +43,7 @@ function OrreryInner() {
   const [cameraDistance, setCameraDistance] = useState(50);
   const [camIdx, setCamIdx] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [positionsReady, setPositionsReady] = useState(false);
   const positionsRef = useRef(new Map<number, [number, number, number]>());
 
   const jd = useMemo(() => julianDate(simTime), [simTime]);
