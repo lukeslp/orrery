@@ -695,10 +695,10 @@ export default function Panels(props: PanelProps) {
           {speed !== 1 && <span style={{ color: accent, fontSize: 10, fontWeight: 400 }}>{speedLabel(speed)}</span>}
         </div>
 
-        {/* Row 2: Camera presets | Bodies | Layers | About — unified toolbar */}
+        {/* Row 2: Camera presets (scrollable on mobile) */}
         <div
           role="toolbar"
-          aria-label="Navigation controls"
+          aria-label="Camera presets"
           style={{
             display: 'flex', alignItems: 'center', gap: mobile ? 3 : 4,
             ...glass, padding: mobile ? '4px 8px' : '4px 10px',
@@ -710,7 +710,6 @@ export default function Panels(props: PanelProps) {
             justifyContent: 'center',
           }}
         >
-          {/* Camera preset buttons */}
           {cams.map((cam, i) => {
             const active = camIdx === i && selPlanet === null;
             return (
@@ -741,60 +740,42 @@ export default function Panels(props: PanelProps) {
             );
           })}
 
-          {/* Divider */}
-          <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
-
-          {/* Bodies dropdown */}
-          <BodiesDropdown
-            selPlanet={selPlanet}
-            setSelPlanet={setSelPlanet}
-            accent={accent}
-            accentRgb={accentRgb}
-            mobile={mobile}
-            onMoonSelect={onMoonSelect}
-          />
-
-          {/* Layers dropdown */}
-          <LayersDropdown
-            accent={accent}
-            accentRgb={accentRgb}
-            mobile={mobile}
-            neoStatus={neoStatus}
-            neoCount={neos.length}
-            showStars={showStars} setShowStars={setShowStars}
-            showConstellations={showConstellations} setShowConstellations={setShowConstellations}
-            showDwarf={showDwarf} setShowDwarf={setShowDwarf}
-            showNeo={showNeo} setShowNeo={setShowNeo}
-            showAsteroidBelt={showAsteroidBelt} setShowAsteroidBelt={setShowAsteroidBelt}
-            showMilkyWay={showMilkyWay} setShowMilkyWay={setShowMilkyWay}
-            showDeepSpace={showDeepSpace} setShowDeepSpace={setShowDeepSpace}
-          />
-
-          {/* Divider */}
-          <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
-
-          {/* About button */}
-          <button
-            onClick={() => setShowAbout(true)}
-            aria-label="About this orrery"
-            style={{
-              background: 'transparent',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '50%',
-              width: mobile ? 32 : 28,
-              height: mobile ? 32 : 28,
-              fontSize: mobile ? 12 : 13,
-              cursor: 'pointer', fontFamily: 'inherit',
-              color: 'rgba(255,255,255,0.4)',
-              fontWeight: 300,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
-              transition: 'all 0.15s',
-            }}
-          >
-            ?
-          </button>
+          {/* Desktop: Bodies/Layers/About inline with presets */}
+          {!mobile && <>
+            <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
+            <BodiesDropdown selPlanet={selPlanet} setSelPlanet={setSelPlanet} accent={accent} accentRgb={accentRgb} mobile={false} onMoonSelect={onMoonSelect} />
+            <LayersDropdown accent={accent} accentRgb={accentRgb} mobile={false} neoStatus={neoStatus} neoCount={neos.length}
+              showStars={showStars} setShowStars={setShowStars} showConstellations={showConstellations} setShowConstellations={setShowConstellations}
+              showDwarf={showDwarf} setShowDwarf={setShowDwarf} showNeo={showNeo} setShowNeo={setShowNeo}
+              showAsteroidBelt={showAsteroidBelt} setShowAsteroidBelt={setShowAsteroidBelt} showMilkyWay={showMilkyWay} setShowMilkyWay={setShowMilkyWay}
+              showDeepSpace={showDeepSpace} setShowDeepSpace={setShowDeepSpace} />
+            <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.1)', flexShrink: 0 }} />
+            <button onClick={() => setShowAbout(true)} aria-label="About this orrery" style={{
+              background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '50%',
+              width: 28, height: 28, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit',
+              color: 'rgba(255,255,255,0.4)', fontWeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}>?</button>
+          </>}
         </div>
+
+        {/* Row 3 (mobile only): Bodies / Layers / About — always visible, not in scroll area */}
+        {mobile && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center',
+          }}>
+            <BodiesDropdown selPlanet={selPlanet} setSelPlanet={setSelPlanet} accent={accent} accentRgb={accentRgb} mobile={true} onMoonSelect={onMoonSelect} />
+            <LayersDropdown accent={accent} accentRgb={accentRgb} mobile={true} neoStatus={neoStatus} neoCount={neos.length}
+              showStars={showStars} setShowStars={setShowStars} showConstellations={showConstellations} setShowConstellations={setShowConstellations}
+              showDwarf={showDwarf} setShowDwarf={setShowDwarf} showNeo={showNeo} setShowNeo={setShowNeo}
+              showAsteroidBelt={showAsteroidBelt} setShowAsteroidBelt={setShowAsteroidBelt} showMilkyWay={showMilkyWay} setShowMilkyWay={setShowMilkyWay}
+              showDeepSpace={showDeepSpace} setShowDeepSpace={setShowDeepSpace} />
+            <button onClick={() => setShowAbout(true)} aria-label="About this orrery" style={{
+              background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '50%',
+              width: 32, height: 32, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit',
+              color: 'rgba(255,255,255,0.4)', fontWeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}>?</button>
+          </div>
+        )}
       </div>
 
       {/* ── Scale indicator ── */}
