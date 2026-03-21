@@ -177,7 +177,7 @@ export interface SceneProps {
 export default function Scene({
   jd, T, neos, selNeo, setSelNeo, selPlanet, setSelPlanet,
   focusTarget, onPositionsUpdate, showDwarf,
-  showStars, showConstellations, showAsteroidBelt, showMilkyWay, showDeepSpace,
+  showStars, showConstellations, showAsteroidBelt, showMilkyWay: _, showDeepSpace,
   cinematic, onMoonSelect, selMoonIdx, onCameraDistance, camPreset,
 }: SceneProps) {
   const [hov, setHov] = useState<number | null>(null);
