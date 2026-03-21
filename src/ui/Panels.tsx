@@ -117,11 +117,15 @@ function ScaleIndicator({ cameraDistance }: { cameraDistance: number }) {
 
 function useClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () => void) {
   useEffect(() => {
-    const fn = (e: MouseEvent) => {
+    const fn = (e: MouseEvent | TouchEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) handler();
     };
     document.addEventListener('mousedown', fn);
-    return () => document.removeEventListener('mousedown', fn);
+    document.addEventListener('touchstart', fn, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', fn);
+      document.removeEventListener('touchstart', fn);
+    };
   }, [ref, handler]);
 }
 
