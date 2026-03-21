@@ -10,7 +10,8 @@
       "mcp__plugin_playwright_playwright__browser_click",
       "mcp__plugin_playwright_playwright__browser_press_key",
       "Bash(cp:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "mcp__plugin_playwright_playwright__browser_console_messages"
     ]
   },
   "enableAllProjectMcpServers": true,
