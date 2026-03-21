@@ -134,7 +134,7 @@ function OrreryInner() {
     }
   }, [cinematicShots]);
 
-  // Cinematic tour timer
+  // Cinematic tour timer — wait for scene + positions before starting
   useEffect(() => {
     if (!cinematic) {
       if (cinematicTimer.current) clearTimeout(cinematicTimer.current);
@@ -155,6 +155,9 @@ function OrreryInner() {
       setNavStack(isMobile ? ['Solar System'] : ['Solar System', 'Earth']);
       return;
     }
+
+    // Don't start tour until scene is ready and positions are available
+    if (!sceneReady || !positionsReady) return;
 
     // Start tour from shot 0 — layers begin minimal
     cinematicIdx.current = 0;
@@ -179,11 +182,13 @@ function OrreryInner() {
     return () => {
       if (cinematicTimer.current) clearTimeout(cinematicTimer.current);
     };
-  }, [cinematic, applyCinematicShot, cinematicShots]);
+  }, [cinematic, sceneReady, positionsReady, applyCinematicShot, cinematicShots]);
 
+  const [positionsReady, setPositionsReady] = useState(false);
   const handlePositionsUpdate = useCallback((m: Map<number, [number, number, number]>) => {
     positionsRef.current = m;
-  }, []);
+    if (m.size > 0 && !positionsReady) setPositionsReady(true);
+  }, [positionsReady]);
 
   // (Earth focus now handled by cinematic exit)
 
