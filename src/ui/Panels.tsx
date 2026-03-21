@@ -778,6 +778,112 @@ export default function Panels(props: PanelProps) {
         )}
       </div>
 
+      {/* ── Background blur overlay when body selected ── */}
+      {sp && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute', inset: 0,
+            background: mobile
+              ? 'radial-gradient(ellipse at 50% 80%, rgba(0,0,0,0.45) 0%, transparent 60%)'
+              : 'radial-gradient(ellipse at 15% 60%, rgba(0,0,0,0.45) 0%, transparent 55%)',
+            ...(mobile ? {} : { backdropFilter: 'blur(1.5px)', WebkitBackdropFilter: 'blur(1.5px)' }),
+            pointerEvents: 'none',
+            zIndex: 19,
+            transition: 'opacity 0.3s',
+          }}
+        />
+      )}
+
+      {/* ── Planet/Moon info card ── */}
+      {(sp || selectedMoon) && (
+        <div
+          role="dialog"
+          aria-label={selectedMoon ? `${selectedMoon.name} details` : `${sp!.name} details`}
+          style={mobile ? {
+            position: 'fixed',
+            left: 0, right: 0, bottom: 0, top: 'auto',
+            maxHeight: '45vh',
+            borderRadius: '12px 12px 0 0',
+            paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
+            overflowY: 'auto',
+            ...bokehCard,
+            padding: '16px 20px',
+            paddingBottom: 'max(20px, env(safe-area-inset-bottom))',
+            zIndex: 20,
+          } : {
+            position: 'absolute',
+            bottom: 16, left: 16,
+            maxWidth: 340, width: '30vw', minWidth: 260,
+            ...bokehCard,
+            padding: '14px 20px',
+            zIndex: 20,
+          }}
+        >
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{
+                width: 12, height: 12, borderRadius: '50%',
+                background: selectedMoon ? selectedMoon.color : sp!.color,
+                boxShadow: `0 0 8px ${selectedMoon ? selectedMoon.color : sp!.color}`,
+                flexShrink: 0,
+              }} />
+              <div>
+                <div style={{ color: '#fff', fontSize: 16, fontWeight: 600, letterSpacing: 1 }}>
+                  {selectedMoon ? selectedMoon.name : sp!.name}
+                </div>
+                <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 10, fontWeight: 300, fontStyle: 'italic', letterSpacing: 0.5 }}>
+                  {selectedMoon ? `Moon of ${sp!.name}` : sp!.type}
+                </div>
+              </div>
+            </div>
+            <Btn onClick={() => setSelPlanet(null)} label="Close info card">{'\u2715'}</Btn>
+          </div>
+
+          {/* Description */}
+          <p style={{
+            color: 'rgba(255,255,255,0.6)', fontSize: 12, lineHeight: 1.6, fontWeight: 300,
+            margin: '10px 0', fontStyle: 'italic',
+          }}>
+            {selectedMoon ? selectedMoon.desc : sp!.desc}
+          </p>
+
+          {/* Stats grid */}
+          {!selectedMoon && sp && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px' }}>
+              <Stat label="Distance" val={`${sp.distAU} AU`} />
+              <Stat label="Period" val={sp.period < 365 ? `${sp.period.toFixed(0)} days` : `${(sp.period / 365.25).toFixed(1)} years`} />
+              {sp.surfaceTemp && <Stat label="Surface temp" val={sp.surfaceTemp} />}
+              {sp.gravity && <Stat label="Gravity" val={sp.gravity} />}
+              <Stat label="Moons" val={sp.moons} />
+            </div>
+          )}
+          {selectedMoon && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px' }}>
+              <Stat label="Orbital period" val={selectedMoon.period < 1 ? `${(selectedMoon.period * 24).toFixed(1)} hours` : `${selectedMoon.period.toFixed(1)} days`} />
+              <Stat label="Parent" val={sp!.name} />
+            </div>
+          )}
+
+          {/* Breadcrumb nav */}
+          <div style={{ display: 'flex', gap: 4, marginTop: 10, flexWrap: 'wrap' }}>
+            {navStack.map((crumb, i) => (
+              <span key={i} style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', fontWeight: 300 }}>
+                {i > 0 && <span style={{ margin: '0 4px' }}>{'\u203a'}</span>}
+                <span
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => props.navigateToLevel(i)}
+                  onKeyDown={e => { if (e.key === 'Enter') props.navigateToLevel(i); }}
+                  style={{ cursor: i < navStack.length - 1 ? 'pointer' : 'default', color: i === navStack.length - 1 ? accent : 'rgba(255,255,255,0.25)' }}
+                >{crumb}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ── Scale indicator ── */}
       <ScaleIndicator cameraDistance={cameraDistance} />
 
