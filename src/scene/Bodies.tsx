@@ -279,7 +279,7 @@ export function SatelliteOrbit({ moon, parentPos }: { moon: MoonDef; parentPos: 
   return (
     <Line
       points={pts}
-      color="rgba(255,255,255,0.15)"
+      color="#ffffff"
       lineWidth={0.4}
       transparent
       opacity={0.15}
