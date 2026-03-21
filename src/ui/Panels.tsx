@@ -693,6 +693,35 @@ export default function Panels(props: PanelProps) {
           <span style={{ fontSize: mobile ? 12 : 14 }}>{moon.emoji}</span>
           {!mobile && <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 10, fontStyle: 'italic', fontWeight: 300 }}>{moon.name} {'\u00b7'} {moon.ill}%</span>}
           {speed !== 1 && <span style={{ color: accent, fontSize: 10, fontWeight: 400 }}>{speedLabel(speed)}</span>}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 2, marginLeft: 4 }}>
+            <button
+              onClick={() => props.setSpeed(s => Math.max(1, Math.round(s / 10) || 1))}
+              aria-label="Slow down"
+              style={{
+                background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)',
+                fontSize: 11, cursor: 'pointer', fontFamily: 'inherit', padding: '2px 5px',
+                minWidth: 28, minHeight: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >{'\u00ab'}</button>
+            <button
+              onClick={() => props.setPlaying(p => !p)}
+              aria-label={props.playing ? 'Pause simulation' : 'Play simulation'}
+              style={{
+                background: 'none', border: 'none', color: props.playing ? accent : 'rgba(255,255,255,0.5)',
+                fontSize: 13, cursor: 'pointer', fontFamily: 'inherit', padding: '2px 5px',
+                minWidth: 28, minHeight: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >{props.playing ? '\u23f8' : '\u25b6'}</button>
+            <button
+              onClick={() => props.setSpeed(s => Math.min(86400 * 365, (s < 10 ? s * 10 : s * 10)))}
+              aria-label="Speed up"
+              style={{
+                background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)',
+                fontSize: 11, cursor: 'pointer', fontFamily: 'inherit', padding: '2px 5px',
+                minWidth: 28, minHeight: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >{'\u00bb'}</button>
+          </div>
         </div>
 
         {/* Row 2: Camera presets (scrollable on mobile) */}
