@@ -572,25 +572,29 @@ export default function Panels(props: PanelProps) {
         style={{
           position: 'absolute', inset: 0, zIndex: 20,
           display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center',
+          alignItems: 'center',
           cursor: 'pointer',
         }}
       >
-        {/* Time */}
+        {/* Time + date — top of screen, understated */}
         <div style={{
-          fontSize: mobile ? 64 : 96, fontWeight: 200, letterSpacing: 6,
-          color: '#fff', fontFamily: "'Cormorant Garamond','Garamond','Baskerville','Georgia',serif",
-          textShadow: '0 0 40px rgba(0,0,0,0.8)',
+          marginTop: mobile ? 20 : 32,
+          display: 'flex', alignItems: 'baseline', gap: mobile ? 8 : 12,
         }}>
-          {fmtTime(simTime)}
-        </div>
-        {/* Date */}
-        <div style={{
-          fontSize: mobile ? 14 : 18, fontWeight: 300, letterSpacing: 3,
-          color: 'rgba(255,255,255,0.4)', marginTop: 8,
-          fontStyle: 'italic',
-        }}>
-          {fmtDate(simTime)}
+          <span style={{
+            fontSize: mobile ? 16 : 20, fontWeight: 300, letterSpacing: 3,
+            color: 'rgba(255,255,255,0.2)',
+            fontFamily: "'Cormorant Garamond','Garamond','Baskerville','Georgia',serif",
+          }}>
+            {fmtTime(simTime)}
+          </span>
+          <span style={{
+            fontSize: mobile ? 10 : 12, fontWeight: 300, letterSpacing: 2,
+            color: 'rgba(255,255,255,0.12)',
+            fontStyle: 'italic',
+          }}>
+            {fmtDate(simTime)}
+          </span>
         </div>
         {/* Current body label */}
         {cinematicLabel && cinematicLabel !== 'Solar System' && (
