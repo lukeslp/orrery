@@ -562,7 +562,10 @@ export default function Panels(props: PanelProps) {
   }, [mobile, drawerOpen, setDrawerOpen]);
   useClickOutside(drawerRef, handleDrawerClickOutside);
 
-  // ─── Cinematic clock mode ──────────────────────────────────────────────────
+  // ─── Cinematic mode overlay ─────────────────────────────────────────────────
+  // Current body label from nav stack
+  const cinematicLabel = navStack[navStack.length - 1] || '';
+
   if (cinematic) {
     return (
       <div
@@ -573,6 +576,7 @@ export default function Panels(props: PanelProps) {
           cursor: 'pointer',
         }}
       >
+        {/* Time */}
         <div style={{
           fontSize: mobile ? 64 : 96, fontWeight: 200, letterSpacing: 6,
           color: '#fff', fontFamily: "'Cormorant Garamond','Garamond','Baskerville','Georgia',serif",
@@ -580,6 +584,7 @@ export default function Panels(props: PanelProps) {
         }}>
           {fmtTime(simTime)}
         </div>
+        {/* Date */}
         <div style={{
           fontSize: mobile ? 14 : 18, fontWeight: 300, letterSpacing: 3,
           color: 'rgba(255,255,255,0.4)', marginTop: 8,
@@ -587,6 +592,25 @@ export default function Panels(props: PanelProps) {
         }}>
           {fmtDate(simTime)}
         </div>
+        {/* Current body label */}
+        {cinematicLabel && cinematicLabel !== 'Solar System' && (
+          <div style={{
+            fontSize: mobile ? 18 : 24, fontWeight: 300, letterSpacing: 4,
+            color: 'rgba(255,255,255,0.25)', marginTop: 20,
+            textTransform: 'uppercase',
+          }}>
+            {cinematicLabel}
+          </div>
+        )}
+        {/* Exit hint */}
+        <div style={{
+          position: 'absolute', bottom: mobile ? 60 : 56,
+          color: 'rgba(255,255,255,0.12)', fontSize: 10,
+          letterSpacing: 2, fontWeight: 300, fontStyle: 'italic',
+        }}>
+          click or press any key to explore
+        </div>
+        {/* Watermark */}
         <div style={{
           position: 'absolute', bottom: mobile ? 24 : 32,
           color: 'rgba(255,255,255,0.06)', fontSize: 11,
