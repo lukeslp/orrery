@@ -7,7 +7,8 @@
       "Bash(sudo apt-get:*)",
       "mcp__plugin_playwright_playwright__browser_close",
       "Bash(source:*)",
-      "mcp__plugin_playwright_playwright__browser_click"
+      "mcp__plugin_playwright_playwright__browser_click",
+      "mcp__plugin_playwright_playwright__browser_press_key"
     ]
   },
   "enableAllProjectMcpServers": true,
