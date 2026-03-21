@@ -146,20 +146,18 @@ export function Planet({ planet, T, selected, onSelect, hovered, onHover }: {
       </mesh>
       {planet.tex === 'earth' && <EarthClouds radius={r} />}
       {planet.hasRings && <SaturnRings radius={r} />}
-      {/* Always show planet name label */}
-      <Html distanceFactor={10} style={{ pointerEvents: 'none' }}>
-        <div style={{
-          color: hovered || selected ? '#fff' : 'rgba(255,255,255,0.6)',
-          fontSize: 10, fontFamily: 'JetBrains Mono, monospace',
-          background: hovered || selected ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.4)',
-          padding: '2px 8px', borderRadius: 3,
-          whiteSpace: 'nowrap', transform: 'translateY(-20px)',
-          border: hovered || selected ? '1px solid rgba(255,255,255,0.15)' : '1px solid transparent',
-          transition: 'all 0.15s',
-        }}>
-          {planet.name}
-        </div>
-      </Html>
+      {hovered && !selected && (
+        <Html distanceFactor={10} style={{ pointerEvents: 'none' }}>
+          <div style={{
+            color: '#fff', fontSize: 10, fontFamily: 'JetBrains Mono, monospace',
+            background: 'rgba(0,0,0,0.8)', padding: '2px 8px', borderRadius: 3,
+            whiteSpace: 'nowrap', transform: 'translateY(-20px)',
+            border: '1px solid rgba(255,255,255,0.15)',
+          }}>
+            {planet.name}
+          </div>
+        </Html>
+      )}
     </group>
   );
 }
