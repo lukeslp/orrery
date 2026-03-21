@@ -19,8 +19,9 @@ import LoadingScreen from './ui/LoadingScreen';
 
 type CinematicStep = {
   camPreset?: number; focusPlanet?: number; duration: number; label: string;
-  stars?: boolean; constellations?: boolean; asteroidBelt?: boolean;
-  milkyWay?: boolean; deepSpace?: boolean; dwarf?: boolean;
+  desc?: string;
+  stars?: boolean; constellations?: boolean; constellationFocus?: boolean;
+  asteroidBelt?: boolean; milkyWay?: boolean; deepSpace?: boolean; dwarf?: boolean;
 };
 
 function OrreryInner() {
