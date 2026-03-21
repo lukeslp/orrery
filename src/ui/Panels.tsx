@@ -834,7 +834,6 @@ export default function Panels(props: PanelProps) {
             left: 0, right: 0, bottom: 0, top: 'auto',
             maxHeight: '45vh',
             borderRadius: '12px 12px 0 0',
-            paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
             overflowY: 'auto',
             ...bokehCard,
             padding: '16px 20px',
