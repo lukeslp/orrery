@@ -195,6 +195,7 @@ function useConstellationLineData(): LineData | null {
 
 export function ConstellationLines({ visible, theme }: { visible: boolean; theme: OrreryTheme }) {
   const lineData = useConstellationLineData();
+  const { camera } = useThree();
 
   const geometry = useMemo(() => {
     if (!lineData) return null;
@@ -210,6 +211,14 @@ export function ConstellationLines({ visible, theme }: { visible: boolean; theme
     depthWrite: false,
     depthTest: true,
   }), [theme.constellationLine]);
+
+  // Distance-based fade: full opacity < 200 AU, dim > 500 AU
+  useFrame(() => {
+    const dist = camera.position.length();
+    if (dist < 200) material.opacity = 0.35;
+    else if (dist > 500) material.opacity = 0.05;
+    else material.opacity = 0.35 - (dist - 200) / 300 * 0.3;
+  });
 
   if (!geometry) return null;
 
