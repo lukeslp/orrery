@@ -35,7 +35,7 @@ function OrreryInner() {
   const [navStack, setNavStack] = useState<string[]>(['Solar System']);
   const [selMoonIdx, setSelMoonIdx] = useState<number | null>(null);
   const [cameraDistance, setCameraDistance] = useState(50);
-  const [camIdx, setCamIdx] = useState(1);
+  const [camIdx, setCamIdx] = useState(0);
   const positionsRef = useRef(new Map<number, [number, number, number]>());
 
   const jd = useMemo(() => julianDate(simTime), [simTime]);
