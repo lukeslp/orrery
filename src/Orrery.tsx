@@ -59,40 +59,55 @@ function OrreryInner() {
 
   // ─── Cinematic: continuous zoom cycle through scale levels ──────────────────
   const cinematicSteps = useMemo((): CinematicStep[] => [
-    // Start close — dramatic inner planets
     { camPreset: 0, duration: 5000, label: 'Inner Planets',
-      stars: true, constellations: false, asteroidBelt: false, milkyWay: false, deepSpace: false, dwarf: false },
-    // Fly to Earth
-    { focusPlanet: 2, duration: 6000, label: 'Earth' },
-    // Pull back, reveal asteroid belt
-    { camPreset: 1, duration: 5000, label: 'Solar System', asteroidBelt: true },
-    // Fly to Jupiter
-    { focusPlanet: 4, duration: 6000, label: 'Jupiter' },
-    // Top-down, reveal constellations
-    { camPreset: 2, duration: 5000, label: 'From Above', constellations: true },
-    // Fly to Saturn
-    { focusPlanet: 5, duration: 6000, label: 'Saturn' },
-    // Ecliptic plane sweep
-    { camPreset: 3, duration: 4000, label: 'Ecliptic Plane' },
-    // Outer view, reveal dwarfs
-    { camPreset: 4, duration: 5000, label: 'Outer Planets', dwarf: true },
-    // Kuiper belt
-    { camPreset: 5, duration: 5000, label: 'Kuiper Belt' },
-    // Oort cloud, reveal milky way
-    { camPreset: 6, duration: 6000, label: 'Oort Cloud', milkyWay: true },
-    // Galaxy view, reveal deep space
-    { camPreset: 7, duration: 7000, label: 'Galactic View', deepSpace: true },
-    // Sweep back in with planet flybys
-    { camPreset: 5, duration: 4000, label: 'Kuiper Belt' },
-    { focusPlanet: 7, duration: 5000, label: 'Neptune' },
-    { camPreset: 4, duration: 4000, label: 'Outer Planets' },
-    { focusPlanet: 3, duration: 5000, label: 'Mars' },
-    { camPreset: 1, duration: 4000, label: 'Solar System' },
-    { focusPlanet: 1, duration: 5000, label: 'Venus' },
+      desc: 'Mercury, Venus, Earth, and Mars -- the rocky worlds closest to the Sun.',
+      stars: true, constellations: false, asteroidBelt: false, milkyWay: false, deepSpace: false, dwarf: false, constellationFocus: false },
+    { focusPlanet: 2, duration: 6000, label: 'Earth',
+      desc: 'Third rock from the Sun. The only known world with liquid water on its surface.' },
+    { camPreset: 1, duration: 5000, label: 'Solar System',
+      desc: 'The asteroid belt marks the boundary between rocky and gaseous worlds.',
+      asteroidBelt: true },
+    { focusPlanet: 4, duration: 6000, label: 'Jupiter',
+      desc: 'King of the planets. Its Great Red Spot is a storm larger than Earth.' },
+    { camPreset: 2, duration: 5000, label: 'From Above',
+      desc: 'The ancient constellations emerge -- patterns our ancestors saw in the stars.',
+      constellations: true },
+    { camPreset: 2, duration: 6000, label: 'Constellations',
+      desc: '88 constellations map the entire celestial sphere, tracing stories millennia old.',
+      constellationFocus: true },
+    { focusPlanet: 5, duration: 6000, label: 'Saturn',
+      desc: 'The ringed giant. Its rings span 282,000 km but are only 10 meters thick.',
+      constellationFocus: false },
+    { camPreset: 3, duration: 4000, label: 'Ecliptic Plane',
+      desc: "The plane of Earth's orbit -- where all the planets roughly align." },
+    { camPreset: 4, duration: 5000, label: 'Outer Planets',
+      desc: 'Beyond the asteroid belt lie the gas and ice giants, and the dwarf planets.',
+      dwarf: true },
+    { camPreset: 5, duration: 5000, label: 'Kuiper Belt',
+      desc: 'A ring of icy bodies beyond Neptune, home to Pluto and thousands more.' },
+    { camPreset: 6, duration: 6000, label: 'Oort Cloud',
+      desc: 'A vast spherical shell of comets at the edge of the Solar System.',
+      milkyWay: true },
+    { camPreset: 7, duration: 7000, label: 'Galactic View',
+      desc: 'Our Solar System is one of billions in the Milky Way galaxy.',
+      deepSpace: true },
+    { camPreset: 5, duration: 4000, label: 'Kuiper Belt',
+      desc: 'Sweeping back through the outer reaches.' },
+    { focusPlanet: 7, duration: 5000, label: 'Neptune',
+      desc: 'The windiest planet. Storms rage at 2,100 km/h on this distant ice giant.' },
+    { camPreset: 4, duration: 4000, label: 'Outer Planets',
+      desc: 'The gas giants dominate the outer Solar System.' },
+    { focusPlanet: 3, duration: 5000, label: 'Mars',
+      desc: 'The Red Planet. Olympus Mons rises 21 km -- the tallest volcano known.' },
+    { camPreset: 1, duration: 4000, label: 'Solar System',
+      desc: 'Our cosmic neighborhood -- eight planets orbiting an ordinary star.' },
+    { focusPlanet: 1, duration: 5000, label: 'Venus',
+      desc: "Earth's twin in size, but a world of crushing pressure and sulfuric acid clouds." },
   ], []);
 
   const cinematicIdx = useRef(0);
   const cinematicStart = useRef(0);
+  const [cinematicDesc, setCinematicDesc] = useState('');
 
   // Space weather state for cinematic overlay (NOAA SWPC, no auth needed)
   const [solarWind, setSolarWind] = useState<string | null>(null);
@@ -125,10 +140,12 @@ function OrreryInner() {
 
     if (step.stars !== undefined) setShowStars(() => step.stars!);
     if (step.constellations !== undefined) setShowConstellations(() => step.constellations!);
+    if (step.constellationFocus !== undefined) setConstellationFocus(() => step.constellationFocus!);
     if (step.asteroidBelt !== undefined) setShowAsteroidBelt(() => step.asteroidBelt!);
     if (step.milkyWay !== undefined) setShowMilkyWay(() => step.milkyWay!);
     if (step.deepSpace !== undefined) setShowDeepSpace(() => step.deepSpace!);
     if (step.dwarf !== undefined) setShowDwarf(() => step.dwarf!);
+    setCinematicDesc(step.desc || '');
   }, [cinematicSteps]);
 
   // Cinematic timer — poll-based to avoid fragile setTimeout chains
@@ -449,6 +466,7 @@ function OrreryInner() {
         setSimTime={setSimTime}
         positionsRef={positionsRef}
         cinematic={cinematic}
+        cinematicDesc={cinematicDesc}
         setCinematic={setCinematic}
         navStack={navStack}
         navigateBack={navigateBack}

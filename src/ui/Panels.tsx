@@ -513,6 +513,7 @@ export interface PanelProps {
   setSimTime: (fn: (d: Date) => Date) => void;
   positionsRef: React.MutableRefObject<Map<number, [number, number, number]>>;
   cinematic: boolean;
+  cinematicDesc: string;
   setCinematic: (c: boolean) => void;
   navStack: string[];
   navigateBack: () => void;
@@ -538,7 +539,7 @@ export default function Panels(props: PanelProps) {
     showMilkyWay, setShowMilkyWay,
     showDeepSpace, setShowDeepSpace,
     drawerOpen, setDrawerOpen,
-    cinematic,
+    cinematic, cinematicDesc,
     navStack,
     selMoonIdx, cameraDistance,
     cams, camIdx, onPresetSelect,
@@ -620,6 +621,16 @@ export default function Panels(props: PanelProps) {
           }}>
             {cinematicLabel}
           </div>
+          {cinematicDesc && (
+            <div style={{
+              marginTop: 8, maxWidth: mobile ? '80vw' : 420,
+              fontSize: mobile ? 11 : 13, fontWeight: 300, fontStyle: 'italic',
+              color: 'rgba(255,255,255,0.2)', lineHeight: 1.6,
+              textAlign: 'center', letterSpacing: 0.3,
+            }}>
+              {cinematicDesc}
+            </div>
+          )}
         </div>
 
         {/* Exit hint */}
