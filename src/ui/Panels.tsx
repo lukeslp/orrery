@@ -495,6 +495,7 @@ function SideDrawer({
 export interface PanelProps {
   simTime: Date;
   moon: { name: string; ill: number };
+  solarWind: string | null;
   speed: number; setSpeed: (fn: (s: number) => number) => void;
   playing: boolean; setPlaying: (fn: (p: boolean) => boolean) => void;
   focusTarget: FocusTarget | null; setFocusTarget: (f: FocusTarget | null) => void;
@@ -526,7 +527,7 @@ export interface PanelProps {
 
 export default function Panels(props: PanelProps) {
   const {
-    simTime, moon, speed,
+    simTime, moon, solarWind, speed,
     selPlanet, setSelPlanet, neos, neoStatus, selNeo, setSelNeo,
     showNeo, setShowNeo,
     showDwarf, setShowDwarf,

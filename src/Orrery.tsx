@@ -86,36 +86,16 @@ function OrreryInner() {
   const cinematicIdx = useRef(0);
   const cinematicTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Weather state for cinematic overlay
-  const [weather, setWeather] = useState<{ temp: string; desc: string; location: string } | null>(null);
+  // Space weather state for cinematic overlay (NOAA SWPC, no auth needed)
+  const [solarWind, setSolarWind] = useState<string | null>(null);
 
-  // Fetch weather on mount (Open-Meteo, no API key needed)
   useEffect(() => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`)
-          .then(r => r.json())
-          .then(data => {
-            const cur = data.current;
-            if (!cur) return;
-            const code = cur.weather_code as number;
-            const desc = code === 0 ? 'Clear' : code <= 3 ? 'Partly Cloudy' :
-              code <= 48 ? 'Foggy' : code <= 57 ? 'Drizzle' :
-              code <= 67 ? 'Rain' : code <= 77 ? 'Snow' :
-              code <= 82 ? 'Showers' : code <= 86 ? 'Snow Showers' : 'Thunderstorm';
-            setWeather({
-              temp: `${Math.round(cur.temperature_2m)}F`,
-              desc,
-              location: '',
-            });
-          })
-          .catch(() => {});
-      },
-      () => {},
-      { timeout: 5000 }
-    );
+    fetch('https://services.swpc.noaa.gov/products/summary/solar-wind-speed.json')
+      .then(r => r.json())
+      .then(data => {
+        if (data?.WindSpeed) setSolarWind(`${Math.round(Number(data.WindSpeed))} km/s`);
+      })
+      .catch(() => {});
   }, []);
 
   // Apply a cinematic step (camera preset + layers)
@@ -443,7 +423,7 @@ function OrreryInner() {
       <LoadingScreen ready={sceneReady} />
 
       <Panels
-        simTime={simTime} moon={moon}
+        simTime={simTime} moon={moon} solarWind={solarWind}
         speed={speed} setSpeed={setSpeed}
         playing={playing} setPlaying={setPlaying}
         focusTarget={focusTarget} setFocusTarget={setFocusTarget}
