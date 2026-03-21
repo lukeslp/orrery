@@ -20,7 +20,7 @@ import LoadingScreen from './ui/LoadingScreen';
 function OrreryInner() {
   const [neos, setNeos] = useState<NEO[]>([]);
   const [selNeo, setSelNeo] = useState<NEO | null>(null);
-  const [selPlanet, setSelPlanet] = useState<number | null>(null);
+  const [selPlanet, setSelPlanet] = useState<number | null>(2);
   const [showNeo, setShowNeo] = useState(false);
   const [showDwarf, setShowDwarf] = useState(true);
   const [showStars, setShowStars] = useState(true);
@@ -32,10 +32,10 @@ function OrreryInner() {
   const [focusTarget, setFocusTarget] = useState<FocusTarget | null>(null);
   const [sceneReady, setSceneReady] = useState(false);
   const [cinematic, setCinematic] = useState(false);
-  const [navStack, setNavStack] = useState<string[]>(['Solar System']);
+  const [navStack, setNavStack] = useState<string[]>(['Solar System', 'Earth']);
   const [selMoonIdx, setSelMoonIdx] = useState<number | null>(null);
   const [cameraDistance, setCameraDistance] = useState(50);
-  const [camIdx, setCamIdx] = useState(0);
+  const [camIdx, setCamIdx] = useState(2);
   const positionsRef = useRef(new Map<number, [number, number, number]>());
 
   const jd = useMemo(() => julianDate(simTime), [simTime]);

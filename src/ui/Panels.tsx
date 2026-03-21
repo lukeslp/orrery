@@ -523,7 +523,7 @@ export default function Panels(props: PanelProps) {
             ...(mobile
               ? { bottom: 80, left: 8, right: 8, width: 'auto', maxHeight: '40vh', overflowY: 'auto', paddingBottom: 'env(safe-area-inset-bottom)' }
               : { top: 96, left: 14, width: 205 }),
-            ...glass, padding: '12px 14px', zIndex: 20,
+            ...bokehCard, padding: '14px 16px', zIndex: 20,
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
@@ -623,7 +623,7 @@ export default function Panels(props: PanelProps) {
           style={{
             position: 'absolute', bottom: mobile ? 80 : 56,
             left: '50%', transform: 'translateX(-50%)',
-            ...glass, padding: '10px 16px', maxWidth: 420,
+            ...bokehCard, padding: '12px 18px', maxWidth: 420,
             width: mobile ? 'calc(100vw - 16px)' : '90%', zIndex: 20,
           }}
         >
