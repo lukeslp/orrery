@@ -21,25 +21,24 @@ function OrreryInner() {
   const [neos, setNeos] = useState<NEO[]>([]);
   const [neoStatus, setNeoStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
   const [selNeo, setSelNeo] = useState<NEO | null>(null);
-  // Mobile: no info card on load (blocks screen). Desktop: Earth selected.
-  const isMobileInit = typeof window !== 'undefined' && window.innerWidth < 768;
-  const [selPlanet, setSelPlanet] = useState<number | null>(isMobileInit ? null : 2);
+  // Cinematic mode is the default — start bare, reveal layers progressively
+  const [selPlanet, setSelPlanet] = useState<number | null>(null);
   const [showNeo, setShowNeo] = useState(false);
-  const [showDwarf, setShowDwarf] = useState(true);
+  const [showDwarf, setShowDwarf] = useState(false);
   const [showStars, setShowStars] = useState(true);
-  const [showConstellations, setShowConstellations] = useState(true);
-  const [showAsteroidBelt, setShowAsteroidBelt] = useState(true);
-  const [showMilkyWay, setShowMilkyWay] = useState(true);
-  const [showDeepSpace, setShowDeepSpace] = useState(true);
+  const [showConstellations, setShowConstellations] = useState(false);
+  const [showAsteroidBelt, setShowAsteroidBelt] = useState(false);
+  const [showMilkyWay, setShowMilkyWay] = useState(false);
+  const [showDeepSpace, setShowDeepSpace] = useState(false);
   const [constellationFocus, setConstellationFocus] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [simTime, setSimTime] = useState(new Date());
   const [playing, setPlaying] = useState(true);
   const [focusTarget, setFocusTarget] = useState<FocusTarget | null>(null);
   const [sceneReady, setSceneReady] = useState(false);
-  const [cinematic, setCinematic] = useState(false);
+  const [cinematic, setCinematic] = useState(true);
   const [cinematicAngle, setCinematicAngle] = useState<{ angle: number; elevation: number; distMult: number } | undefined>(undefined);
-  const [navStack, setNavStack] = useState<string[]>(isMobileInit ? ['Solar System'] : ['Solar System', 'Earth']);
+  const [navStack, setNavStack] = useState<string[]>(['Solar System']);
   const [selMoonIdx, setSelMoonIdx] = useState<number | null>(null);
   const [cameraDistance, setCameraDistance] = useState(50);
   const [camIdx, setCamIdx] = useState(0);
@@ -52,49 +51,69 @@ function OrreryInner() {
 
   const camPreset = camIdx >= 0 && camIdx < CAMS.length ? CAMS[camIdx] : null;
 
-  // ─── Cinematic tour: auto-cycle through bodies and views ────────────────────
-  const cinematicShots = useMemo(() => {
-    // Each shot: { planetIdx, moonIdx?, duration(ms), angle, elevation, distMult }
-    // angle/elevation/distMult control camera placement relative to body
-    const shots: { planetIdx: number; moonIdx?: number; duration: number; angle: number; elevation: number; distMult: number; label: string }[] = [
-      // Wide solar system view
-      { planetIdx: -1, duration: 8000, angle: 0, elevation: 0.4, distMult: 1, label: 'Solar System' },
-      // Inner planets
-      { planetIdx: 2, duration: 7000, angle: 0.3, elevation: 0.3, distMult: 1, label: 'Earth' },
-      { planetIdx: 2, moonIdx: 0, duration: 5000, angle: -0.5, elevation: 0.2, distMult: 1.5, label: 'The Moon' },
-      { planetIdx: 1, duration: 5000, angle: 1.2, elevation: 0.5, distMult: 1, label: 'Venus' },
-      { planetIdx: 0, duration: 5000, angle: 2.0, elevation: 0.3, distMult: 1, label: 'Mercury' },
-      { planetIdx: 3, duration: 5000, angle: -0.3, elevation: 0.4, distMult: 1, label: 'Mars' },
-      // Gas giants
-      { planetIdx: 4, duration: 7000, angle: 0.8, elevation: 0.3, distMult: 0.8, label: 'Jupiter' },
-      { planetIdx: 4, moonIdx: 2, duration: 5000, angle: -0.4, elevation: 0.2, distMult: 1.2, label: 'Ganymede' },
-      { planetIdx: 5, duration: 7000, angle: -0.6, elevation: 0.5, distMult: 0.7, label: 'Saturn' },
-      { planetIdx: 5, moonIdx: 5, duration: 5000, angle: 0.9, elevation: 0.3, distMult: 1, label: 'Titan' },
-      // Ice giants and outer
-      { planetIdx: 6, duration: 5000, angle: 1.5, elevation: 0.4, distMult: 1, label: 'Uranus' },
-      { planetIdx: 7, duration: 5000, angle: -1.0, elevation: 0.3, distMult: 1, label: 'Neptune' },
-      { planetIdx: 7, moonIdx: 0, duration: 4000, angle: 0.5, elevation: 0.2, distMult: 1.3, label: 'Triton' },
-      // Dwarf planets
-      { planetIdx: 9, duration: 5000, angle: 0.2, elevation: 0.5, distMult: 1, label: 'Pluto' },
-      // Pull back to wide view
-      { planetIdx: -1, duration: 6000, angle: Math.PI, elevation: 0.6, distMult: 1, label: 'Solar System' },
-    ];
-    return shots;
-  }, []);
+  // ─── Cinematic tour: auto-cycle through bodies, progressively reveal layers ─
+  type CinematicShot = {
+    planetIdx: number; moonIdx?: number;
+    duration: number; angle: number; elevation: number; distMult: number;
+    label: string;
+    layers?: Partial<{
+      showConstellations: boolean; showAsteroidBelt: boolean;
+      showMilkyWay: boolean; showDeepSpace: boolean; showDwarf: boolean;
+    }>;
+  };
+  const cinematicShots = useMemo((): CinematicShot[] => [
+    // Open: just stars and planets, wide view
+    { planetIdx: -1, duration: 8000, angle: 0, elevation: 0.4, distMult: 1, label: 'Solar System' },
+    // Inner planets — still bare
+    { planetIdx: 2, duration: 7000, angle: 0.3, elevation: 0.3, distMult: 1, label: 'Earth' },
+    { planetIdx: 2, moonIdx: 0, duration: 5000, angle: -0.5, elevation: 0.2, distMult: 1.5, label: 'The Moon' },
+    { planetIdx: 1, duration: 5000, angle: 1.2, elevation: 0.5, distMult: 1, label: 'Venus' },
+    { planetIdx: 0, duration: 5000, angle: 2.0, elevation: 0.3, distMult: 1, label: 'Mercury' },
+    // Mars — reveal asteroid belt
+    { planetIdx: 3, duration: 6000, angle: -0.3, elevation: 0.4, distMult: 1, label: 'Mars',
+      layers: { showAsteroidBelt: true } },
+    // Jupiter — reveal constellations
+    { planetIdx: 4, duration: 7000, angle: 0.8, elevation: 0.3, distMult: 0.8, label: 'Jupiter',
+      layers: { showConstellations: true } },
+    { planetIdx: 4, moonIdx: 2, duration: 5000, angle: -0.4, elevation: 0.2, distMult: 1.2, label: 'Ganymede' },
+    // Saturn — reveal milky way
+    { planetIdx: 5, duration: 7000, angle: -0.6, elevation: 0.5, distMult: 0.7, label: 'Saturn',
+      layers: { showMilkyWay: true } },
+    { planetIdx: 5, moonIdx: 5, duration: 5000, angle: 0.9, elevation: 0.3, distMult: 1, label: 'Titan' },
+    // Ice giants — reveal dwarf planets
+    { planetIdx: 6, duration: 5000, angle: 1.5, elevation: 0.4, distMult: 1, label: 'Uranus',
+      layers: { showDwarf: true } },
+    { planetIdx: 7, duration: 5000, angle: -1.0, elevation: 0.3, distMult: 1, label: 'Neptune' },
+    { planetIdx: 7, moonIdx: 0, duration: 4000, angle: 0.5, elevation: 0.2, distMult: 1.3, label: 'Triton' },
+    // Pluto — reveal deep space
+    { planetIdx: 9, duration: 5000, angle: 0.2, elevation: 0.5, distMult: 1, label: 'Pluto',
+      layers: { showDeepSpace: true } },
+    // Pull back — everything now visible
+    { planetIdx: -1, duration: 6000, angle: Math.PI, elevation: 0.6, distMult: 1, label: 'Solar System' },
+  ], []);
 
   const cinematicIdx = useRef(0);
   const cinematicTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Apply a cinematic shot
+  // Apply a cinematic shot (camera + layer reveals)
   const applyCinematicShot = useCallback((idx: number) => {
     const shot = cinematicShots[idx % cinematicShots.length];
     setCinematicAngle({ angle: shot.angle, elevation: shot.elevation, distMult: shot.distMult });
+
+    // Progressive layer reveals
+    if (shot.layers) {
+      if (shot.layers.showConstellations !== undefined) setShowConstellations(() => shot.layers!.showConstellations!);
+      if (shot.layers.showAsteroidBelt !== undefined) setShowAsteroidBelt(() => shot.layers!.showAsteroidBelt!);
+      if (shot.layers.showMilkyWay !== undefined) setShowMilkyWay(() => shot.layers!.showMilkyWay!);
+      if (shot.layers.showDeepSpace !== undefined) setShowDeepSpace(() => shot.layers!.showDeepSpace!);
+      if (shot.layers.showDwarf !== undefined) setShowDwarf(() => shot.layers!.showDwarf!);
+    }
+
     if (shot.planetIdx === -1) {
-      // Wide solar system view
       setSelPlanet(null);
       setSelMoonIdx(null);
       setFocusTarget(null);
-      setCamIdx(1); // System view preset
+      setCamIdx(1);
       setNavStack(['Solar System']);
     } else {
       setSelPlanet(shot.planetIdx);
@@ -120,10 +139,24 @@ function OrreryInner() {
     if (!cinematic) {
       if (cinematicTimer.current) clearTimeout(cinematicTimer.current);
       setCinematicAngle(undefined);
+      // Restore all layers when exiting cinematic
+      setShowStars(() => true);
+      setShowConstellations(() => true);
+      setShowAsteroidBelt(() => true);
+      setShowMilkyWay(() => true);
+      setShowDeepSpace(() => true);
+      setShowDwarf(() => true);
+      // Focus on Earth after cinematic
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+      setSelPlanet(isMobile ? null : 2);
+      setCamIdx(-1);
+      const earthPos = positionsRef.current.get(2);
+      if (earthPos) setFocusTarget({ planetIdx: 2, pos: earthPos });
+      setNavStack(isMobile ? ['Solar System'] : ['Solar System', 'Earth']);
       return;
     }
 
-    // Start tour from shot 0
+    // Start tour from shot 0 — layers begin minimal
     cinematicIdx.current = 0;
     applyCinematicShot(0);
 
@@ -144,20 +177,7 @@ function OrreryInner() {
     positionsRef.current = m;
   }, []);
 
-  // Start focused on Earth (camera follows even on mobile, just no info card)
-  const didInitFocus = useRef(false);
-  useEffect(() => {
-    if (didInitFocus.current) return;
-    if (positionsRef.current.size > 0) return;
-  }, []);
-  useEffect(() => {
-    if (didInitFocus.current) return;
-    const pos = positionsRef.current.get(2);
-    if (pos) {
-      setFocusTarget({ planetIdx: 2, pos });
-      didInitFocus.current = true;
-    }
-  });
+  // (Earth focus now handled by cinematic exit)
 
   // Time tick (~60fps)
   useEffect(() => {
