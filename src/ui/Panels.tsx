@@ -616,8 +616,13 @@ export default function Panels(props: PanelProps) {
         aria-label="Navigation"
         style={{
           position: 'absolute', top: 56, left: 12, bottom: 56,
-          width: expandedSection ? 200 : 200,
-          ...glass, padding: '6px 8px', zIndex: 15,
+          width: 200,
+          background: 'rgba(0,0,0,0.75)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: 6,
+          padding: '6px 8px', zIndex: 15,
           overflowY: 'auto', overflowX: 'hidden',
           scrollbarWidth: 'thin',
           scrollbarColor: 'rgba(255,255,255,0.08) transparent',
