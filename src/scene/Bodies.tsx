@@ -149,11 +149,6 @@ export function Planet({ planet, T, selected, onSelect, hovered, onHover }: {
 
   return (
     <group position={pos}>
-      {/* Soft glow behind planet for visibility */}
-      <mesh>
-        <sphereGeometry args={[r * 2.5, 32, 32]} />
-        <meshBasicMaterial color={planet.color} transparent opacity={0.06} depthWrite={false} />
-      </mesh>
       <mesh
         ref={ref}
         renderOrder={10}
