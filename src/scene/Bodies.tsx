@@ -39,6 +39,26 @@ export function Sun() {
       </mesh>
       <pointLight intensity={5} color="#fff5e0" distance={200} />
       <pointLight intensity={2} color="#ffcc80" distance={100} />
+      <Html
+        position={[0, 0.2, 0]}
+        center
+        distanceFactor={10}
+        style={{ pointerEvents: 'none' }}
+        zIndexRange={[1, 0]}
+      >
+        <div style={{
+          color: 'rgba(255,220,160,0.6)',
+          fontSize: 12,
+          fontFamily: "'Cormorant Garamond', serif",
+          fontWeight: 400,
+          letterSpacing: 1.5,
+          whiteSpace: 'nowrap',
+          userSelect: 'none',
+          textShadow: '0 0 12px rgba(255,180,60,0.5)',
+        }}>
+          Sol
+        </div>
+      </Html>
     </group>
   );
 }
