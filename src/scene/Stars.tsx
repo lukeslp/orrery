@@ -456,10 +456,10 @@ export function ConstellationLabels({ visible, focus }: { visible: boolean; focu
                 <div style={{
                   color: c.color,
                   opacity: labelOpacity,
-                  fontSize: 11,
+                  fontSize: 14,
                   fontFamily: "'Cormorant Garamond', serif",
                   fontStyle: 'italic',
-                  fontWeight: 300,
+                  fontWeight: 400,
                   whiteSpace: 'nowrap',
                   letterSpacing: 1,
                   userSelect: 'none',
@@ -467,8 +467,8 @@ export function ConstellationLabels({ visible, focus }: { visible: boolean; focu
                   lineHeight: 1.3,
                   textShadow: `0 0 10px ${c.color}, 0 0 20px rgba(0,0,0,0.9)`,
                 }}>
-                  <span style={{ display: 'block', fontSize: 13, fontWeight: 400, fontStyle: 'normal' }}>{c.latin}</span>
-                  {c.english && <span style={{ display: 'block', fontSize: 9, opacity: 0.6 }}>{c.english}</span>}
+                  <span style={{ display: 'block', fontSize: 16, fontWeight: 500, fontStyle: 'normal' }}>{c.latin}</span>
+                  {c.english && <span style={{ display: 'block', fontSize: 11, opacity: 0.7 }}>{c.english}</span>}
                 </div>
               </Html>
             )}

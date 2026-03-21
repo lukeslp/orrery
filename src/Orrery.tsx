@@ -428,7 +428,7 @@ function OrreryInner() {
         <Suspense fallback={null}>
           <Scene
             jd={jd} T={T}
-            neos={neos} selNeo={selNeo} setSelNeo={setSelNeo}
+            neos={showNeo ? neos : []} selNeo={selNeo} setSelNeo={setSelNeo}
             selPlanet={selPlanet} setSelPlanet={handlePlanetSelect}
             focusTarget={focusTarget}
             onPositionsUpdate={handlePositionsUpdate}
