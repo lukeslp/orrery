@@ -320,7 +320,7 @@ export function ConstellationLabels({ visible }: { visible: boolean }) {
             {visibleLabels.has(c.id) && (
               <Html
                 center
-                distanceFactor={1800}
+                distanceFactor={300}
                 style={{ pointerEvents: 'none' }}
                 zIndexRange={[1, 0]}
               >

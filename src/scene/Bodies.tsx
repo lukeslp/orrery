@@ -236,13 +236,13 @@ export function Satellite({ moon, parentPos, jd, selected, onSelect, hovered, on
         <Html
           position={[0, moon.radius + 0.008, 0]}
           center
-          distanceFactor={4}
+          distanceFactor={1.5}
           style={{ pointerEvents: 'none' }}
           zIndexRange={[1, 0]}
         >
           <div style={{
             color: hovered || selected ? '#fff' : 'rgba(255,255,255,0.4)',
-            fontSize: 9,
+            fontSize: 8,
             fontFamily: "'Cormorant Garamond', serif",
             fontWeight: 300,
             fontStyle: 'italic',
