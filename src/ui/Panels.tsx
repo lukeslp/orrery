@@ -10,7 +10,7 @@
  */
 
 import { useEffect, useRef, useCallback } from 'react';
-import type { NEO, FocusTarget, CamPreset } from '../lib/kepler';
+import type { NEO, CamPreset } from '../lib/kepler';
 import { ALL_BODIES } from '../data/planets';
 import { getMoonsForPlanet } from '../data/moons';
 import { useTheme, THEMES } from '../lib/themes';
@@ -498,7 +498,6 @@ export interface PanelProps {
   solarWind: string | null;
   speed: number; setSpeed: (fn: (s: number) => number) => void;
   playing: boolean; setPlaying: (fn: (p: boolean) => boolean) => void;
-  focusTarget: FocusTarget | null; setFocusTarget: (f: FocusTarget | null) => void;
   selPlanet: number | null; setSelPlanet: (i: number | null) => void;
   neos: NEO[]; neoStatus: 'loading' | 'loaded' | 'error'; selNeo: NEO | null; setSelNeo: (n: NEO | null) => void;
   showNeo: boolean; setShowNeo: (fn: (p: boolean) => boolean) => void;
@@ -510,8 +509,6 @@ export interface PanelProps {
   showMilkyWay: boolean; setShowMilkyWay: (fn: (p: boolean) => boolean) => void;
   showDeepSpace: boolean; setShowDeepSpace: (fn: (p: boolean) => boolean) => void;
   drawerOpen: boolean; setDrawerOpen: (fn: boolean | ((p: boolean) => boolean)) => void;
-  setSimTime: (fn: (d: Date) => Date) => void;
-  positionsRef: React.MutableRefObject<Map<number, [number, number, number]>>;
   cinematic: boolean;
   cinematicDesc: string;
   setCinematic: (c: boolean) => void;

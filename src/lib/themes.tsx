@@ -91,15 +91,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     try { localStorage.setItem(STORAGE_KEY, t.id); } catch { /* ignore */ }
   }, []);
 
-  const cycleTheme = useCallback(() => {
-    setThemeState(prev => {
-      const idx = THEMES.findIndex(t => t.id === prev.id);
-      const next = THEMES[(idx + 1) % THEMES.length];
-      try { localStorage.setItem(STORAGE_KEY, next.id); } catch { /* ignore */ }
-      return next;
-    });
-  }, []);
-
   // Set CSS custom properties on :root
   useEffect(() => {
     const root = document.documentElement;
@@ -109,7 +100,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, cycleTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );
