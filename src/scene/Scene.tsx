@@ -165,7 +165,7 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, onCameraDistanc
       minDistance={0.05}
       maxDistance={100000}
       autoRotate={cinematic || camPreset?.autoRotate || false}
-      autoRotateSpeed={cinematic ? 0.15 : camPreset?.autoRotate ? 0.15 : 0}
+      autoRotateSpeed={cinematic ? 0.3 : camPreset?.autoRotate ? 0.15 : 0}
     />
   );
 }

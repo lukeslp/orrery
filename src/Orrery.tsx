@@ -402,6 +402,7 @@ function OrreryInner() {
             showMilkyWay={showMilkyWay}
             showDeepSpace={showDeepSpace}
             cinematic={cinematic}
+            cinematicAngle={cinematicAngle}
             onMoonSelect={handleMoonSelect}
             selMoonIdx={selMoonIdx}
             onCameraDistance={setCameraDistance}
