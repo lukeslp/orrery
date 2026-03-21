@@ -567,7 +567,7 @@ export default function Panels(props: PanelProps) {
 
   if (cinematic) {
     const dim: React.CSSProperties = {
-      color: 'rgba(255,255,255,0.25)', fontSize: 10, fontWeight: 300,
+      color: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: 300,
       letterSpacing: 1.5, fontStyle: 'italic',
     };
     return (
@@ -586,7 +586,7 @@ export default function Panels(props: PanelProps) {
         }}>
           <span style={{
             fontSize: mobile ? 32 : 44, fontWeight: 300, letterSpacing: 6,
-            color: 'rgba(255,255,255,0.6)',
+            color: 'rgba(255,255,255,0.85)',
             fontFamily: "'Cormorant Garamond','Garamond','Baskerville','Georgia',serif",
           }}>
             {fmtTime(simTime)}
