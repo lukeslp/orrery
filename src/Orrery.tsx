@@ -52,102 +52,104 @@ function OrreryInner() {
 
   const camPreset = camIdx >= 0 && camIdx < CAMS.length ? CAMS[camIdx] : null;
 
-  // ─── Cinematic tour: auto-cycle through bodies, progressively reveal layers ─
-  type CinematicShot = {
-    planetIdx: number; moonIdx?: number;
-    duration: number; angle: number; elevation: number; distMult: number;
-    label: string;
-    layers?: Partial<{
-      showConstellations: boolean; showAsteroidBelt: boolean;
-      showMilkyWay: boolean; showDeepSpace: boolean; showDwarf: boolean;
-    }>;
+  // ─── Cinematic: continuous zoom cycle through scale levels ──────────────────
+  // Each step: camera preset index + layer state. Zooms out then back in.
+  type CinematicStep = {
+    camPreset: number; duration: number; label: string;
+    stars?: boolean; constellations?: boolean; asteroidBelt?: boolean;
+    milkyWay?: boolean; deepSpace?: boolean; dwarf?: boolean;
   };
-  const cinematicShots = useMemo((): CinematicShot[] => [
-    // Open: just stars and planets, wide view
-    { planetIdx: -1, duration: 8000, angle: 0, elevation: 0.4, distMult: 1, label: 'Solar System' },
-    // Inner planets — still bare
-    { planetIdx: 2, duration: 7000, angle: 0.3, elevation: 0.3, distMult: 1, label: 'Earth' },
-    { planetIdx: 2, moonIdx: 0, duration: 5000, angle: -0.5, elevation: 0.2, distMult: 1.5, label: 'The Moon' },
-    { planetIdx: 1, duration: 5000, angle: 1.2, elevation: 0.5, distMult: 1, label: 'Venus' },
-    { planetIdx: 0, duration: 5000, angle: 2.0, elevation: 0.3, distMult: 1, label: 'Mercury' },
-    // Mars — reveal asteroid belt
-    { planetIdx: 3, duration: 6000, angle: -0.3, elevation: 0.4, distMult: 1, label: 'Mars',
-      layers: { showAsteroidBelt: true } },
-    // Jupiter — reveal constellations
-    { planetIdx: 4, duration: 7000, angle: 0.8, elevation: 0.3, distMult: 0.8, label: 'Jupiter',
-      layers: { showConstellations: true } },
-    { planetIdx: 4, moonIdx: 2, duration: 5000, angle: -0.4, elevation: 0.2, distMult: 1.2, label: 'Ganymede' },
-    // Saturn — reveal milky way
-    { planetIdx: 5, duration: 7000, angle: -0.6, elevation: 0.5, distMult: 0.7, label: 'Saturn',
-      layers: { showMilkyWay: true } },
-    { planetIdx: 5, moonIdx: 5, duration: 5000, angle: 0.9, elevation: 0.3, distMult: 1, label: 'Titan' },
-    // Ice giants — reveal dwarf planets
-    { planetIdx: 6, duration: 5000, angle: 1.5, elevation: 0.4, distMult: 1, label: 'Uranus',
-      layers: { showDwarf: true } },
-    { planetIdx: 7, duration: 5000, angle: -1.0, elevation: 0.3, distMult: 1, label: 'Neptune' },
-    { planetIdx: 7, moonIdx: 0, duration: 4000, angle: 0.5, elevation: 0.2, distMult: 1.3, label: 'Triton' },
-    // Pluto — reveal deep space
-    { planetIdx: 9, duration: 5000, angle: 0.2, elevation: 0.5, distMult: 1, label: 'Pluto',
-      layers: { showDeepSpace: true } },
-    // Pull back — everything now visible
-    { planetIdx: -1, duration: 6000, angle: Math.PI, elevation: 0.6, distMult: 1, label: 'Solar System' },
+  const cinematicSteps = useMemo((): CinematicStep[] => [
+    // Zoom out: reveal layers progressively
+    { camPreset: 8, duration: 10000, label: 'Inner Solar System',
+      stars: true, constellations: false, asteroidBelt: false, milkyWay: false, deepSpace: false, dwarf: false },
+    { camPreset: 1, duration: 10000, label: 'The Solar System',
+      asteroidBelt: true },
+    { camPreset: 2, duration: 8000, label: 'Orbital Plane',
+      constellations: true },
+    { camPreset: 3, duration: 8000, label: 'Ecliptic View' },
+    { camPreset: 4, duration: 8000, label: 'Outer Planets',
+      dwarf: true },
+    { camPreset: 5, duration: 8000, label: 'Kuiper Belt' },
+    { camPreset: 6, duration: 10000, label: 'Oort Cloud',
+      milkyWay: true },
+    { camPreset: 7, duration: 12000, label: 'Galactic View',
+      deepSpace: true },
+    // Zoom back in
+    { camPreset: 6, duration: 8000, label: 'Oort Cloud' },
+    { camPreset: 5, duration: 8000, label: 'Kuiper Belt' },
+    { camPreset: 4, duration: 8000, label: 'Outer Planets' },
+    { camPreset: 2, duration: 8000, label: 'Orbital Plane' },
+    { camPreset: 0, duration: 10000, label: 'Inner Solar System' },
   ], []);
 
   const cinematicIdx = useRef(0);
   const cinematicTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Apply a cinematic shot (camera + layer reveals)
-  const applyCinematicShot = useCallback((idx: number) => {
-    const shot = cinematicShots[idx % cinematicShots.length];
-    setCinematicAngle({ angle: shot.angle, elevation: shot.elevation, distMult: shot.distMult });
+  // Weather state for cinematic overlay
+  const [weather, setWeather] = useState<{ temp: string; desc: string; location: string } | null>(null);
 
-    // Progressive layer reveals
-    if (shot.layers) {
-      if (shot.layers.showConstellations !== undefined) setShowConstellations(() => shot.layers!.showConstellations!);
-      if (shot.layers.showAsteroidBelt !== undefined) setShowAsteroidBelt(() => shot.layers!.showAsteroidBelt!);
-      if (shot.layers.showMilkyWay !== undefined) setShowMilkyWay(() => shot.layers!.showMilkyWay!);
-      if (shot.layers.showDeepSpace !== undefined) setShowDeepSpace(() => shot.layers!.showDeepSpace!);
-      if (shot.layers.showDwarf !== undefined) setShowDwarf(() => shot.layers!.showDwarf!);
-    }
+  // Fetch weather on mount (Open-Meteo, no API key needed)
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`)
+          .then(r => r.json())
+          .then(data => {
+            const cur = data.current;
+            if (!cur) return;
+            const code = cur.weather_code as number;
+            const desc = code === 0 ? 'Clear' : code <= 3 ? 'Partly Cloudy' :
+              code <= 48 ? 'Foggy' : code <= 57 ? 'Drizzle' :
+              code <= 67 ? 'Rain' : code <= 77 ? 'Snow' :
+              code <= 82 ? 'Showers' : code <= 86 ? 'Snow Showers' : 'Thunderstorm';
+            setWeather({
+              temp: `${Math.round(cur.temperature_2m)}F`,
+              desc,
+              location: '',
+            });
+          })
+          .catch(() => {});
+      },
+      () => {},
+      { timeout: 5000 }
+    );
+  }, []);
 
-    if (shot.planetIdx === -1) {
-      setSelPlanet(null);
-      setSelMoonIdx(null);
-      setFocusTarget(null);
-      setCamIdx(1);
-      setNavStack(['Solar System']);
-    } else {
-      setSelPlanet(shot.planetIdx);
-      setCamIdx(-1);
-      const pos = positionsRef.current.get(shot.planetIdx);
-      if (shot.moonIdx !== undefined) {
-        const moons = getMoonsForPlanet(shot.planetIdx);
-        if (shot.moonIdx < moons.length) {
-          setSelMoonIdx(shot.moonIdx);
-          setFocusTarget({ planetIdx: shot.planetIdx, pos: pos || [0, 0, 0], moonIdx: shot.moonIdx });
-          setNavStack(['Solar System', ALL_BODIES[shot.planetIdx].name, moons[shot.moonIdx].name]);
-        }
-      } else {
-        setSelMoonIdx(null);
-        setFocusTarget({ planetIdx: shot.planetIdx, pos: pos || [0, 0, 0] });
-        setNavStack(['Solar System', ALL_BODIES[shot.planetIdx].name]);
-      }
-    }
-  }, [cinematicShots]);
+  // Apply a cinematic step (camera preset + layers)
+  const applyCinematicStep = useCallback((idx: number) => {
+    const step = cinematicSteps[idx % cinematicSteps.length];
+    // Set camera to the preset
+    setCamIdx(step.camPreset);
+    setSelPlanet(null);
+    setSelMoonIdx(null);
+    setFocusTarget(null);
+    setCinematicAngle(undefined);
+    setNavStack([step.label]);
+    // Apply layer changes (only if explicitly set in this step)
+    if (step.stars !== undefined) setShowStars(() => step.stars!);
+    if (step.constellations !== undefined) setShowConstellations(() => step.constellations!);
+    if (step.asteroidBelt !== undefined) setShowAsteroidBelt(() => step.asteroidBelt!);
+    if (step.milkyWay !== undefined) setShowMilkyWay(() => step.milkyWay!);
+    if (step.deepSpace !== undefined) setShowDeepSpace(() => step.deepSpace!);
+    if (step.dwarf !== undefined) setShowDwarf(() => step.dwarf!);
+  }, [cinematicSteps]);
 
-  // Cinematic tour timer — wait for scene + positions before starting
+  // Cinematic timer — wait for scene before starting
   useEffect(() => {
     if (!cinematic) {
       if (cinematicTimer.current) clearTimeout(cinematicTimer.current);
       setCinematicAngle(undefined);
-      // Restore all layers when exiting cinematic
+      // Restore all layers when exiting
       setShowStars(() => true);
       setShowConstellations(() => true);
       setShowAsteroidBelt(() => true);
       setShowMilkyWay(() => true);
       setShowDeepSpace(() => true);
       setShowDwarf(() => true);
-      // Focus on Earth after cinematic
+      // Focus on Earth
       const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
       setSelPlanet(isMobile ? null : 2);
       setCamIdx(-1);
@@ -157,33 +159,23 @@ function OrreryInner() {
       return;
     }
 
-    // Don't start tour until scene is ready and positions are available
-    if (!sceneReady || !positionsReady) return;
+    if (!sceneReady) return;
 
-    // Start tour from shot 0 — layers begin minimal
     cinematicIdx.current = 0;
-    applyCinematicShot(0);
+    applyCinematicStep(0);
 
     const advance = () => {
-      cinematicIdx.current = (cinematicIdx.current + 1) % cinematicShots.length;
-      // Reset layers to bare at the start of each cycle
-      if (cinematicIdx.current === 0) {
-        setShowConstellations(() => false);
-        setShowAsteroidBelt(() => false);
-        setShowMilkyWay(() => false);
-        setShowDeepSpace(() => false);
-        setShowDwarf(() => false);
-      }
-      applyCinematicShot(cinematicIdx.current);
-      cinematicTimer.current = setTimeout(advance, cinematicShots[cinematicIdx.current].duration);
+      cinematicIdx.current = (cinematicIdx.current + 1) % cinematicSteps.length;
+      applyCinematicStep(cinematicIdx.current);
+      cinematicTimer.current = setTimeout(advance, cinematicSteps[cinematicIdx.current].duration);
     };
 
-    cinematicTimer.current = setTimeout(advance, cinematicShots[0].duration);
+    cinematicTimer.current = setTimeout(advance, cinematicSteps[0].duration);
 
     return () => {
       if (cinematicTimer.current) clearTimeout(cinematicTimer.current);
     };
-  }, [cinematic, sceneReady, positionsReady, applyCinematicShot, cinematicShots]);
+  }, [cinematic, sceneReady, applyCinematicStep, cinematicSteps]);
 
   const handlePositionsUpdate = useCallback((m: Map<number, [number, number, number]>) => {
     positionsRef.current = m;
