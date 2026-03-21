@@ -59,53 +59,23 @@ function OrreryInner() {
 
   // ─── Cinematic: continuous zoom cycle through scale levels ──────────────────
   const cinematicSteps = useMemo((): CinematicStep[] => [
-    // Phase 1: Outward journey — inner system to galactic scale
-    { camPreset: 0, duration: 4000, label: 'Inner Planets',
-      desc: 'Mercury, Venus, Earth, and Mars -- the rocky worlds closest to the Sun.',
-      stars: true, constellations: false, constellationFocus: false, asteroidBelt: false, milkyWay: false, deepSpace: false, dwarf: false },
-    { focusPlanet: 4, duration: 5000, label: 'Jupiter',
-      desc: 'King of the planets. Its Great Red Spot is a storm larger than Earth. 95 known moons.',
-      asteroidBelt: true },
-    { focusPlanet: 2, duration: 5000, label: 'Earth',
-      desc: 'Our home. The only known world with liquid water on its surface.',
-      constellations: true },
-    { camPreset: 5, duration: 3000, label: 'Kuiper Belt',
-      desc: 'A ring of icy bodies beyond Neptune, home to Pluto and thousands more.',
-      dwarf: true, milkyWay: true },
-    { camPreset: 6, duration: 3000, label: 'Oort Cloud',
-      desc: 'A vast spherical shell of comets at the edge of the Solar System.',
-      deepSpace: true },
-    { camPreset: 7, duration: 5000, label: 'Galactic View',
-      desc: 'Our Solar System is one of billions in the Milky Way galaxy.' },
-
-    // Phase 2: Dramatic zoom back in to the Sun
-    { camPreset: 8, duration: 6000, label: 'Sol',
-      desc: 'A yellow dwarf star, 4.6 billion years old. 99.86% of all mass in the solar system.',
-      deepSpace: false, milkyWay: false },
-
-    // Phase 3: Planet tour
-    { focusPlanet: 3, duration: 5000, label: 'Mars',
-      desc: 'The Red Planet. Olympus Mons rises 21 km -- the tallest volcano known.' },
-    { focusPlanet: 5, duration: 5000, label: 'Saturn',
-      desc: 'The ringed giant. Its rings span 282,000 km but are only 10 meters thick.' },
-    { camPreset: 2, duration: 5000, label: 'Constellations',
-      desc: '88 constellations map the entire celestial sphere, tracing stories millennia old.',
-      constellationFocus: true },
-    { focusPlanet: 6, duration: 5000, label: 'Uranus',
-      desc: 'Ice giant tilted 97.8 degrees on its side. Faint rings and 28 known moons.',
-      constellationFocus: false },
-    { focusPlanet: 7, duration: 5000, label: 'Neptune',
-      desc: 'The windiest planet. Storms rage at 2,100 km/h on this distant ice giant.' },
-    { focusPlanet: 0, duration: 4000, label: 'Mercury',
-      desc: 'Smallest planet. Temperature swings from -180 to 430 degrees with no atmosphere.' },
-    { focusPlanet: 1, duration: 5000, label: 'Venus',
-      desc: "Earth's twin in size, but a world of crushing pressure and sulfuric acid clouds." },
-    { camPreset: 3, duration: 4000, label: 'Ecliptic Plane',
-      desc: "The plane of Earth's orbit -- where all the planets roughly align." },
-
-    // Phase 4: Return home
-    { camPreset: 0, duration: 5000, label: 'Inner Planets',
-      desc: 'Our cosmic neighborhood -- four rocky worlds orbiting close to an ordinary star.' },
+    // 1. Start at the Sun
+    { camPreset: 8, duration: 5000, label: 'Sol',
+      stars: true, constellations: false, constellationFocus: false,
+      asteroidBelt: false, milkyWay: false, deepSpace: false, dwarf: false },
+    // 2. Pull out to inner planets
+    { camPreset: 0, duration: 5000, label: 'Inner Planets' },
+    // 3. Zoom to Earth
+    { focusPlanet: 2, duration: 5000, label: 'Earth' },
+    // 4. Pull out to full system
+    { camPreset: 1, duration: 5000, label: 'Solar System',
+      constellations: true, asteroidBelt: true, dwarf: true },
+    // 5. Out to galaxy
+    { camPreset: 7, duration: 6000, label: 'Galaxy',
+      milkyWay: true, deepSpace: true },
+    // 6. Dive back to Saturn
+    { focusPlanet: 5, duration: 6000, label: 'Saturn',
+      deepSpace: false, milkyWay: false, constellations: false },
   ], []);
 
   const cinematicIdx = useRef(0);
