@@ -242,12 +242,12 @@ export default function Panels(props: PanelProps) {
         style={{
           position: 'absolute', top: mobile ? 52 : 56,
           left: '50%', transform: 'translateX(-50%)',
-          display: 'flex', alignItems: 'center', gap: 3, zIndex: 10,
+          display: 'flex', alignItems: 'center', gap: mobile ? 3 : 4, zIndex: 10,
           maxWidth: mobile ? 'calc(100vw - 24px)' : 'none',
           overflowX: mobile ? 'auto' : 'visible',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
-          ...glass, padding: mobile ? '6px 10px' : '4px 10px',
+          ...glass, padding: mobile ? '6px 10px' : '6px 12px',
         }}
       >
         {cams.map((cam, i) => {
@@ -259,23 +259,23 @@ export default function Panels(props: PanelProps) {
               aria-label={`Camera preset: ${cam.label} (${cam.key})`}
               aria-pressed={active}
               style={{
-                background: active ? `rgba(${accentRgb},0.08)` : 'transparent',
-                border: `1px solid ${active ? `rgba(${accentRgb},0.35)` : 'rgba(255,255,255,0.07)'}`,
-                borderRadius: 3,
-                padding: mobile ? '6px 10px' : '3px 8px',
-                fontSize: 11,
+                background: active ? `rgba(${accentRgb},0.12)` : 'transparent',
+                border: `1px solid ${active ? `rgba(${accentRgb},0.4)` : 'rgba(255,255,255,0.1)'}`,
+                borderRadius: 4,
+                padding: mobile ? '6px 10px' : '5px 12px',
+                fontSize: mobile ? 11 : 13,
                 cursor: 'pointer', fontFamily: 'inherit',
                 whiteSpace: 'nowrap',
                 flexShrink: 0,
                 minWidth: mobile ? 44 : 'auto',
-                minHeight: mobile ? 36 : 'auto',
-                color: active ? accent : 'rgba(255,255,255,0.4)',
+                minHeight: mobile ? 36 : 32,
+                color: active ? accent : 'rgba(255,255,255,0.55)',
                 fontWeight: active ? 500 : 300,
                 letterSpacing: 0.5,
                 transition: 'all 0.15s',
               }}
             >
-              {!mobile && <span style={{ opacity: 0.35, fontSize: 9, marginRight: 3 }}>{cam.key}</span>}
+              {!mobile && <span style={{ opacity: 0.4, fontSize: 10, marginRight: 4 }}>{cam.key}</span>}
               {cam.label}
             </button>
           );
