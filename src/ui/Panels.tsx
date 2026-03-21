@@ -354,12 +354,11 @@ export default function Panels(props: PanelProps) {
         }}
       >
         {(mobile ? [
-          { l: 'Planets', on: showPlanetList, fn: () => setShowPlanetList(p => !p), a: 'Toggle planet list' },
           { l: 'NEO', on: showNeo, fn: () => setShowNeo(p => !p), a: 'Toggle near-Earth objects panel' },
+          { l: 'Dwarf', on: showDwarf, fn: () => setShowDwarf(p => !p), a: 'Toggle dwarf planets' },
           { l: 'Stars', on: showStars, fn: () => setShowStars(p => !p), a: 'Toggle star field' },
           { l: 'Lines', on: showConstellations, fn: () => setShowConstellations(p => !p), a: 'Toggle constellation lines' },
         ] : [
-          { l: 'Planets', on: showPlanetList, fn: () => setShowPlanetList(p => !p), a: 'Toggle planet list (P)' },
           { l: 'NEO', on: showNeo, fn: () => setShowNeo(p => !p), a: 'Toggle near-Earth objects (N)' },
           { l: 'Dwarf', on: showDwarf, fn: () => setShowDwarf(p => !p), a: 'Toggle dwarf planets (D)' },
           { l: 'Stars', on: showStars, fn: () => setShowStars(p => !p), a: 'Toggle star field (S)' },
@@ -409,94 +408,7 @@ export default function Panels(props: PanelProps) {
         </button>
       </div>
 
-      {/* ── Planet list panel ── */}
-      {showPlanetList && (
-        <div
-          role="navigation"
-          aria-label="Planet list"
-          style={{
-            position: 'absolute',
-            ...(mobile
-              ? { left: 0, right: 0, bottom: 0, top: 'auto', maxHeight: '50vh', borderRadius: '12px 12px 0 0' }
-              : { top: 96, left: 14, width: 190 }),
-            ...glass, padding: '10px 10px', zIndex: 20,
-            overflowY: 'auto',
-            paddingBottom: mobile ? 'max(10px, env(safe-area-inset-bottom))' : '10px',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 10, letterSpacing: 2, textTransform: 'uppercase', fontWeight: 300 }}>Bodies</span>
-            <Btn onClick={() => setShowPlanetList(p => !p)} label="Close planet list">{'\u2715'}</Btn>
-          </div>
-          {ALL_BODIES.map((body, idx) => {
-            const isSelected = selPlanet === idx;
-            const bodyMoons = getMoonsForPlanet(idx);
-            return (
-              <div key={body.name}>
-                <button
-                  onClick={() => { setSelPlanet(idx); if (mobile) setShowPlanetList(() => false); }}
-                  aria-label={`Focus on ${body.name}`}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    width: '100%', padding: mobile ? '10px 8px' : '5px 8px',
-                    background: isSelected ? `rgba(${accentRgb},0.07)` : 'transparent',
-                    border: isSelected ? `1px solid rgba(${accentRgb},0.2)` : '1px solid transparent',
-                    borderRadius: 4, cursor: 'pointer', fontFamily: 'inherit',
-                    minHeight: mobile ? 44 : 'auto',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  <span style={{
-                    width: 8, height: 8, borderRadius: '50%',
-                    background: body.color, flexShrink: 0,
-                  }} />
-                  <span style={{ color: isSelected ? '#fff' : 'rgba(255,255,255,0.7)', fontSize: mobile ? 12 : 11, textAlign: 'left', fontWeight: isSelected ? 500 : 300 }}>
-                    {body.name}
-                  </span>
-                  {body.isDwarf && (
-                    <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 8, marginLeft: 'auto', fontStyle: 'italic' }}>dwarf</span>
-                  )}
-                  <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 9, marginLeft: body.isDwarf ? 0 : 'auto' }}>
-                    {body.distAU} AU
-                  </span>
-                </button>
-                {/* Inline moons when planet is selected */}
-                {isSelected && bodyMoons.length > 0 && (
-                  <div style={{ paddingLeft: 24, paddingBottom: 4 }}>
-                    {bodyMoons.map((m, mIdx) => (
-                      <button
-                        key={m.name}
-                        onClick={(e) => { e.stopPropagation(); onMoonSelect?.(idx, mIdx); }}
-                        aria-label={`Focus on ${m.name}`}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: 6,
-                          width: '100%', padding: mobile ? '6px 6px' : '3px 6px',
-                          background: selMoonIdx === mIdx ? `rgba(${accentRgb},0.07)` : 'transparent',
-                          border: selMoonIdx === mIdx ? `1px solid rgba(${accentRgb},0.15)` : '1px solid transparent',
-                          borderRadius: 3, cursor: 'pointer', fontFamily: 'inherit',
-                          minHeight: mobile ? 36 : 'auto',
-                          transition: 'all 0.12s',
-                        }}
-                      >
-                        <span style={{
-                          width: 5, height: 5, borderRadius: '50%',
-                          background: m.color, flexShrink: 0, opacity: 0.7,
-                        }} />
-                        <span style={{
-                          color: selMoonIdx === mIdx ? accent : 'rgba(255,255,255,0.45)',
-                          fontSize: 10, fontWeight: 300, fontStyle: 'italic',
-                        }}>
-                          {m.name}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
+      {/* Planet list panel removed — bodies now selected via dropdown */}
 
       {/* ── Selected moon info card ── */}
       {selectedMoon && !showPlanetList && (
