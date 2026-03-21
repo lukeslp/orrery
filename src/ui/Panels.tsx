@@ -335,20 +335,25 @@ export default function Panels(props: PanelProps) {
           ...(mobile
             ? { bottom: 68, left: 8, right: 8, paddingBottom: 0 }
             : { bottom: 14, right: 14 }),
-          display: 'flex', gap: 3, zIndex: 10,
+          display: 'flex', gap: mobile ? 3 : 5, zIndex: 10,
           ...(mobile
             ? { overflowX: 'auto', WebkitOverflowScrolling: 'touch' as any, scrollbarWidth: 'none' as any }
             : {}),
         }}
       >
-        {[
-          { l: 'P', on: showPlanetList, fn: () => setShowPlanetList(p => !p), a: 'Toggle planet list' },
+        {(mobile ? [
+          { l: 'Planets', on: showPlanetList, fn: () => setShowPlanetList(p => !p), a: 'Toggle planet list' },
           { l: 'NEO', on: showNeo, fn: () => setShowNeo(p => !p), a: 'Toggle near-Earth objects panel' },
-          { l: 'DWF', on: showDwarf, fn: () => setShowDwarf(p => !p), a: 'Toggle dwarf planets' },
-          { l: 'STR', on: showStars, fn: () => setShowStars(p => !p), a: 'Toggle star field' },
-          { l: 'CON', on: showConstellations, fn: () => setShowConstellations(p => !p), a: 'Toggle constellation lines' },
-          ...(!mobile ? [{ l: '\u26f6', on: false, fn: () => document.documentElement.requestFullscreen?.(), a: 'Toggle fullscreen' }] : []),
-        ].map(b => (
+          { l: 'Stars', on: showStars, fn: () => setShowStars(p => !p), a: 'Toggle star field' },
+          { l: 'Lines', on: showConstellations, fn: () => setShowConstellations(p => !p), a: 'Toggle constellation lines' },
+        ] : [
+          { l: 'Planets', on: showPlanetList, fn: () => setShowPlanetList(p => !p), a: 'Toggle planet list (P)' },
+          { l: 'NEO', on: showNeo, fn: () => setShowNeo(p => !p), a: 'Toggle near-Earth objects (N)' },
+          { l: 'Dwarf', on: showDwarf, fn: () => setShowDwarf(p => !p), a: 'Toggle dwarf planets (D)' },
+          { l: 'Stars', on: showStars, fn: () => setShowStars(p => !p), a: 'Toggle star field (S)' },
+          { l: 'Constellations', on: showConstellations, fn: () => setShowConstellations(p => !p), a: 'Toggle constellation lines (C)' },
+          { l: 'Fullscreen', on: false, fn: () => document.documentElement.requestFullscreen?.(), a: 'Toggle fullscreen' },
+        ]).map(b => (
           <button
             key={b.l}
             onClick={b.fn}
@@ -356,16 +361,16 @@ export default function Panels(props: PanelProps) {
             aria-pressed={b.on}
             style={{
               ...glass,
-              padding: mobile ? '8px 12px' : '5px 10px',
-              fontSize: 11,
+              padding: mobile ? '8px 12px' : '7px 14px',
+              fontSize: mobile ? 11 : 13,
               cursor: 'pointer', fontFamily: 'inherit',
               whiteSpace: 'nowrap',
               flexShrink: 0,
               minWidth: mobile ? 44 : 'auto',
-              minHeight: mobile ? 44 : 'auto',
-              color: b.on ? accent : 'rgba(255,255,255,0.35)',
-              borderColor: b.on ? `rgba(${accentRgb},0.35)` : 'rgba(255,255,255,0.07)',
-              background: b.on ? `rgba(${accentRgb},0.08)` : 'rgba(0,0,0,0.5)',
+              minHeight: mobile ? 44 : 32,
+              color: b.on ? accent : 'rgba(255,255,255,0.5)',
+              borderColor: b.on ? `rgba(${accentRgb},0.4)` : 'rgba(255,255,255,0.1)',
+              background: b.on ? `rgba(${accentRgb},0.1)` : 'rgba(0,0,0,0.55)',
               transition: 'all 0.15s',
             }}
           >
