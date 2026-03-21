@@ -37,13 +37,11 @@ function OrreryInner() {
   const [focusTarget, setFocusTarget] = useState<FocusTarget | null>(null);
   const [sceneReady, setSceneReady] = useState(false);
   const [cinematic, setCinematic] = useState(true);
-  const [cinematicAngle, setCinematicAngle] = useState<{ angle: number; elevation: number; distMult: number } | undefined>(undefined);
   const [navStack, setNavStack] = useState<string[]>(['Solar System']);
   const [selMoonIdx, setSelMoonIdx] = useState<number | null>(null);
   const [cameraDistance, setCameraDistance] = useState(50);
   const [camIdx, setCamIdx] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [positionsReady, setPositionsReady] = useState(false);
   const positionsRef = useRef(new Map<number, [number, number, number]>());
 
   const jd = useMemo(() => julianDate(simTime), [simTime]);

@@ -684,7 +684,7 @@ export default function Panels(props: PanelProps) {
               }}
             >{props.playing ? 'II' : '>'}</button>
             <button
-              onClick={() => props.setSpeed(s => Math.min(86400 * 365, (s < 10 ? s * 10 : s * 10)))}
+              onClick={() => props.setSpeed(s => Math.min(86400 * 365, s * 10))}
               aria-label="Speed up"
               style={{
                 background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)',

@@ -24,21 +24,6 @@ export const bokehCard: React.CSSProperties = {
   boxShadow: '0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)',
 };
 
-// Dropdown panel: glass with slightly more background
-export const dropdownPanel: React.CSSProperties = {
-  ...glass,
-  background: 'rgba(0,0,0,0.75)',
-  borderRadius: 8,
-  boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
-};
-
-// About modal: larger blur for prominence
-export const aboutModal: React.CSSProperties = {
-  ...bokehCard,
-  backdropFilter: 'blur(40px) saturate(1.4)',
-  WebkitBackdropFilter: 'blur(40px) saturate(1.4)',
-};
-
 // ─── Bottom sheet (mobile dropdowns/modals) ──────────────────────────────────
 
 export function bottomSheet(maxHeight = '60vh'): React.CSSProperties {
