@@ -411,7 +411,7 @@ export default function Panels(props: PanelProps) {
       {/* Planet list panel removed — bodies now selected via dropdown */}
 
       {/* ── Selected moon info card ── */}
-      {selectedMoon && !showPlanetList && (
+      {selectedMoon && (
         <div
           role="dialog"
           aria-label={`${selectedMoon.name} information`}
