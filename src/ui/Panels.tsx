@@ -568,6 +568,10 @@ export default function Panels(props: PanelProps) {
   const cinematicLabel = navStack[navStack.length - 1] || '';
 
   if (cinematic) {
+    const dim: React.CSSProperties = {
+      color: 'rgba(255,255,255,0.25)', fontSize: 10, fontWeight: 300,
+      letterSpacing: 1.5, fontStyle: 'italic',
+    };
     return (
       <div
         style={{
@@ -577,38 +581,51 @@ export default function Panels(props: PanelProps) {
           cursor: 'pointer',
         }}
       >
-        {/* Time + date — top of screen */}
+        {/* Top cluster: time, date, celestial data */}
         <div style={{
           marginTop: mobile ? 20 : 32,
-          display: 'flex', alignItems: 'baseline', gap: mobile ? 8 : 12,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
         }}>
           <span style={{
-            fontSize: mobile ? 22 : 28, fontWeight: 300, letterSpacing: 4,
-            color: 'rgba(255,255,255,0.5)',
+            fontSize: mobile ? 32 : 44, fontWeight: 300, letterSpacing: 6,
+            color: 'rgba(255,255,255,0.6)',
             fontFamily: "'Cormorant Garamond','Garamond','Baskerville','Georgia',serif",
           }}>
             {fmtTime(simTime)}
           </span>
           <span style={{
             fontSize: mobile ? 11 : 13, fontWeight: 300, letterSpacing: 2,
-            color: 'rgba(255,255,255,0.3)',
-            fontStyle: 'italic',
+            color: 'rgba(255,255,255,0.3)', fontStyle: 'italic',
           }}>
             {fmtDate(simTime)}
           </span>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: mobile ? 10 : 16,
+            marginTop: 6,
+          }}>
+            <span style={dim}>{moon.name}, {moon.ill}%</span>
+            {solarWind && (
+              <>
+                <span style={{ ...dim, color: 'rgba(255,255,255,0.12)' }}>{'\u00b7'}</span>
+                <span style={dim}>Solar wind {solarWind}</span>
+              </>
+            )}
+          </div>
         </div>
-        {/* Current body label — centered on screen */}
+
+        {/* Current zoom label -- centered */}
         <div style={{
           position: 'absolute', top: '50%', left: '50%',
           transform: 'translate(-50%, -50%)',
           fontSize: mobile ? 28 : 42, fontWeight: 300, letterSpacing: 6,
-          color: cinematicLabel === 'Solar System' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.3)',
+          color: 'rgba(255,255,255,0.2)',
           textTransform: 'uppercase',
           fontFamily: "'Cormorant Garamond','Garamond','Baskerville','Georgia',serif",
           textShadow: '0 0 30px rgba(0,0,0,0.6)',
         }}>
           {cinematicLabel}
         </div>
+
         {/* Exit hint */}
         <div style={{
           position: 'absolute', bottom: mobile ? 60 : 56,
