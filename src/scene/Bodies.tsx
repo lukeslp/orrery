@@ -120,7 +120,6 @@ export function Planet({ planet, T, selected, onSelect, hovered, onHover }: {
   const ref = useRef<THREE.Mesh>(null);
   const pos = useMemo(() => planetXYZ(planet, T), [planet, T]);
   const tex = useLoader(THREE.TextureLoader, TEX[planet.tex]);
-  const { theme } = useTheme();
   const r = planet.radius;
 
   useFrame((_, dt) => {
@@ -165,7 +164,6 @@ export function Satellite({ moon, parentPos, jd, selected, onSelect, hovered, on
   hovered?: boolean; onHover?: (h: boolean) => void;
 }) {
   const ref = useRef<THREE.Mesh>(null);
-  const { theme } = useTheme();
   const angle = ((jd - 2451545) / moon.period) * Math.PI * 2;
   const inc = (moon.i || 0) * (Math.PI / 180);
 

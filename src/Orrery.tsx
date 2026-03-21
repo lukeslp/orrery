@@ -48,6 +48,21 @@ function OrreryInner() {
     positionsRef.current = m;
   }, []);
 
+  // Start focused on Earth
+  const didInitFocus = useRef(false);
+  useEffect(() => {
+    if (didInitFocus.current) return;
+    if (positionsRef.current.size > 0) return; // wait for first positions update
+  }, []);
+  useEffect(() => {
+    if (didInitFocus.current) return;
+    const pos = positionsRef.current.get(2);
+    if (pos) {
+      setFocusTarget({ planetIdx: 2, pos });
+      didInitFocus.current = true;
+    }
+  });
+
   // Time tick (~60fps)
   useEffect(() => {
     if (!playing) return;
