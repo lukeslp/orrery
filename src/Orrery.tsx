@@ -32,7 +32,6 @@ function OrreryInner() {
   const [showMilkyWay, setShowMilkyWay] = useState(true);
   const [showDeepSpace, setShowDeepSpace] = useState(true);
   const [constellationFocus, setConstellationFocus] = useState(false);
-  const [showAbout, setShowAbout] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [simTime, setSimTime] = useState(new Date());
   const [playing, setPlaying] = useState(true);
@@ -433,7 +432,7 @@ function OrreryInner() {
         showMilkyWay={showMilkyWay} setShowMilkyWay={setShowMilkyWay}
         showDeepSpace={showDeepSpace} setShowDeepSpace={setShowDeepSpace}
         constellationFocus={constellationFocus} setConstellationFocus={setConstellationFocus}
-        showAbout={showAbout} setShowAbout={setShowAbout}
+        drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen}
         setSimTime={setSimTime}
         positionsRef={positionsRef}
         cinematic={cinematic}
