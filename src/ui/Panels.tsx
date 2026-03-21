@@ -151,13 +151,13 @@ export default function Panels(props: PanelProps) {
     showDwarf, setShowDwarf,
     showStars, setShowStars,
     showConstellations, setShowConstellations,
-    showPlanetList, setShowPlanetList,
+    showPlanetList: _showPlanetList, setShowPlanetList: _setShowPlanetList,
     positionsRef,
     cinematic,
     navStack, navigateBack,
     selMoonIdx, cameraDistance,
     cams, camIdx, onPresetSelect,
-    onMoonSelect,
+    onMoonSelect: _onMoonSelect,
   } = props;
 
   const { theme, cycleTheme } = useTheme();
