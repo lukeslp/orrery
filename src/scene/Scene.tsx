@@ -13,6 +13,8 @@ import { planetXYZ } from '../lib/kepler';
 import { Sun, Planet, OrbitRing, Satellite as MoonSatellite, SatelliteOrbit } from './Bodies';
 import { RealAsteroidBelt, NeoDot, AsteroidOrbitLine } from './Asteroids';
 import { StarField, ConstellationLines, ConstellationLabels } from './Stars';
+import { AsterismField } from './Asterisms';
+import { DeepSkyField } from './DeepSky';
 import { CometField } from './Comets';
 import { MeteorField } from './Meteors';
 import { SatelliteField } from './Satellites';
@@ -226,6 +228,7 @@ export interface SceneProps {
   showComets: boolean;
   showMeteors: boolean;
   showSatellites: boolean;
+  showDeepSky: boolean;
   constellationFocus: boolean;
   cinematic: boolean;
   onMoonSelect?: (planetIdx: number, moonIdx: number) => void;
