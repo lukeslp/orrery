@@ -21,15 +21,26 @@ export interface SatellitePosition {
   vel: number;   // velocity km/s
 }
 
+const LOCAL_TLE = import.meta.env.BASE_URL + 'data/stations.tle';
 const CELESTRAK_URL = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=stations&FORMAT=tle';
 
 /**
- * Fetch TLE data for space stations from CelesTrak.
+ * Fetch TLE data — local bundled file first, CelesTrak fallback.
  */
 export async function fetchTLEs(): Promise<SatelliteRecord[]> {
-  const resp = await fetch(CELESTRAK_URL);
-  if (!resp.ok) throw new Error(`CelesTrak: ${resp.status}`);
-  const text = await resp.text();
+  let text: string;
+  try {
+    const local = await fetch(LOCAL_TLE);
+    if (local.ok) {
+      text = await local.text();
+    } else {
+      throw new Error('local unavailable');
+    }
+  } catch {
+    const resp = await fetch(CELESTRAK_URL);
+    if (!resp.ok) throw new Error(`CelesTrak: ${resp.status}`);
+    text = await resp.text();
+  }
 
   const lines = text.trim().split('\n').map(l => l.trim());
   const records: SatelliteRecord[] = [];
