@@ -5,10 +5,9 @@
  * Color: #ff66ff (magenta, colorblind-safe).
  */
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
-import * as THREE from 'three';
 import type { SatelliteRecord, SatellitePosition } from '../lib/satellites';
 import { fetchTLEs, propagateSatellite } from '../lib/satellites';
 

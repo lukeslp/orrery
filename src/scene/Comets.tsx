@@ -6,7 +6,6 @@
  */
 
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import type { CometDef } from '../data/comets';

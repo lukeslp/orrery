@@ -65,7 +65,8 @@ export function propagateSatellite(
   earthPos: [number, number, number],
 ): SatellitePosition | null {
   const posVel = satellite.propagate(rec.satrec, date);
-  if (!posVel.position || typeof posVel.position === 'boolean') return null;
+  if (!posVel || !posVel.position || typeof posVel.position === 'boolean') return null;
+  if (!posVel.velocity || typeof posVel.velocity === 'boolean') return null;
 
   const eciPos = posVel.position as satellite.EciVec3<number>;
   const eciVel = posVel.velocity as satellite.EciVec3<number>;
