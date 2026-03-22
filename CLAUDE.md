@@ -11,7 +11,7 @@ pnpm lint         # ESLint with typescript-eslint + react-hooks
 pnpm preview      # Serve production build locally
 ```
 
-Deployed at: `https://dr.eamer.dev/orrery/`
+Deployed at: `https://orrery.solar` and `https://dr.eamer.dev/orrery/`
 
 ## Architecture
 
@@ -68,4 +68,4 @@ Heliocentric ecliptic → Three.js: `[x, z, -y]` where y-up is ecliptic normal. 
 
 ### Deployment
 
-Vite `base: '/orrery/'`. Built to `dist/`. Served by Caddy as static files at `dr.eamer.dev/orrery/*`.
+Vite `base: '/'`. Built to `dist/`. Served by Caddy at `orrery.solar` (root) and `dr.eamer.dev/orrery/*` (handle_path strips prefix).
