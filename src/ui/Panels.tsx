@@ -488,14 +488,14 @@ function SideDrawer({
               </span>
             </SectionHeader>
             <div style={{ padding: '0 16px 12px' }}>
-              <div style={{ color: accent, fontSize: 15, fontWeight: 500, letterSpacing: 1 }}>
+              <div style={{ color: accent, fontSize: 17, fontWeight: 500, letterSpacing: 1 }}>
                 {selConstellation}
               </div>
-              <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 10, fontWeight: 300, marginTop: 2, letterSpacing: 1 }}>
+              <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, fontWeight: 300, marginTop: 2, letterSpacing: 1 }}>
                 {info.origin} {'\u00b7'} Best: {info.season}
               </div>
               <div style={{
-                color: 'rgba(255,255,255,0.65)', fontSize: 12, fontWeight: 300,
+                color: 'rgba(255,255,255,0.65)', fontSize: 14, fontWeight: 300,
                 marginTop: 10, lineHeight: 1.6, fontStyle: 'italic',
               }}>
                 {info.myth}
@@ -503,13 +503,13 @@ function SideDrawer({
               {info.objects.length > 0 && (
                 <>
                   <div style={{
-                    color: 'rgba(255,255,255,0.3)', fontSize: 9, letterSpacing: 2,
+                    color: 'rgba(255,255,255,0.3)', fontSize: 11, letterSpacing: 2,
                     textTransform: 'uppercase', fontWeight: 300, marginTop: 12, marginBottom: 4,
                   }}>
                     Notable Objects
                   </div>
                   {info.objects.map(obj => (
-                    <div key={obj} style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: 300, lineHeight: 1.6 }}>
+                    <div key={obj} style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: 300, lineHeight: 1.6 }}>
                       {obj}
                     </div>
                   ))}
@@ -543,21 +543,21 @@ function SideDrawer({
               </span>
             </SectionHeader>
             <div style={{ padding: '0 16px 12px' }}>
-              <div style={{ color: accent, fontSize: 15, fontWeight: 500, letterSpacing: 1 }}>
+              <div style={{ color: accent, fontSize: 17, fontWeight: 500, letterSpacing: 1 }}>
                 {craft.name}
               </div>
-              <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 10, fontWeight: 300, marginTop: 2, letterSpacing: 1 }}>
+              <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, fontWeight: 300, marginTop: 2, letterSpacing: 1 }}>
                 {craft.status === 'active' ? 'Active' : 'Inactive'} {'\u00b7'} Launched {craft.launchYear}
               </div>
               <div style={{
-                color: 'rgba(255,255,255,0.65)', fontSize: 12, fontWeight: 300,
+                color: 'rgba(255,255,255,0.65)', fontSize: 14, fontWeight: 300,
                 marginTop: 10, lineHeight: 1.6, fontStyle: 'italic',
               }}>
                 {craft.desc}
               </div>
               <div style={{
                 display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 16px',
-                marginTop: 12, color: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: 300,
+                marginTop: 12, color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: 300,
               }}>
                 <div>Distance <span style={{ color: '#fff', fontWeight: 400 }}>{craft.distAU} AU</span></div>
                 <div>Speed <span style={{ color: '#fff', fontWeight: 400 }}>{craft.speedAUyr} AU/yr</span></div>
@@ -573,8 +573,8 @@ function SideDrawer({
       {/* ── About ── */}
       <SectionHeader>About</SectionHeader>
       <div style={{ padding: '0 16px 20px' }}>
-        <div style={{ color: '#fff', fontSize: 16, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase' }}>Orrery</div>
-        <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, fontStyle: 'italic', fontWeight: 300, marginTop: 2 }}>Interactive Solar System</div>
+        <div style={{ color: '#fff', fontSize: 18, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase' }}>Orrery</div>
+        <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13, fontStyle: 'italic', fontWeight: 300, marginTop: 2 }}>Interactive Solar System</div>
 
         <div style={sectionTitle}>Data Sources</div>
         <div style={{ borderLeft: '1px solid rgba(255,255,255,0.06)', paddingLeft: 10 }}>
