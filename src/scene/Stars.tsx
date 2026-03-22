@@ -629,6 +629,18 @@ export function ConstellationLabels({ visible, focus, onSelect }: { visible: boo
                     cursor: onSelect ? 'pointer' : 'default',
                   }}
                 >
+                  {/* Constellation symbol — zodiac get large glowing glyphs */}
+                  {CONSTELLATION_SYMBOLS[c.id] && (
+                    <span style={{
+                      display: 'block',
+                      fontSize: isZodiac(c.id) ? 18 : 13,
+                      fontStyle: 'normal',
+                      fontWeight: 400,
+                      lineHeight: 1.1,
+                      textShadow: `0 0 12px ${c.color}, 0 0 24px ${c.color}, 0 0 40px rgba(0,0,0,0.8)`,
+                      filter: isZodiac(c.id) ? `drop-shadow(0 0 6px ${c.color})` : 'none',
+                    }}>{CONSTELLATION_SYMBOLS[c.id]}</span>
+                  )}
                   <span style={{ display: 'block', fontSize: 9, fontWeight: 500, fontStyle: 'normal' }}>{c.latin}</span>
                   {c.english && <span style={{ display: 'block', fontSize: 7, opacity: 0.7 }}>{c.english}</span>}
                 </div>

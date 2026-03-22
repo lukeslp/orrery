@@ -99,22 +99,44 @@ export function DeepSkyField({ visible }: { visible: boolean }) {
     return geo;
   }, [objects]);
 
+  // Build per-object colors based on type
+  const colorsAttr = useMemo(() => {
+    if (!objects) return null;
+    const colors = new Float32Array(objects.length * 3);
+    const typeRgb: Record<string, [number, number, number]> = {
+      galaxy:   [0.75, 0.65, 1.0],   // soft violet
+      globular: [1.0, 0.85, 0.65],   // warm gold
+      open:     [0.65, 0.85, 1.0],   // cool blue
+      nebula:   [0.65, 1.0, 0.75],   // soft green
+    };
+    for (let i = 0; i < objects.length; i++) {
+      const [r, g, b] = typeRgb[objects[i].type] || [0.7, 0.8, 1.0];
+      colors[i * 3] = r;
+      colors[i * 3 + 1] = g;
+      colors[i * 3 + 2] = b;
+    }
+    return colors;
+  }, [objects]);
+
   const pointsMat = useMemo(() => new THREE.ShaderMaterial({
     vertexShader: `
       attribute float size;
+      attribute vec3 color;
+      varying vec3 vColor;
       void main() {
+        vColor = color;
         vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-        gl_PointSize = size;
+        gl_PointSize = size * 2.5;
         gl_Position = projectionMatrix * mvPosition;
       }
     `,
     fragmentShader: `
+      varying vec3 vColor;
       void main() {
         float d = length(gl_PointCoord - vec2(0.5));
         if (d > 0.5) discard;
-        // Fuzzy glow for deep sky objects
-        float alpha = 0.5 * smoothstep(0.5, 0.1, d);
-        gl_FragColor = vec4(0.7, 0.8, 1.0, alpha);
+        float alpha = 0.7 * smoothstep(0.5, 0.05, d);
+        gl_FragColor = vec4(vColor, alpha);
       }
     `,
     transparent: true,
@@ -144,6 +166,13 @@ export function DeepSkyField({ visible }: { visible: boolean }) {
     }
     setVisibleIds(vis);
   });
+
+  // Attach color attribute when ready
+  useMemo(() => {
+    if (pointsGeo && colorsAttr) {
+      pointsGeo.setAttribute('color', new THREE.BufferAttribute(colorsAttr, 3));
+    }
+  }, [pointsGeo, colorsAttr]);
 
   if (!visible || !objects || !pointsGeo) return null;
 
