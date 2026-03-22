@@ -18,6 +18,7 @@ import { glass, bokehCard, drawerPanel, drawerTab, bottomSheet, useIsMobile } fr
 import type { CometDef } from '../data/comets';
 import type { MeteorShower } from '../scene/Meteors';
 import type { SatellitePosition } from '../lib/satellites';
+import { MYTHOLOGY } from '../data/mythology';
 
 // ─── Tiny UI primitives ─────────────────────────────────────────────────────────
 
@@ -182,6 +183,7 @@ function SideDrawer({
   showMeteors: boolean; setShowMeteors: (fn: (p: boolean) => boolean) => void;
   showSatellites: boolean; setShowSatellites: (fn: (p: boolean) => boolean) => void;
   showDeepSky: boolean; setShowDeepSky: (fn: (p: boolean) => boolean) => void;
+  selConstellation: string | null; setSelConstellation: (id: string | null) => void;
 }) {
   const { theme, setTheme } = useTheme();
 

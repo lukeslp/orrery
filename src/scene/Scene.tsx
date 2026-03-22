@@ -238,6 +238,7 @@ export interface SceneProps {
   selComet: CometDef | null; setSelComet: (c: CometDef | null) => void;
   selMeteor: MeteorShower | null; setSelMeteor: (m: MeteorShower | null) => void;
   selSatellite: SatellitePosition | null; setSelSatellite: (s: SatellitePosition | null) => void;
+  onConstellationSelect?: (id: string) => void;
 }
 
 export default function Scene({
@@ -247,6 +248,7 @@ export default function Scene({
   showComets, showMeteors, showSatellites, showDeepSky,
   constellationFocus, cinematic, onMoonSelect, selMoonIdx, onCameraDistance, camPreset,
   selComet, setSelComet, selMeteor, setSelMeteor, selSatellite, setSelSatellite,
+  onConstellationSelect,
 }: SceneProps) {
   const [hov, setHov] = useState<number | null>(null);
   const [hovMoon, setHovMoon] = useState<number | null>(null);
@@ -325,7 +327,7 @@ export default function Scene({
       ))}
       <StarField visible={showStars} showDesignations={showConstellations} />
       <ConstellationLines visible={showConstellations} focus={constellationFocus} />
-      <ConstellationLabels visible={showConstellations} focus={constellationFocus} />
+      <ConstellationLabels visible={showConstellations} focus={constellationFocus} onSelect={onConstellationSelect} />
       <AsterismField visible={showConstellations} />
       <DeepSkyField visible={showDeepSky} />
       <CometField

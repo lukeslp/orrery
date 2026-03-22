@@ -607,23 +607,27 @@ export function ConstellationLabels({ visible, focus, onSelect }: { visible: boo
               <Html
                 center
                 distanceFactor={80}
-                style={{ pointerEvents: 'none' }}
+                style={{ pointerEvents: onSelect ? 'auto' : 'none' }}
                 zIndexRange={[1, 0]}
               >
-                <div style={{
-                  color: c.color,
-                  opacity: labelOpacity,
-                  fontSize: 10,
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontStyle: 'italic',
-                  fontWeight: 400,
-                  whiteSpace: 'nowrap',
-                  letterSpacing: 1,
-                  userSelect: 'none',
-                  textAlign: 'center',
-                  lineHeight: 1.3,
-                  textShadow: `0 0 10px ${c.color}, 0 0 20px rgba(0,0,0,0.9)`,
-                }}>
+                <div
+                  onClick={onSelect ? (e) => { e.stopPropagation(); onSelect(c.id); } : undefined}
+                  style={{
+                    color: c.color,
+                    opacity: labelOpacity,
+                    fontSize: 10,
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontStyle: 'italic',
+                    fontWeight: 400,
+                    whiteSpace: 'nowrap',
+                    letterSpacing: 1,
+                    userSelect: 'none',
+                    textAlign: 'center',
+                    lineHeight: 1.3,
+                    textShadow: `0 0 10px ${c.color}, 0 0 20px rgba(0,0,0,0.9)`,
+                    cursor: onSelect ? 'pointer' : 'default',
+                  }}
+                >
                   <span style={{ display: 'block', fontSize: 9, fontWeight: 500, fontStyle: 'normal' }}>{c.latin}</span>
                   {c.english && <span style={{ display: 'block', fontSize: 7, opacity: 0.7 }}>{c.english}</span>}
                 </div>

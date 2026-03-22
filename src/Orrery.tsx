@@ -43,6 +43,7 @@ function OrreryInner() {
   const [showMeteors, setShowMeteors] = useState(false);
   const [showSatellites, setShowSatellites] = useState(false);
   const [showDeepSky, setShowDeepSky] = useState(false);
+  const [selConstellation, setSelConstellation] = useState<string | null>(null);
   const [selComet, setSelComet] = useState<CometDef | null>(null);
   const [selMeteor, setSelMeteor] = useState<MeteorShower | null>(null);
   const [selSatellite, setSelSatellite] = useState<SatellitePosition | null>(null);
@@ -433,6 +434,7 @@ function OrreryInner() {
             showMeteors={showMeteors}
             showSatellites={showSatellites}
             showDeepSky={showDeepSky}
+            onConstellationSelect={(id) => { setSelConstellation(id); setDrawerOpen(true); }}
             constellationFocus={constellationFocus}
             cinematic={cinematic}
             onMoonSelect={handleMoonSelect}
@@ -463,6 +465,7 @@ function OrreryInner() {
         showMeteors={showMeteors} setShowMeteors={setShowMeteors}
         showSatellites={showSatellites} setShowSatellites={setShowSatellites}
         showDeepSky={showDeepSky} setShowDeepSky={setShowDeepSky}
+        selConstellation={selConstellation} setSelConstellation={setSelConstellation}
         constellationFocus={constellationFocus} setConstellationFocus={setConstellationFocus}
         drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen}
         cinematic={cinematic}
