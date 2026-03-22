@@ -12,32 +12,11 @@ import { planetXYZ, orbitPath } from '../lib/kepler';
 import type { MoonDef } from '../data/moons';
 import { useTheme } from '../lib/themes';
 
-// ─── Radial glow texture (generated once) ────────────────────────────────────
-
-let _glowTex: THREE.Texture | null = null;
-function getGlowTexture(): THREE.Texture {
-  if (_glowTex) return _glowTex;
-  const size = 128;
-  const canvas = document.createElement('canvas');
-  canvas.width = size; canvas.height = size;
-  const ctx = canvas.getContext('2d')!;
-  const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-  grad.addColorStop(0, 'rgba(255,255,255,1)');
-  grad.addColorStop(0.3, 'rgba(255,255,255,0.6)');
-  grad.addColorStop(0.7, 'rgba(255,255,255,0.1)');
-  grad.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, size, size);
-  _glowTex = new THREE.CanvasTexture(canvas);
-  return _glowTex;
-}
-
 // ─── Sun ────────────────────────────────────────────────────────────────────────
 
 export function Sun({ cameraDistance = 0 }: { cameraDistance?: number }) {
   const ref = useRef<THREE.Mesh>(null);
   const tex = useLoader(THREE.TextureLoader, TEX.sun);
-  const glowTex = useMemo(() => getGlowTexture(), []);
   useFrame((_, dt) => { if (ref.current) ref.current.rotation.y += dt * 0.02; });
   const farGlow = Math.min(cameraDistance / 50, 4);
   return (
@@ -47,24 +26,27 @@ export function Sun({ cameraDistance = 0 }: { cameraDistance?: number }) {
         <sphereGeometry args={[0.12, 32, 32]} />
         <meshBasicMaterial color="#fffcf0" toneMapped={false} />
       </mesh>
-      {/* Textured surface */}
+      {/* Textured surface — additive so dark patches glow instead of going black */}
       <mesh ref={ref}>
         <sphereGeometry args={[0.15, 48, 48]} />
-        <meshBasicMaterial map={tex} toneMapped={false} color="#ffffff" />
+        <meshBasicMaterial map={tex} toneMapped={false} color="#ffffff" transparent opacity={0.9} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
-      {/* Inner warm glow — always visible */}
-      <sprite scale={[0.6, 0.6, 1]}>
-        <spriteMaterial map={glowTex} color="#fff8e0" transparent opacity={0.6} blending={THREE.AdditiveBlending} toneMapped={false} />
-      </sprite>
-      {/* Outer soft corona glow — always visible */}
-      <sprite scale={[1.2, 1.2, 1]}>
-        <spriteMaterial map={glowTex} color="#ffcc66" transparent opacity={0.2} blending={THREE.AdditiveBlending} toneMapped={false} />
-      </sprite>
+      {/* Inner corona — transparent sphere, no sprite squares */}
+      <mesh>
+        <sphereGeometry args={[0.22, 32, 32]} />
+        <meshBasicMaterial color="#fff0d0" transparent opacity={0.15} blending={THREE.AdditiveBlending} toneMapped={false} depthWrite={false} side={THREE.BackSide} />
+      </mesh>
+      {/* Outer corona */}
+      <mesh>
+        <sphereGeometry args={[0.35, 32, 32]} />
+        <meshBasicMaterial color="#ffcc66" transparent opacity={0.06} blending={THREE.AdditiveBlending} toneMapped={false} depthWrite={false} side={THREE.BackSide} />
+      </mesh>
       {/* Distance-adaptive beacon for far zoom */}
       {cameraDistance > 30 && (
-        <sprite scale={[0.15 * farGlow * 3, 0.15 * farGlow * 3, 1]}>
-          <spriteMaterial map={glowTex} color="#ffdd88" transparent opacity={0.5} blending={THREE.AdditiveBlending} toneMapped={false} />
-        </sprite>
+        <mesh>
+          <sphereGeometry args={[0.15 * farGlow * 1.5, 16, 16]} />
+          <meshBasicMaterial color="#ffdd88" transparent opacity={0.3} blending={THREE.AdditiveBlending} toneMapped={false} depthWrite={false} />
+        </mesh>
       )}
       <pointLight intensity={5} color="#fff5e0" distance={200} />
       <pointLight intensity={2} color="#ffcc80" distance={100} />
@@ -213,9 +195,10 @@ export function Planet({ planet, T, selected, onSelect, hovered, onHover, moonFo
       {planet.hasRings && <SaturnRings radius={r} />}
       {/* Distance-adaptive glow beacon */}
       {cameraDistance > 30 && (
-        <sprite scale={[r * glow * 2, r * glow * 2, 1]}>
-          <spriteMaterial map={getGlowTexture()} color={planet.color} transparent opacity={0.4} blending={THREE.AdditiveBlending} toneMapped={false} />
-        </sprite>
+        <mesh>
+          <sphereGeometry args={[r * glow, 16, 16]} />
+          <meshBasicMaterial color={planet.color} transparent opacity={0.3} blending={THREE.AdditiveBlending} toneMapped={false} depthWrite={false} />
+        </mesh>
       )}
       {/* Always-visible label */}
       <Html
