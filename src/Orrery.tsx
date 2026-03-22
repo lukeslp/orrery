@@ -475,7 +475,6 @@ function OrreryInner() {
         selComet={selComet} setSelComet={setSelComet}
         selMeteor={selMeteor} setSelMeteor={setSelMeteor}
         selSatellite={selSatellite} setSelSatellite={setSelSatellite}
-        jd={jd}
       />
     </div>
   );

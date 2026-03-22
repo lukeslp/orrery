@@ -532,7 +532,6 @@ export interface PanelProps {
   selComet: CometDef | null; setSelComet: (c: CometDef | null) => void;
   selMeteor: MeteorShower | null; setSelMeteor: (m: MeteorShower | null) => void;
   selSatellite: SatellitePosition | null; setSelSatellite: (s: SatellitePosition | null) => void;
-  jd: number;
 }
 
 export default function Panels(props: PanelProps) {
@@ -554,7 +553,7 @@ export default function Panels(props: PanelProps) {
     selMoonIdx, cameraDistance,
     cams, camIdx, onPresetSelect,
     onMoonSelect,
-    selComet, setSelComet, selMeteor, setSelMeteor, selSatellite, setSelSatellite, jd,
+    selComet, setSelComet, selMeteor, setSelMeteor, selSatellite, setSelSatellite,
   } = props;
 
   const { theme } = useTheme();
