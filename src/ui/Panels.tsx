@@ -776,7 +776,10 @@ export default function Panels(props: PanelProps) {
             { label: 'Const', on: showConstellations, fn: () => setShowConstellations((p: boolean) => !p) },
             { label: 'Belt', on: showAsteroidBelt, fn: () => setShowAsteroidBelt((p: boolean) => !p) },
             { label: 'Dwarf', on: showDwarf, fn: () => setShowDwarf((p: boolean) => !p) },
-            { label: `NEO`, on: showNeo, fn: () => setShowNeo((p: boolean) => !p) },
+            { label: 'NEO', on: showNeo, fn: () => setShowNeo((p: boolean) => !p) },
+            { label: 'Comets', on: showComets, fn: () => setShowComets((p: boolean) => !p) },
+            { label: 'Meteors', on: showMeteors, fn: () => setShowMeteors((p: boolean) => !p) },
+            { label: 'Sats', on: showSatellites, fn: () => setShowSatellites((p: boolean) => !p) },
           ].map(l => (
             <button
               key={l.label}
