@@ -18,7 +18,10 @@
       "WebFetch(domain:www.aanda.org)",
       "WebFetch(domain:heasarc.gsfc.nasa.gov)",
       "WebFetch(domain:arxiv.org)",
-      "WebFetch(domain:www.researchgate.net)"
+      "WebFetch(domain:www.researchgate.net)",
+      "WebFetch(domain:spiralmap.readthedocs.io)",
+      "Read(//usr/local/lib/python3.10/dist-packages/SpiralMap/**)",
+      "Read(//usr/local/lib/python3.10/dist-packages/**)"
     ]
   },
   "enableAllProjectMcpServers": true,
