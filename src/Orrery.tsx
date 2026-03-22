@@ -313,8 +313,9 @@ function OrreryInner() {
 
   // Camera preset selection
   const handlePresetSelect = useCallback((idx: number) => {
-    setCamIdx(idx);
     const preset = CAMS[idx];
+    if (!preset) return;
+    setCamIdx(idx);
     setSelMoonIdx(null);
     setCinematic(false);
     if (preset.follow !== undefined) {
