@@ -35,6 +35,7 @@ and conductor-style orchestration from a single canonical source.
 - Standalone tool registry
 - Safe execution primitives adapted from local infrastructure patterns
 - Manifest generation for Codex-oriented packaging metadata
+- Claude marketplace and `SKILL.md` generation from the same command registry
 - Unit tests for command coverage and behavior contracts
 
 ## CLI
@@ -45,6 +46,12 @@ python -m swarm.cli show /swarm
 python -m swarm.cli consensus --json
 python scripts/build_manifests.py
 ```
+
+The manifest build also writes:
+
+- `.claude-plugin/plugin.json`
+- `.claude-plugin/marketplace.json`
+- `skills/*/SKILL.md`
 
 ## Design Constraints
 

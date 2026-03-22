@@ -232,6 +232,10 @@ def normalize_command_name(name: str) -> str:
     return name.lower()
 
 
+def command_slug(name: str) -> str:
+    return normalize_command_name(name).removeprefix("/")
+
+
 def get_command(name: str) -> CommandSpec:
     normalized = normalize_command_name(name)
     return _COMMAND_INDEX[normalized]

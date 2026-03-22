@@ -4,8 +4,10 @@ import argparse
 import json
 from pathlib import Path
 
+from .claude_plugin import materialize_claude_plugin
 from .commands import COMMAND_SPECS, get_command
 from .consensus import probe_agents
+from .inventory import inventory_local_sources
 from .manifests import (
     build_codex_package_manifest,
     build_command_manifest,
@@ -13,7 +15,6 @@ from .manifests import (
     build_local_sources_manifest,
     build_route_manifest,
 )
-from .inventory import inventory_local_sources
 
 
 def _json_dump(data: object) -> str:
@@ -53,6 +54,8 @@ def _write_manifest(output_dir: Path) -> None:
     for filename, payload in files.items():
         (output_dir / filename).write_text(_json_dump(payload), encoding="utf-8")
         print(f"wrote {output_dir / filename}")
+    for path in materialize_claude_plugin(output_dir):
+        print(f"wrote {path}")
 
 
 def build_parser() -> argparse.ArgumentParser:
