@@ -153,7 +153,7 @@ const sectionDivider: React.CSSProperties = {
 
 function SideDrawer({
   open, accent, accentRgb, mobile,
-  selPlanet, setSelPlanet, onMoonSelect,
+  selPlanet, setSelPlanet, onMoonSelect, onClose,
   neos, neoStatus, selNeo, setSelNeo,
   showNeo, showStars, showConstellations, constellationFocus, showDwarf,
   showAsteroidBelt, showComets, showMeteors, showSatellites,
@@ -167,6 +167,7 @@ function SideDrawer({
   selPlanet: number | null;
   setSelPlanet: (i: number | null) => void;
   onMoonSelect?: (planetIdx: number, moonIdx: number) => void;
+  onClose: () => void;
   neos: NEO[];
   neoStatus: 'loading' | 'loaded' | 'error';
   selNeo: NEO | null;
@@ -253,7 +254,7 @@ function SideDrawer({
           return (
             <div key={body.name} role="treeitem">
               <button
-                onClick={() => setSelPlanet(idx)}
+                onClick={() => { setSelPlanet(idx); onClose(); }}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 8, width: '100%',
                   padding: mobile ? '10px 16px' : '6px 16px',
@@ -271,7 +272,7 @@ function SideDrawer({
               {moons.map((moon, mIdx) => (
                 <button
                   key={moon.name}
-                  onClick={() => onMoonSelect?.(idx, mIdx)}
+                  onClick={() => { onMoonSelect?.(idx, mIdx); onClose(); }}
                   role="treeitem"
                   style={{
                     display: 'flex', alignItems: 'center', gap: 8, width: '100%',
@@ -303,7 +304,7 @@ function SideDrawer({
           return (
             <div key={body.name} role="treeitem">
               <button
-                onClick={() => setSelPlanet(idx)}
+                onClick={() => { setSelPlanet(idx); onClose(); }}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 8, width: '100%',
                   padding: mobile ? '10px 16px' : '6px 16px',
@@ -321,7 +322,7 @@ function SideDrawer({
               {moons.map((moon, mIdx) => (
                 <button
                   key={moon.name}
-                  onClick={() => onMoonSelect?.(idx, mIdx)}
+                  onClick={() => { onMoonSelect?.(idx, mIdx); onClose(); }}
                   role="treeitem"
                   style={{
                     display: 'flex', alignItems: 'center', gap: 8, width: '100%',
@@ -868,6 +869,7 @@ export default function Panels(props: PanelProps) {
           selPlanet={selPlanet}
           setSelPlanet={setSelPlanet}
           onMoonSelect={onMoonSelect}
+          onClose={() => setDrawerOpen(false)}
           neos={neos}
           neoStatus={neoStatus}
           selNeo={selNeo}
