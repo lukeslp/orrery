@@ -12,6 +12,7 @@ import { useRef, useState, useEffect, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
+import { CONSTELLATION_SYMBOLS, isZodiac } from '../data/constellation-symbols';
 
 const DEG = Math.PI / 180;
 const ECLIPTIC_TILT = 23.4 * DEG;
