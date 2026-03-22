@@ -2,7 +2,7 @@
  * Asteroid belt + NEO dots and orbit lines
  */
 
-import { useRef, useEffect, useMemo } from 'react';
+import { useRef, useEffect, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Line } from '@react-three/drei';
 import * as THREE from 'three';
@@ -79,6 +79,60 @@ export function AsteroidBelt() {
         <meshStandardMaterial color="#887766" roughness={0.9} />
       </instancedMesh>
     </group>
+  );
+}
+
+// ─── Real Asteroid Belt (from prebaked data) ────────────────────────────────────
+
+interface AsteroidData {
+  a: number; e: number; i: number; om: number; w: number;
+  ma: number; epoch: number; H: number; name: string;
+}
+
+const REAL_BELT_PATH = import.meta.env.BASE_URL + 'data/main-belt.json';
+
+export function RealAsteroidBelt({ jd }: { jd: number }) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const [data, setData] = useState<AsteroidData[] | null>(null);
+  const lastJd = useRef(0);
+
+  useEffect(() => {
+    fetch(REAL_BELT_PATH)
+      .then(r => r.json())
+      .then(setData)
+      .catch(() => {});
+  }, []);
+
+  // Recompute positions when jd changes by >0.5 days
+  useEffect(() => {
+    if (!data || !meshRef.current) return;
+    if (Math.abs(jd - lastJd.current) < 0.5 && lastJd.current !== 0) return;
+    lastJd.current = jd;
+
+    const dummy = new THREE.Object3D();
+    const count = Math.min(data.length, 5000);
+
+    for (let idx = 0; idx < count; idx++) {
+      const d = data[idx];
+      const pos = neoXYZ(d.a, d.e, d.i, d.om, d.w, d.ma, d.epoch, jd);
+      const scale = 0.002 + (d.H < 15 ? 0.004 : 0.001);
+      dummy.position.set(pos[0], pos[1], pos[2]);
+      dummy.scale.setScalar(scale);
+      dummy.updateMatrix();
+      meshRef.current!.setMatrixAt(idx, dummy.matrix);
+    }
+    meshRef.current!.instanceMatrix.needsUpdate = true;
+  }, [data, jd]);
+
+  if (!data) return null;
+
+  const count = Math.min(data.length, 5000);
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <icosahedronGeometry args={[1, 0]} />
+      <meshStandardMaterial color="#887766" roughness={0.9} />
+    </instancedMesh>
   );
 }
 
