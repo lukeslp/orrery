@@ -42,13 +42,13 @@ export function Sun() {
       <Html
         position={[0, 0.2, 0]}
         center
-        distanceFactor={12}
+        distanceFactor={25}
         style={{ pointerEvents: 'none' }}
         zIndexRange={[1, 0]}
       >
         <div style={{
           color: 'rgba(255,220,160,0.9)',
-          fontSize: 11,
+          fontSize: 9,
           fontFamily: "'Cormorant Garamond', serif",
           fontWeight: 400,
           letterSpacing: 1.5,
@@ -165,13 +165,13 @@ export function Planet({ planet, T, selected, onSelect, hovered, onHover, moonFo
       <Html
         position={[0, r + 0.02, 0]}
         center
-        distanceFactor={planet.isDwarf ? 6 : 12}
+        distanceFactor={planet.isDwarf ? 12 : 25}
         style={{ pointerEvents: 'none' }}
         zIndexRange={[1, 0]}
       >
         <div style={{
           color: hovered || selected ? '#fff' : 'rgba(255,255,255,0.85)',
-          fontSize: 11,
+          fontSize: 9,
           fontFamily: "'Cormorant Garamond', serif",
           fontWeight: selected ? 600 : 400,
           letterSpacing: 1,
