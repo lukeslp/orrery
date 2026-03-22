@@ -192,8 +192,6 @@ function SideDrawer({
     { label: 'Dwarf Planets', key: 'D', on: showDwarf, fn: () => setShowDwarf(p => !p) },
     { label: neoLabel, key: 'N', on: showNeo, fn: () => setShowNeo(p => !p) },
     { label: 'Asteroid Belt', key: null, on: showAsteroidBelt, fn: () => setShowAsteroidBelt(p => !p) },
-    { label: 'Milky Way', key: null, on: showMilkyWay, fn: () => setShowMilkyWay(p => !p) },
-    { label: 'Deep Space', key: null, on: showDeepSpace, fn: () => setShowDeepSpace(p => !p) },
   ];
 
   // Shared styles
@@ -504,8 +502,6 @@ export interface PanelProps {
   showConstellations: boolean; setShowConstellations: (fn: (p: boolean) => boolean) => void;
   constellationFocus: boolean; setConstellationFocus: (fn: (p: boolean) => boolean) => void;
   showAsteroidBelt: boolean; setShowAsteroidBelt: (fn: (p: boolean) => boolean) => void;
-  showMilkyWay: boolean; setShowMilkyWay: (fn: (p: boolean) => boolean) => void;
-  showDeepSpace: boolean; setShowDeepSpace: (fn: (p: boolean) => boolean) => void;
   drawerOpen: boolean; setDrawerOpen: (fn: boolean | ((p: boolean) => boolean)) => void;
   cinematic: boolean;
   setCinematic: (c: boolean) => void;
@@ -530,8 +526,6 @@ export default function Panels(props: PanelProps) {
     showConstellations, setShowConstellations,
     constellationFocus, setConstellationFocus,
     showAsteroidBelt, setShowAsteroidBelt,
-    showMilkyWay, setShowMilkyWay,
-    showDeepSpace, setShowDeepSpace,
     drawerOpen, setDrawerOpen,
     cinematic,
     navStack,
