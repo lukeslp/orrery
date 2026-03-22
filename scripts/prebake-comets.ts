@@ -26,15 +26,13 @@ const INPUT = resolve(process.env.HOME!, 'data/celestial/mpc/CometEls.txt');
 const OUTPUT = resolve(import.meta.dirname, '..', 'public/data/comets.json');
 
 // Notable comets: these always get included regardless of perihelion date
+// Only the truly famous/historically significant comets
 const NOTABLE_NAMES = new Set([
-  'Halley', 'Hale-Bopp', 'Encke', 'Tempel', 'Swift-Tuttle',
-  'Hyakutake', 'McNaught', 'NEOWISE', 'Tsuchinshan-ATLAS',
-  'Wirtanen', 'Wild', 'Churyumov-Gerasimenko', 'Borrelly',
-  'Kohoutek', 'West', 'Lovejoy', 'ISON', 'Catalina',
-  'Holmes', 'Giacobini-Zinner', 'Hartley', 'Biela',
-  'Schwassmann-Wachmann', 'Tuttle', 'Pons-Brooks',
-  'Olbers', 'Grigg-Skjellerup', 'Temple-Tuttle',
-  'Leonard', 'ZTF',
+  'Halley', 'Hale-Bopp', 'Encke', 'Swift-Tuttle',
+  'NEOWISE', 'Tsuchinshan-ATLAS',
+  'Churyumov-Gerasimenko', 'Pons-Brooks',
+  'Hyakutake', 'West', 'Kohoutek',
+  'Wirtanen', 'Wild 2',
 ]);
 
 function isNotable(name: string): boolean {
