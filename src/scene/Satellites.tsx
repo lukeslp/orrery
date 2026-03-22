@@ -43,13 +43,13 @@ function SatDot({ sat, selected, onSelect }: {
         <Html
           position={[0, size + 0.008, 0]}
           center
-          distanceFactor={10}
+          distanceFactor={25}
           style={{ pointerEvents: 'none' }}
           zIndexRange={[1, 0]}
         >
           <div style={{
             color: SAT_COLOR,
-            fontSize: isISS ? 10 : 8,
+            fontSize: isISS ? 8 : 7,
             fontFamily: "'Cormorant Garamond', serif",
             fontWeight: selected ? 600 : 400,
             whiteSpace: 'nowrap',

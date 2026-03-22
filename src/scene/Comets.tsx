@@ -92,13 +92,13 @@ function CometDot({ comet, jd, selected, onSelect }: {
         <Html
           position={[0, size + 0.015, 0]}
           center
-          distanceFactor={12}
+          distanceFactor={25}
           style={{ pointerEvents: 'none' }}
           zIndexRange={[1, 0]}
         >
           <div style={{
             color: COMET_COLOR,
-            fontSize: 9,
+            fontSize: 7,
             fontFamily: "'Cormorant Garamond', serif",
             fontWeight: selected ? 600 : 300,
             fontStyle: 'italic',

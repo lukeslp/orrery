@@ -194,13 +194,13 @@ export function StarField({ visible }: { visible: boolean }) {
           <group key={star.name} position={star.pos}>
             <Html
               center
-              distanceFactor={300}
+              distanceFactor={500}
               style={{ pointerEvents: 'none' }}
               zIndexRange={[1, 0]}
             >
               <div style={{
-                color: 'rgba(255,255,255,0.6)',
-                fontSize: star.mag < 1.0 ? 9 : 8,
+                color: 'rgba(255,255,255,0.5)',
+                fontSize: star.mag < 1.0 ? 7 : 6,
                 fontFamily: "'Cormorant Garamond', serif",
                 fontWeight: star.mag < 1.0 ? 400 : 300,
                 whiteSpace: 'nowrap',

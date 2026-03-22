@@ -83,13 +83,13 @@ function RadiantMarker({ shower, active, selected, onSelect }: {
       {(selected || active) && (
         <Html
           center
-          distanceFactor={300}
+          distanceFactor={500}
           style={{ pointerEvents: 'none' }}
           zIndexRange={[1, 0]}
         >
           <div style={{
             color: METEOR_COLOR,
-            fontSize: active ? 9 : 8,
+            fontSize: active ? 7 : 6,
             fontFamily: "'Cormorant Garamond', serif",
             fontWeight: selected ? 600 : 300,
             whiteSpace: 'nowrap',
