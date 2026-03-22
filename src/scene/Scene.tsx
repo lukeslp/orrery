@@ -218,8 +218,6 @@ export interface SceneProps {
   showStars: boolean;
   showConstellations: boolean;
   showAsteroidBelt: boolean;
-  showMilkyWay: boolean;
-  showDeepSpace: boolean;
   constellationFocus: boolean;
   cinematic: boolean;
   onMoonSelect?: (planetIdx: number, moonIdx: number) => void;
@@ -231,7 +229,7 @@ export interface SceneProps {
 export default function Scene({
   jd, T, neos, selNeo, setSelNeo, selPlanet, setSelPlanet,
   focusTarget, onPositionsUpdate, showDwarf,
-  showStars, showConstellations, showAsteroidBelt, showMilkyWay, showDeepSpace,
+  showStars, showConstellations, showAsteroidBelt,
   constellationFocus, cinematic, onMoonSelect, selMoonIdx, onCameraDistance, camPreset,
 }: SceneProps) {
   const [hov, setHov] = useState<number | null>(null);
