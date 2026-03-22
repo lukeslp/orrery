@@ -802,7 +802,8 @@ export default function Panels(props: PanelProps) {
   // Current body label from nav stack
   const cinematicLabel = navStack[navStack.length - 1] || '';
 
-  if (cinematic) {
+  // ─── Cinematic overlay (rendered above main UI when active) ──────────────────
+  const cinematicOverlay = cinematic ? (() => {
     const dim: React.CSSProperties = {
       color: 'rgba(255,255,255,0.5)', fontSize: 15, fontWeight: 300,
       letterSpacing: 1.5, fontStyle: 'italic',
@@ -816,6 +817,7 @@ export default function Panels(props: PanelProps) {
           cursor: 'pointer',
           backdropFilter: 'blur(0.5px)',
           WebkitBackdropFilter: 'blur(0.5px)',
+          pointerEvents: 'none',
         }}
       >
         {/* Top cluster: time, date, celestial data */}
@@ -877,9 +879,11 @@ export default function Panels(props: PanelProps) {
         </div>
       </div>
     );
-  }
+  })() : null;
 
   return (
+    <>
+    {cinematicOverlay}
     <>
       {/* ── Top bar: info + presets ── */}
       <div style={{
