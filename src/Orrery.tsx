@@ -27,6 +27,8 @@ type CinematicStep = {
   desc?: string;
   stars?: boolean; constellations?: boolean; constellationFocus?: boolean;
   asteroidBelt?: boolean; dwarf?: boolean;
+  deepSky?: boolean; deepSpace?: boolean;
+  comets?: boolean; satellites?: boolean; meteors?: boolean;
 };
 
 function OrreryInner() {
