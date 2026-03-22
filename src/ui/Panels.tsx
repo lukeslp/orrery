@@ -64,13 +64,11 @@ const SCALE_LANDMARKS = [
   { dist: 2, label: 'Inner' },
   { dist: 10, label: 'Outer' },
   { dist: 50, label: 'Kuiper' },
-  { dist: 5000, label: 'Oort' },
-  { dist: 60000, label: 'Galaxy' },
 ];
 
 function ScaleIndicator({ cameraDistance }: { cameraDistance: number }) {
   const minLog = Math.log10(0.1);
-  const maxLog = Math.log10(200000);
+  const maxLog = Math.log10(500);
   const range = maxLog - minLog;
 
   return (
