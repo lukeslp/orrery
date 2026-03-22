@@ -458,6 +458,61 @@ function SideDrawer({
         </>
       )}
 
+      {/* ── Constellation Info (when selected) ── */}
+      {selConstellation && MYTHOLOGY[selConstellation] && (() => {
+        const info = MYTHOLOGY[selConstellation];
+        return (
+          <>
+            <SectionHeader>
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                <span>Constellation</span>
+                <button
+                  onClick={() => setSelConstellation(null)}
+                  aria-label="Close constellation info"
+                  style={{
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    color: 'rgba(255,255,255,0.3)', fontSize: 14, fontFamily: 'inherit',
+                    padding: '0 4px', lineHeight: 1,
+                  }}
+                >
+                  {'\u00d7'}
+                </button>
+              </span>
+            </SectionHeader>
+            <div style={{ padding: '0 16px 12px' }}>
+              <div style={{ color: accent, fontSize: 15, fontWeight: 500, letterSpacing: 1 }}>
+                {selConstellation}
+              </div>
+              <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 10, fontWeight: 300, marginTop: 2, letterSpacing: 1 }}>
+                {info.origin} {'\u00b7'} Best: {info.season}
+              </div>
+              <div style={{
+                color: 'rgba(255,255,255,0.65)', fontSize: 12, fontWeight: 300,
+                marginTop: 10, lineHeight: 1.6, fontStyle: 'italic',
+              }}>
+                {info.myth}
+              </div>
+              {info.objects.length > 0 && (
+                <>
+                  <div style={{
+                    color: 'rgba(255,255,255,0.3)', fontSize: 9, letterSpacing: 2,
+                    textTransform: 'uppercase', fontWeight: 300, marginTop: 12, marginBottom: 4,
+                  }}>
+                    Notable Objects
+                  </div>
+                  {info.objects.map(obj => (
+                    <div key={obj} style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: 300, lineHeight: 1.6 }}>
+                      {obj}
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+            <div style={sectionDivider} />
+          </>
+        );
+      })()}
+
       {/* ── About ── */}
       <SectionHeader>About</SectionHeader>
       <div style={{ padding: '0 16px 20px' }}>
@@ -476,6 +531,7 @@ function SideDrawer({
           <div style={sourceItem}>d3-celestial star catalogs</div>
           <div style={sourceItem}>HYG Database (bright stars)</div>
           <div style={sourceItem}>IAU constellation boundaries</div>
+          <div style={sourceItem}>OpenNGC deep sky catalog</div>
           <div style={sourceItem}>IAU Meteor Data Center (showers)</div>
           <div style={sourceItem}>CelesTrak TLE (satellites)</div>
         </div>
@@ -492,8 +548,9 @@ function SideDrawer({
           <div style={kbdRow}><span style={kbd}>1-7</span> Camera presets</div>
           <div style={kbdRow}><span style={kbd}>S</span> Stars {'\u00b7'} <span style={kbd}>L</span> Constellations</div>
           <div style={kbdRow}><span style={kbd}>G</span> Stargazer {'\u00b7'} <span style={kbd}>D</span> Dwarf planets</div>
-          <div style={kbdRow}><span style={kbd}>N</span> NEO {'\u00b7'} <span style={kbd}>C</span> Comets</div>
-          <div style={kbdRow}><span style={kbd}>R</span> Radiants {'\u00b7'} <span style={kbd}>I</span> Satellites</div>
+          <div style={kbdRow}><span style={kbd}>K</span> Deep Sky {'\u00b7'} <span style={kbd}>N</span> NEO</div>
+          <div style={kbdRow}><span style={kbd}>C</span> Comets {'\u00b7'} <span style={kbd}>R</span> Radiants</div>
+          <div style={kbdRow}><span style={kbd}>I</span> Satellites</div>
           <div style={kbdRow}><span style={kbd}>F</span> Tour {'\u00b7'} <span style={kbd}>M</span> Panel</div>
           <div style={kbdRow}><span style={kbd}>Space</span> Pause {'\u00b7'} <span style={kbd}>Esc</span> Back/Deselect</div>
         </div>
@@ -522,6 +579,7 @@ export interface PanelProps {
   showMeteors: boolean; setShowMeteors: (fn: (p: boolean) => boolean) => void;
   showSatellites: boolean; setShowSatellites: (fn: (p: boolean) => boolean) => void;
   showDeepSky: boolean; setShowDeepSky: (fn: (p: boolean) => boolean) => void;
+  selConstellation: string | null; setSelConstellation: (id: string | null) => void;
   drawerOpen: boolean; setDrawerOpen: (fn: boolean | ((p: boolean) => boolean)) => void;
   cinematic: boolean;
   setCinematic: (c: boolean) => void;
@@ -553,6 +611,7 @@ export default function Panels(props: PanelProps) {
     showMeteors, setShowMeteors,
     showSatellites, setShowSatellites,
     showDeepSky, setShowDeepSky,
+    selConstellation, setSelConstellation,
     drawerOpen, setDrawerOpen,
     cinematic,
     navStack,
@@ -891,6 +950,7 @@ export default function Panels(props: PanelProps) {
           showMeteors={showMeteors} setShowMeteors={setShowMeteors}
           showSatellites={showSatellites} setShowSatellites={setShowSatellites}
           showDeepSky={showDeepSky} setShowDeepSky={setShowDeepSky}
+          selConstellation={selConstellation} setSelConstellation={setSelConstellation}
         />
       </div>
 
