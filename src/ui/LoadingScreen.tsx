@@ -1,12 +1,30 @@
 /*
  * Loading overlay — visible until 3D scene is ready.
- * Fades out smoothly over 500ms.
+ * Fades out smoothly, reveals real data facts as assets load.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
+const FACTS = [
+  'Charting 41,487 stars from the HYG catalog',
+  'Mapping 89 constellations across the celestial sphere',
+  'Placing 5,000 asteroids in the main belt',
+  'Tracing 95 comet orbits through the inner solar system',
+  'Cataloging 113 meteor showers from the IAU database',
+  'Tracking 30 satellites in Earth orbit via SGP4 propagation',
+  'Plotting 288 deep sky objects — galaxies, nebulae, star clusters',
+  'Computing Keplerian orbits for 8 planets and 32 moons',
+  'Positioning 5 interstellar spacecraft beyond the heliosphere',
+  'Scattering 5,000 icy bodies across the Oort Cloud',
+  'Rendering Saturn\'s rings — C Ring to Encke Gap',
+  'Resolving 10 nearby star systems within 12 light-years',
+];
 
 export default function LoadingScreen({ ready, progress = 0 }: { ready: boolean; progress?: number }) {
   const [visible, setVisible] = useState(true);
+  const [shownFacts, setShownFacts] = useState<string[]>([]);
+  const factIdx = useRef(0);
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
   useEffect(() => {
     if (ready) {
@@ -14,6 +32,18 @@ export default function LoadingScreen({ ready, progress = 0 }: { ready: boolean;
       return () => clearTimeout(t);
     }
   }, [ready]);
+
+  // Reveal facts one at a time as loading progresses
+  useEffect(() => {
+    if (ready) return;
+    const id = setInterval(() => {
+      if (factIdx.current < FACTS.length) {
+        setShownFacts(prev => [...prev, FACTS[factIdx.current]]);
+        factIdx.current++;
+      }
+    }, isMobile ? 600 : 450);
+    return () => clearInterval(id);
+  }, [ready, isMobile]);
 
   if (!visible) return null;
 
@@ -40,7 +70,38 @@ export default function LoadingScreen({ ready, progress = 0 }: { ready: boolean;
       }}>
         Orrery
       </div>
-      
+
+      {/* Facts feed */}
+      <div style={{
+        maxWidth: isMobile ? 280 : 360,
+        minHeight: isMobile ? 140 : 180,
+        marginBottom: 20,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
+        overflow: 'hidden',
+      }}>
+        {shownFacts.slice(-5).map((fact, i) => {
+          const isLatest = i === shownFacts.slice(-5).length - 1;
+          return (
+            <div
+              key={fact}
+              style={{
+                color: isLatest ? 'rgba(0,255,204,0.6)' : 'rgba(255,255,255,0.15)',
+                fontSize: isMobile ? 11 : 12,
+                fontStyle: 'italic',
+                lineHeight: 1.6,
+                letterSpacing: 0.5,
+                transition: 'color 0.4s ease, opacity 0.4s ease',
+                textAlign: 'center',
+              }}
+            >
+              {fact}
+            </div>
+          );
+        })}
+      </div>
+
       <div style={{
         width: 120, height: 1,
         background: 'rgba(255,255,255,0.1)',
@@ -64,13 +125,6 @@ export default function LoadingScreen({ ready, progress = 0 }: { ready: boolean;
       }}>
         {ready ? 'Ready' : `Initializing ${Math.round(progress)}%`}
       </div>
-
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 0.3; transform: scaleX(1); }
-          50% { opacity: 1; transform: scaleX(2); }
-        }
-      `}</style>
     </div>
   );
 }
