@@ -13,6 +13,142 @@ import {
 } from '../data/deepspace';
 import type { Spacecraft } from '../data/deepspace';
 
+const DEEP_SPACE_SPHERE_RADIUS = 920;
+
+const milkyWayVertexShader = `
+  varying vec3 vWorldPos;
+  varying vec3 vLocalDir;
+
+  void main() {
+    vec4 worldPos = modelMatrix * vec4(position, 1.0);
+    vWorldPos = worldPos.xyz;
+    vLocalDir = normalize(position);
+    gl_Position = projectionMatrix * viewMatrix * worldPos;
+  }
+`;
+
+const milkyWayFragmentShader = `
+  varying vec3 vWorldPos;
+  varying vec3 vLocalDir;
+
+  uniform vec3 centerDir;
+  uniform float bandOpacity;
+
+  void main() {
+    vec3 dir = normalize(vWorldPos);
+    float latitude = abs(vLocalDir.y);
+    float band = smoothstep(0.32, 0.04, latitude);
+
+    float centerFalloff = max(dot(dir, normalize(centerDir)), 0.0);
+    centerFalloff = pow(centerFalloff, 8.0);
+
+    float dust = 0.7 + 0.3 * sin(dir.x * 28.0 + dir.z * 15.0) * sin(dir.y * 24.0 + dir.x * 11.0);
+    float opacity = band * bandOpacity * dust + centerFalloff * 0.38;
+
+    vec3 bandColor = vec3(0.16, 0.24, 0.34);
+    vec3 coreColor = vec3(0.96, 0.78, 0.54);
+    vec3 color = mix(bandColor, coreColor, centerFalloff * 0.9);
+
+    gl_FragColor = vec4(color, opacity);
+  }
+`;
+
+function makeGlowTexture() {
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  const gradient = ctx.createRadialGradient(
+    size / 2,
+    size / 2,
+    0,
+    size / 2,
+    size / 2,
+    size / 2,
+  );
+  gradient.addColorStop(0, 'rgba(255,255,255,1)');
+  gradient.addColorStop(0.25, 'rgba(255,255,255,0.95)');
+  gradient.addColorStop(0.55, 'rgba(255,255,255,0.35)');
+  gradient.addColorStop(1, 'rgba(255,255,255,0)');
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function GlowSprite({
+  color,
+  opacity,
+  position,
+  scale,
+}: {
+  color: string;
+  opacity: number;
+  position: [number, number, number];
+  scale: [number, number, number];
+}) {
+  const texture = useMemo(() => makeGlowTexture(), []);
+
+  if (!texture) return null;
+
+  return (
+    <sprite position={position} scale={scale}>
+      <spriteMaterial
+        color={color}
+        map={texture}
+        alphaMap={texture}
+        transparent
+        opacity={opacity}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+        toneMapped={false}
+      />
+    </sprite>
+  );
+}
+
+function MilkyWayBackdrop() {
+  const materialRef = useRef<THREE.ShaderMaterial | null>(null);
+  const centerDir = useMemo(() => new THREE.Vector3(...raDecToSphere(266.4, -29.0, 1)).normalize(), []);
+  const uniforms = useMemo(() => ({
+    centerDir: { value: centerDir },
+    bandOpacity: { value: 0.24 },
+  }), [centerDir]);
+
+  useFrame((_, dt) => {
+    if (!materialRef.current) return;
+    const t = performance.now() * 0.00005;
+    materialRef.current.uniforms.bandOpacity.value = 0.23 + Math.sin(t + dt) * 0.02;
+  });
+
+  return (
+    <group rotation={[0.98, 0.54, -0.22]}>
+      <mesh>
+        <sphereGeometry args={[DEEP_SPACE_SPHERE_RADIUS, 96, 96]} />
+        <shaderMaterial
+          ref={materialRef}
+          vertexShader={milkyWayVertexShader}
+          fragmentShader={milkyWayFragmentShader}
+          uniforms={uniforms}
+          transparent
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+      <GlowSprite color="#ffd29a" opacity={0.3} position={raDecToSphere(266.4, -29.0, DEEP_SPACE_SPHERE_RADIUS - 20)} scale={[240, 160, 1]} />
+      <GlowSprite color="#8fbaff" opacity={0.12} position={raDecToSphere(85.0, 0.0, DEEP_SPACE_SPHERE_RADIUS - 10)} scale={[340, 110, 1]} />
+    </group>
+  );
+}
+
 // ─── Oort Cloud (instanced particle shell) ──────────────────────────────────
 
 function OortCloud() {
@@ -113,9 +249,7 @@ function SpacecraftDot({ craft, selected, onSelect }: {
         <meshBasicMaterial color={color} toneMapped={false} />
       </mesh>
       {/* Glow */}
-      <sprite position={pos} scale={[size * 4, size * 4, 1]}>
-        <spriteMaterial color={color} transparent opacity={0.3} blending={THREE.AdditiveBlending} toneMapped={false} />
-      </sprite>
+      <GlowSprite color={color} opacity={0.3} position={pos} scale={[size * 4, size * 4, 1]} />
       {/* Label */}
       <Html position={[pos[0], pos[1] + 3, pos[2]]} center distanceFactor={50} style={{ pointerEvents: 'none' }} zIndexRange={[1, 0]}>
         <div style={{
@@ -179,9 +313,7 @@ function NearStarMarkers() {
               <meshBasicMaterial color={color} toneMapped={false} />
             </mesh>
             {/* Glow sprite */}
-            <sprite position={pos} scale={[size * 6, size * 6, 1]}>
-              <spriteMaterial color={color} transparent opacity={0.25} blending={THREE.AdditiveBlending} toneMapped={false} />
-            </sprite>
+            <GlowSprite color={color} opacity={0.25} position={pos} scale={[size * 6, size * 6, 1]} />
             <Html position={[pos[0], pos[1] + 4, pos[2]]} center distanceFactor={200} style={{ pointerEvents: 'none' }} zIndexRange={[1, 0]}>
               <div style={{
                 color: 'rgba(255,255,255,0.7)',
@@ -211,7 +343,7 @@ function GalaxyMarkers() {
   return (
     <group>
       {LOCAL_GROUP.map(gal => {
-        const pos = raDecToSphere(gal.ra, gal.dec, 290);
+        const pos = raDecToSphere(gal.ra, gal.dec, DEEP_SPACE_SPHERE_RADIUS - 90);
         const isSpiral = gal.type === 'Spiral';
         const color = isSpiral ? '#ccaaff' : '#88aacc';
         const size = isSpiral ? 3 : 1.8;
@@ -227,9 +359,7 @@ function GalaxyMarkers() {
               <meshBasicMaterial color={color} toneMapped={false} />
             </mesh>
             {/* Diffuse glow */}
-            <sprite position={pos} scale={[size * 8, size * 5, 1]}>
-              <spriteMaterial color={color} transparent opacity={0.15} blending={THREE.AdditiveBlending} toneMapped={false} />
-            </sprite>
+            <GlowSprite color={color} opacity={0.15} position={pos} scale={[size * 8, size * 5, 1]} />
             <Html position={[pos[0], pos[1] + 5, pos[2]]} center distanceFactor={200} style={{ pointerEvents: 'none' }} zIndexRange={[1, 0]}>
               <div style={{
                 color: 'rgba(200,180,255,0.7)',
@@ -266,6 +396,7 @@ export function DeepSpaceField({ visible, selSpacecraft, setSelSpacecraft }: Dee
   if (!visible) return null;
   return (
     <group>
+      <MilkyWayBackdrop />
       <OortCloud />
       <SpacecraftMarkers selSpacecraft={selSpacecraft} setSelSpacecraft={setSelSpacecraft} />
       <NearStarMarkers />

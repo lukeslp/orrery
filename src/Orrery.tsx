@@ -162,65 +162,40 @@ function OrreryInner() {
   // ─── Cinematic: continuous zoom cycle through scale levels ──────────────────
   const cinematicSteps = useMemo((): CinematicStep[] => [
     // 1. Open on the Sun close-up
-    { camPreset: 7, duration: 6000, label: 'Sol',
+    { camPreset: 7, duration: 6500, label: 'Sol',
       stars: true, constellations: false, constellationFocus: false,
       asteroidBelt: false, dwarf: false, deepSky: false, deepSpace: false,
-      comets: false, satellites: false, meteors: false, autoRotateSpeed: 0.45 },
-    // 2. Pull out to inner planets
-    { camPreset: 0, duration: 5000, label: 'Inner Planets',
-      stars: true, constellations: false, constellationFocus: false,
-      asteroidBelt: false, dwarf: false, deepSky: false, deepSpace: false,
-      comets: false, satellites: false, meteors: false, autoRotateSpeed: 0.55 },
-    // 3. Earth with the one full constellation reveal during the tour
-    { focusPlanet: 2, duration: 6500, label: 'Earthrise',
-      stars: true, constellations: true, constellationFocus: true,
-      asteroidBelt: false, dwarf: false, deepSky: false, deepSpace: false,
-      comets: false, satellites: false, meteors: false, autoRotateSpeed: 1.2 },
-    // 4. Zoom back out earlier to re-establish the system
-    { camPreset: 1, duration: 4500, label: 'Solar System',
-      stars: true, constellations: true, constellationFocus: false,
-      asteroidBelt: true, dwarf: true, deepSky: false, deepSpace: false,
-      comets: false, satellites: false, meteors: false, autoRotateSpeed: 0.45 },
-    // 5. Return to the Moon
-    { focusPlanet: 2, focusMoon: 0, duration: 5000, label: 'Moon',
-      stars: true, constellations: true, constellationFocus: false,
-      asteroidBelt: false, dwarf: false, deepSky: false, deepSpace: false,
-      comets: false, satellites: false, meteors: false, autoRotateSpeed: 0.95 },
-    // 6. Mars
-    { focusPlanet: 3, duration: 4000, label: 'Mars',
-      stars: true, constellations: false, constellationFocus: false,
-      asteroidBelt: false, dwarf: false, deepSky: false, deepSpace: false,
-      comets: false, satellites: false, meteors: false, autoRotateSpeed: 0.5 },
-    // 7. Pull out — reveal asteroid belt
-    { camPreset: 8, duration: 5000, label: 'Asteroid Belt',
-      stars: true, constellations: false, constellationFocus: false,
-      asteroidBelt: true, dwarf: false, deepSky: false, deepSpace: false,
-      comets: false, satellites: false, meteors: false, autoRotateSpeed: 0.4 },
-    // 8. Jupiter
-    { focusPlanet: 4, duration: 5000, label: 'Jupiter',
-      stars: true, constellations: false, constellationFocus: false,
-      asteroidBelt: true, dwarf: false, deepSky: false, deepSpace: false,
-      comets: false, satellites: false, meteors: false, autoRotateSpeed: 0.55 },
-    // 9. Saturn and its rings
-    { focusPlanet: 5, duration: 6000, label: 'Saturn',
-      stars: true, constellations: false, constellationFocus: false,
-      asteroidBelt: true, dwarf: false, deepSky: false, deepSpace: false,
-      comets: false, satellites: false, meteors: false, autoRotateSpeed: 0.5 },
-    // 10. Outer reaches — Kuiper belt with luminous celestial overlays
-    { camPreset: 5, duration: 6500, label: 'Kuiper Belt',
-      stars: true, constellations: true, constellationFocus: false,
-      asteroidBelt: false, dwarf: true, deepSky: true, deepSpace: true,
       comets: false, satellites: false, meteors: false, autoRotateSpeed: 0.3 },
-    // 11. Stargazer — constellations and deep sky in full glory
+    // 2. Drop into Earth before the wider pullback
+    { focusPlanet: 2, duration: 6500, label: 'Earthrise',
+      stars: true, constellations: false, constellationFocus: false,
+      asteroidBelt: false, dwarf: false, deepSky: false, deepSpace: false,
+      comets: false, satellites: false, meteors: false, autoRotateSpeed: 0.62 },
+    // 3. Pull out to inner planets
+    { camPreset: 0, duration: 6000, label: 'Inner Planets',
+      stars: true, constellations: false, constellationFocus: false,
+      asteroidBelt: false, dwarf: false, deepSky: false, deepSpace: false,
+      comets: false, satellites: false, meteors: false, autoRotateSpeed: 0.35 },
+    // 4. Get the constellation reveal out of the way early
     { camPreset: 10, duration: 7000, label: 'Stargazer',
       stars: true, constellations: true, constellationFocus: true,
-      asteroidBelt: false, dwarf: false, deepSky: true, deepSpace: false,
-      comets: false, satellites: false, meteors: false, autoRotateSpeed: 0.22 },
-    // 12. Screensaver orbit — gentle auto-rotate following Earth
-    { camPreset: 6, duration: 8000, label: 'Screensaver',
-      stars: true, constellations: false, constellationFocus: false,
       asteroidBelt: false, dwarf: false, deepSky: false, deepSpace: false,
-      comets: false, satellites: false, meteors: false, autoRotateSpeed: 0.4 },
+      comets: false, satellites: false, meteors: false, autoRotateSpeed: 0.14 },
+    // 5. Re-establish the whole system
+    { camPreset: 1, duration: 6000, label: 'Solar System',
+      stars: true, constellations: false, constellationFocus: false,
+      asteroidBelt: true, dwarf: true, deepSky: false, deepSpace: false,
+      comets: false, satellites: false, meteors: false, autoRotateSpeed: 0.22 },
+    // 6. Outer system without snapping to another single-planet close-up
+    { camPreset: 4, duration: 6500, label: 'Outer Planets',
+      stars: true, constellations: false, constellationFocus: false,
+      asteroidBelt: true, dwarf: true, deepSky: false, deepSpace: false,
+      comets: false, satellites: false, meteors: false, autoRotateSpeed: 0.16 },
+    // 7. Deep-space pullback with local-group framing, then loop back to Sol
+    { camPreset: 9, duration: 7500, label: 'Milky Way',
+      stars: true, constellations: false, constellationFocus: false,
+      asteroidBelt: false, dwarf: true, deepSky: true, deepSpace: true,
+      comets: false, satellites: false, meteors: false, autoRotateSpeed: 0.08 },
   ], []);
 
   const cinematicIdx = useRef(0);
@@ -641,6 +616,7 @@ function OrreryInner() {
             onCameraDistance={setCameraDistance}
             cameraDistance={cameraDistance}
             camPreset={camPreset}
+            showBodyGlyphs={camPreset?.label === 'Stargazer'}
             selComet={selComet} setSelComet={setSelComet}
             selMeteor={selMeteor} setSelMeteor={setSelMeteor}
             selSatellite={selSatellite} setSelSatellite={setSelSatellite}

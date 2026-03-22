@@ -12,6 +12,7 @@ import { useRef, useState, useEffect, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
+import { ZODIAC_SYMBOLS, isZodiac, type ConstellationSymbolSvg } from '../data/constellation-symbols';
 
 const DEG = Math.PI / 180;
 const ECLIPTIC_TILT = 23.4 * DEG;
@@ -37,7 +38,6 @@ interface StarGeoJson {
 }
 
 interface ConstellationLineFeature {
-  id?: string | number;
   geometry: {
     coordinates: [number, number][][];
   };
@@ -63,12 +63,6 @@ interface ConstellationPointGeoJson {
   features: ConstellationPointFeature[];
 }
 
-interface ConstellationOverlayData {
-  viewBox: string;
-  paths: string[];
-  points: Array<[number, number]>;
-}
-
 function setsEqual<T>(a: Set<T>, b: Set<T>) {
   if (a.size !== b.size) return false;
   for (const value of a) {
@@ -88,88 +82,31 @@ function raDecTo3D(raDeg: number, decDeg: number, r: number = SPHERE_RADIUS): [n
   return [x, y, z];
 }
 
-function buildConstellationOverlay(
-  coordinates: [number, number][][],
-  centerPos: [number, number, number],
-): ConstellationOverlayData | null {
-  if (coordinates.length === 0) return null;
-
-  const center = new THREE.Vector3(...centerPos).normalize();
-  const referenceAxis = Math.abs(center.y) > 0.92
-    ? new THREE.Vector3(0, 0, 1)
-    : new THREE.Vector3(0, 1, 0);
-  const east = new THREE.Vector3().crossVectors(referenceAxis, center);
-  if (east.lengthSq() < 1e-6) east.set(1, 0, 0);
-  else east.normalize();
-  const north = new THREE.Vector3().crossVectors(center, east).normalize();
-  const point = new THREE.Vector3();
-  const projectedLines: Array<Array<[number, number]>> = [];
-  const rawPoints: Array<[number, number]> = [];
-
-  for (const lineString of coordinates) {
-    const projected: Array<[number, number]> = [];
-    for (const [ra, dec] of lineString) {
-      const [x, y, z] = raDecTo3D(ra, dec, 1);
-      point.set(x, y, z).normalize();
-      const px = point.dot(east);
-      const py = point.dot(north);
-      projected.push([px, py]);
-      rawPoints.push([px, py]);
-    }
-    if (projected.length > 1) projectedLines.push(projected);
+function sphericalArcPoints(
+  start: [number, number, number],
+  end: [number, number, number],
+): THREE.Vector3[] {
+  const a = new THREE.Vector3(...start).normalize();
+  const b = new THREE.Vector3(...end).normalize();
+  const angle = a.angleTo(b);
+  if (angle < 1e-5) {
+    return [a.multiplyScalar(SPHERE_RADIUS), b.multiplyScalar(SPHERE_RADIUS)];
   }
 
-  if (projectedLines.length === 0 || rawPoints.length === 0) return null;
+  const axis = new THREE.Vector3().crossVectors(a, b);
+  if (axis.lengthSq() < 1e-10) {
+    return [a.multiplyScalar(SPHERE_RADIUS), b.multiplyScalar(SPHERE_RADIUS)];
+  }
+  axis.normalize();
+  const steps = Math.max(2, Math.ceil(angle / (Math.PI / 96)));
+  const points: THREE.Vector3[] = [];
 
-  let minX = Infinity;
-  let maxX = -Infinity;
-  let minY = Infinity;
-  let maxY = -Infinity;
-  for (const [x, y] of rawPoints) {
-    if (x < minX) minX = x;
-    if (x > maxX) maxX = x;
-    if (y < minY) minY = y;
-    if (y > maxY) maxY = y;
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    points.push(a.clone().applyAxisAngle(axis, angle * t).multiplyScalar(SPHERE_RADIUS));
   }
 
-  const rawWidth = Math.max(maxX - minX, 0.02);
-  const rawHeight = Math.max(maxY - minY, 0.02);
-  const maxDim = Math.max(rawWidth, rawHeight);
-  const targetSize = 240;
-  const padding = 28;
-  const scale = targetSize / maxDim;
-  const contentWidth = Math.max(rawWidth * scale, 128);
-  const contentHeight = Math.max(rawHeight * scale, 128);
-  const offsetX = padding + (contentWidth - rawWidth * scale) / 2;
-  const offsetY = padding + (contentHeight - rawHeight * scale) / 2;
-  const svgWidth = contentWidth + padding * 2;
-  const svgHeight = contentHeight + padding * 2;
-
-  const normalize = ([x, y]: [number, number]): [number, number] => ([
-    offsetX + (x - minX) * scale,
-    offsetY + (maxY - y) * scale,
-  ]);
-
-  const paths = projectedLines.map((lineString) => lineString.map((coords, idx) => {
-    const [x, y] = normalize(coords);
-    return `${idx === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
-  }).join(' '));
-
-  const seen = new Set<string>();
-  const points: Array<[number, number]> = [];
-  for (const coords of rawPoints) {
-    const [x, y] = normalize(coords);
-    const key = `${x.toFixed(1)},${y.toFixed(1)}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    points.push([x, y]);
-  }
-
-  return {
-    viewBox: `0 0 ${svgWidth.toFixed(1)} ${svgHeight.toFixed(1)}`,
-    paths,
-    points,
-  };
+  return points;
 }
 
 // ─── Camera-following group with ecliptic tilt ──────────────────────────────
@@ -515,10 +452,15 @@ function useConstellationLineData(): ColoredLineData | null {
             for (let i = 0; i < lineString.length - 1; i++) {
               const [ra1, dec1] = lineString[i];
               const [ra2, dec2] = lineString[i + 1];
-              const [x1, y1, z1] = raDecTo3D(ra1, dec1);
-              const [x2, y2, z2] = raDecTo3D(ra2, dec2);
-              segments.push(x1, y1, z1, x2, y2, z2);
-              segColors.push(cr, cg, cb, cr, cg, cb);
+              const start = raDecTo3D(ra1, dec1);
+              const end = raDecTo3D(ra2, dec2);
+              const arc = sphericalArcPoints(start, end);
+              for (let j = 0; j < arc.length - 1; j++) {
+                const p1 = arc[j];
+                const p2 = arc[j + 1];
+                segments.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
+                segColors.push(cr, cg, cb, cr, cg, cb);
+              }
             }
           }
         });
@@ -696,37 +638,35 @@ interface ConstellationCentroid {
   english: string;
   pos: [number, number, number];
   color: string;  // per-constellation color (CSS rgb)
-  overlay: ConstellationOverlayData | null;
+  symbol: ConstellationSymbolSvg | null;
 }
 
 function useConstellationCentroids(): ConstellationCentroid[] {
   const [centroids, setCentroids] = useState<ConstellationCentroid[]>([]);
 
   useEffect(() => {
-    Promise.all([
-      fetch(BASE_PATH + 'constellations.json').then((r): Promise<ConstellationPointGeoJson> => r.json() as Promise<ConstellationPointGeoJson>),
-      fetch(BASE_PATH + 'constellations.lines.json').then((r): Promise<ConstellationLineGeoJson> => r.json() as Promise<ConstellationLineGeoJson>),
-    ])
-      .then(([geojson, lineGeojson]) => {
+    fetch(BASE_PATH + 'constellations.json')
+      .then((r): Promise<ConstellationPointGeoJson> => r.json() as Promise<ConstellationPointGeoJson>)
+      .then((geojson) => {
         const items: ConstellationCentroid[] = [];
         const seenIds = new Set<string>();
         let featureIdx = 0;
         for (const feature of geojson.features) {
           const coords = feature.geometry.coordinates;
           if (feature.geometry.type === 'Point') {
-            let uid = String(feature.id);
+            const baseId = String(feature.id);
+            let uid = baseId;
             if (seenIds.has(uid)) uid = `${uid}_${seenIds.size}`;
             seenIds.add(uid);
             const [r, g, b] = constellationColor(featureIdx);
             const pos = raDecTo3D(coords[0], coords[1]);
-            const lineFeature = lineGeojson.features[featureIdx];
             items.push({
               id: uid,
               latin: String(feature.properties.name ?? feature.id),
               english: feature.properties.en || '',
               pos,
               color: `rgb(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)})`,
-              overlay: lineFeature ? buildConstellationOverlay(lineFeature.geometry.coordinates, pos) : null,
+              symbol: ZODIAC_SYMBOLS[baseId] ?? null,
             });
             featureIdx++;
           }
@@ -830,64 +770,56 @@ export function ConstellationLabels({ visible, focus, onSelect }: { visible: boo
                     textShadow: `0 0 10px ${c.color}, 0 0 24px ${c.color}, 0 0 36px rgba(0,0,0,0.9)`,
                     cursor: onSelect ? 'pointer' : 'default',
                     position: 'relative',
-                    minWidth: focus && c.overlay ? 360 : 210,
-                    minHeight: focus && c.overlay ? 320 : 180,
-                    padding: focus && c.overlay ? '220px 14px 14px' : 0,
+                    minWidth: focus && c.symbol ? 320 : 210,
+                    minHeight: focus && c.symbol ? 300 : 180,
+                    padding: focus && c.symbol ? '208px 14px 14px' : 0,
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'flex-end',
                   }}
                 >
-                  {focus && c.overlay && (
+                  {focus && c.symbol && (
                     <svg
-                      viewBox={c.overlay.viewBox}
-                      width={320}
-                      height={320}
+                      viewBox={c.symbol.viewBox}
+                      width={260}
+                      height={260}
                       aria-hidden="true"
                       style={{
                         position: 'absolute',
                         left: '50%',
                         top: '50%',
-                        transform: 'translate(-50%, -56%)',
+                        transform: 'translate(-50%, -58%)',
                         overflow: 'visible',
                         pointerEvents: 'none',
-                        opacity: 0.92,
-                        filter: `drop-shadow(0 0 14px ${c.color}) drop-shadow(0 0 36px ${c.color})`,
+                        opacity: isZodiac(c.id) ? 0.94 : 0.8,
+                        filter: `drop-shadow(0 0 8px rgba(255,255,255,0.12)) drop-shadow(0 0 18px ${c.color})`,
                       }}
                     >
-                      <g opacity={0.18}>
-                        {c.overlay.paths.map((path, idx) => (
+                      <g opacity={0.12}>
+                        {c.symbol.paths.map((path, idx) => (
                           <path
                             key={`glow-${c.id}-${idx}`}
                             d={path}
                             fill="none"
                             stroke={c.color}
-                            strokeWidth={15}
+                            strokeWidth={isZodiac(c.id) ? 10 : 9}
                             strokeLinecap="round"
                             strokeLinejoin="round"
                           />
                         ))}
                       </g>
-                      <g opacity={0.54}>
-                        {c.overlay.paths.map((path, idx) => (
+                      <g opacity={0.96}>
+                        {c.symbol.paths.map((path, idx) => (
                           <path
                             key={`line-${c.id}-${idx}`}
                             d={path}
                             fill="none"
-                            stroke={c.color}
-                            strokeWidth={4.5}
+                            stroke="rgba(255,247,232,0.96)"
+                            strokeWidth={isZodiac(c.id) ? 2.8 : 2.4}
                             strokeLinecap="round"
                             strokeLinejoin="round"
                           />
-                        ))}
-                      </g>
-                      <g>
-                        {c.overlay.points.map(([x, y], idx) => (
-                          <circle key={`aura-${c.id}-${idx}`} cx={x} cy={y} r={8} fill={c.color} opacity={0.14} />
-                        ))}
-                        {c.overlay.points.map(([x, y], idx) => (
-                          <circle key={`core-${c.id}-${idx}`} cx={x} cy={y} r={2.8} fill={c.color} opacity={0.78} />
                         ))}
                       </g>
                     </svg>

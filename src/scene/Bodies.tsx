@@ -2,134 +2,105 @@
  * Celestial bodies — Sun, Planet, Moon, orbit rings, Saturn rings
  */
 
-import { useRef, useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
 import { Html, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { TEX } from '../data/planets';
+import { BODY_SYMBOLS } from '../data/body-symbols';
 import type { PlanetDef } from '../lib/kepler';
 import { planetXYZ, orbitPath } from '../lib/kepler';
 import type { MoonDef } from '../data/moons';
 import { useTheme } from '../lib/themes';
 
-const sunCoronaVertexShader = `
-  varying vec3 vNormal;
-  varying vec3 vWorldPos;
-  void main() {
-    vNormal = normalize(normalMatrix * normal);
-    vec4 worldPos = modelMatrix * vec4(position, 1.0);
-    vWorldPos = worldPos.xyz;
-    gl_Position = projectionMatrix * viewMatrix * worldPos;
-  }
-`;
-
-const sunCoronaFragmentShader = `
-  varying vec3 vNormal;
-  varying vec3 vWorldPos;
-  uniform vec3 viewPos;
-  uniform float time;
-  uniform float intensity;
-
-  void main() {
-    vec3 viewDir = normalize(viewPos - vWorldPos);
-    float fresnel = pow(1.0 - max(dot(vNormal, viewDir), 0.0), 2.2);
-    float pulse = 0.82 + 0.18 * sin(time * 1.7);
-    float ripple = 0.75 + 0.25 * sin(time * 2.6 + vWorldPos.y * 18.0 + vWorldPos.x * 12.0);
-    float glow = fresnel * pulse * ripple * intensity;
-
-    vec3 inner = vec3(1.0, 0.72, 0.18);
-    vec3 outer = vec3(1.0, 0.36, 0.05);
-    vec3 color = mix(inner, outer, clamp(fresnel * 1.2, 0.0, 1.0));
-
-    gl_FragColor = vec4(color, glow);
-  }
-`;
-
 // ─── Sun ────────────────────────────────────────────────────────────────────────
 
-export function Sun({ cameraDistance = 0 }: { cameraDistance?: number }) {
+function BodyGlyph({
+  symbolKey,
+  color,
+  distanceFactor,
+  size,
+}: {
+  symbolKey: string;
+  color: string;
+  distanceFactor: number;
+  size: number;
+}) {
+  const symbol = BODY_SYMBOLS[symbolKey];
+  if (!symbol) return null;
+
+  return (
+    <Html center distanceFactor={distanceFactor} style={{ pointerEvents: 'none' }} zIndexRange={[1, 0]}>
+      <svg
+        viewBox={symbol.viewBox}
+        width={size}
+        height={size}
+        aria-hidden="true"
+        style={{
+          overflow: 'visible',
+          opacity: 0.94,
+          filter: `drop-shadow(0 0 8px rgba(255,255,255,0.1)) drop-shadow(0 0 18px ${color})`,
+        }}
+      >
+        <g opacity={0.1}>
+          {symbol.paths.map((path, idx) => (
+            <path
+              key={`${symbolKey}-glow-${idx}`}
+              d={path}
+              fill="none"
+              stroke={color}
+              strokeWidth={8}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          ))}
+        </g>
+        <g opacity={0.96}>
+          {symbol.paths.map((path, idx) => (
+            <path
+              key={`${symbolKey}-line-${idx}`}
+              d={path}
+              fill="none"
+              stroke="rgba(255,247,232,0.96)"
+              strokeWidth={2.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          ))}
+        </g>
+      </svg>
+    </Html>
+  );
+}
+
+export function Sun({ cameraDistance = 0, showGlyphOverlay = false }: { cameraDistance?: number; showGlyphOverlay?: boolean }) {
   const ref = useRef<THREE.Mesh>(null);
-  const coronaRef = useRef<THREE.ShaderMaterial | null>(null);
-  const outerCoronaRef = useRef<THREE.ShaderMaterial | null>(null);
   const tex = useLoader(THREE.TextureLoader, TEX.sun);
-  useFrame((_, dt) => { if (ref.current) ref.current.rotation.y += dt * 0.02; });
-  useFrame(({ camera, clock }, dt) => {
+  useFrame((_, dt) => {
     if (ref.current) ref.current.rotation.y += dt * 0.02;
-    const t = clock.elapsedTime;
-    if (coronaRef.current) {
-      coronaRef.current.uniforms.time.value = t;
-      coronaRef.current.uniforms.viewPos.value.copy(camera.position);
-    }
-    if (outerCoronaRef.current) {
-      outerCoronaRef.current.uniforms.time.value = t * 0.85;
-      outerCoronaRef.current.uniforms.viewPos.value.copy(camera.position);
-    }
   });
-  const farGlow = Math.min(cameraDistance / 50, 4);
-  const coronaUniforms = useMemo(() => ({
-    viewPos: { value: new THREE.Vector3() },
-    time: { value: 0 },
-    intensity: { value: 0.95 },
-  }), []);
-  const outerCoronaUniforms = useMemo(() => ({
-    viewPos: { value: new THREE.Vector3() },
-    time: { value: 0 },
-    intensity: { value: 0.46 },
-  }), []);
   return (
     <group>
-      {/* Dense white-hot core */}
+      {/* Compact white-hot core */}
       <mesh>
-        <sphereGeometry args={[0.135, 64, 64]} />
-        <meshBasicMaterial color="#fff4cf" toneMapped={false} />
+        <sphereGeometry args={[0.102, 48, 48]} />
+        <meshBasicMaterial color="#fff5d8" toneMapped={false} transparent opacity={0.72} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
-      {/* Chromosphere shell */}
-      <mesh>
-        <sphereGeometry args={[0.147, 64, 64]} />
-        <meshBasicMaterial color="#ffbc4a" toneMapped={false} transparent opacity={0.88} blending={THREE.AdditiveBlending} depthWrite={false} />
-      </mesh>
-      {/* Texture overlay — additive so it adds detail without darkening */}
+      {/* Main textured photosphere */}
       <mesh ref={ref}>
-        <sphereGeometry args={[0.151, 48, 48]} />
-        <meshBasicMaterial map={tex} toneMapped={false} color="#fff8ef" transparent opacity={0.62} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <sphereGeometry args={[0.146, 64, 64]} />
+        <meshBasicMaterial map={tex} toneMapped={false} color="#fff7ec" transparent opacity={0.96} depthWrite={false} />
       </mesh>
-      {/* Inner corona */}
+      {/* Thin chromosphere tint */}
       <mesh>
-        <sphereGeometry args={[0.19, 64, 64]} />
-        <shaderMaterial
-          ref={coronaRef}
-          vertexShader={sunCoronaVertexShader}
-          fragmentShader={sunCoronaFragmentShader}
-          uniforms={coronaUniforms}
-          transparent
-          blending={THREE.AdditiveBlending}
-          side={THREE.BackSide}
-          depthWrite={false}
-        />
+        <sphereGeometry args={[0.152, 64, 64]} />
+        <meshBasicMaterial color="#ffb24a" toneMapped={false} transparent opacity={0.16} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
-      {/* Outer corona */}
-      <mesh>
-        <sphereGeometry args={[0.26, 48, 48]} />
-        <shaderMaterial
-          ref={outerCoronaRef}
-          vertexShader={sunCoronaVertexShader}
-          fragmentShader={sunCoronaFragmentShader}
-          uniforms={outerCoronaUniforms}
-          transparent
-          blending={THREE.AdditiveBlending}
-          side={THREE.BackSide}
-          depthWrite={false}
-        />
-      </mesh>
-      {/* Distance-adaptive beacon for far zoom */}
-      {cameraDistance > 30 && (
-        <mesh>
-          <sphereGeometry args={[0.15 * farGlow * 1.8, 16, 16]} />
-          <meshBasicMaterial color="#ffbf66" transparent opacity={0.16} blending={THREE.AdditiveBlending} toneMapped={false} depthWrite={false} />
-        </mesh>
+      {showGlyphOverlay && (
+        <BodyGlyph symbolKey="Sol" color="rgba(255,196,108,0.95)" distanceFactor={0.86} size={92} />
       )}
-      <pointLight intensity={6.5} color="#fff3d2" distance={220} />
-      <pointLight intensity={3.2} color="#ffb25c" distance={140} />
+      <pointLight intensity={cameraDistance > 2 ? 5.8 : 6.4} color="#fff3d2" distance={220} />
+      <pointLight intensity={cameraDistance > 2 ? 2.6 : 3.0} color="#ffb25c" distance={140} />
       <Html
         position={[0, 0.25, 0]}
         center
@@ -152,6 +123,14 @@ export function Sun({ cameraDistance = 0 }: { cameraDistance?: number }) {
       </Html>
     </group>
   );
+}
+
+function planetLabelScale(radius: number) {
+  return THREE.MathUtils.clamp(Math.sqrt(radius / 0.06), 0.34, 1.5);
+}
+
+function moonLabelScale(radius: number) {
+  return THREE.MathUtils.clamp(Math.sqrt(radius / 0.015), 0.2, 1.05);
 }
 
 // ─── Earth cloud layer (separate component to avoid conditional hook) ────────────
@@ -207,7 +186,7 @@ const ringFragmentShader = `
     float noise = fract(sin(t * 347.3 + 43.1) * 43758.5453);
     alpha += noise * 0.04 * alpha;
 
-    gl_FragColor = vec4(color, alpha * 0.65);
+    gl_FragColor = vec4(color, alpha * 0.42);
   }
 `;
 
@@ -235,16 +214,23 @@ function SaturnRings({ radius }: { radius: number }) {
 
 // ─── Planet ─────────────────────────────────────────────────────────────────────
 
-export function Planet({ planet, T, selected, onSelect, hovered, onHover, moonFocused, cameraDistance = 0 }: {
+export function Planet({ planet, T, selected, onSelect, hovered, onHover, moonFocused, cameraDistance = 0, showGlyphOverlay = false }: {
   planet: PlanetDef; T: number; selected: boolean; onSelect: () => void;
   hovered: boolean; onHover: (h: boolean) => void; moonFocused?: boolean;
   cameraDistance?: number;
+  showGlyphOverlay?: boolean;
 }) {
   const ref = useRef<THREE.Mesh>(null);
   const pos = useMemo(() => planetXYZ(planet, T), [planet, T]);
   const tex = useLoader(THREE.TextureLoader, TEX[planet.tex]);
   const r = planet.radius;
-  const glow = Math.min(cameraDistance / 50, 4);
+  const glow = Math.min(cameraDistance / 80, 1.8);
+  const labelScale = planetLabelScale(r);
+  const labelDistanceFactor = THREE.MathUtils.lerp(1.2, 3, labelScale / 1.5);
+  const labelFontSize = THREE.MathUtils.lerp(5.2, 9.4, labelScale / 1.5);
+  const labelOffset = r + THREE.MathUtils.lerp(0.01, 0.024, labelScale / 1.5);
+  const glyphDistanceFactor = Math.max(0.68, labelDistanceFactor * 0.72);
+  const glyphSize = THREE.MathUtils.lerp(32, 96, labelScale / 1.5);
   // Invisible click target: larger sphere for easier selection
   const hitRadius = Math.max(r * 3, 0.15);
 
@@ -274,26 +260,34 @@ export function Planet({ planet, T, selected, onSelect, hovered, onHover, moonFo
       {planet.tex === 'earth' && <EarthClouds radius={r} />}
       {planet.hasRings && <SaturnRings radius={r} />}
       {/* Distance-adaptive glow beacon */}
-      {cameraDistance > 30 && (
+      {cameraDistance > 30 && planet.tex !== 'earth' && (
         <mesh>
           <sphereGeometry args={[r * glow, 16, 16]} />
           <meshBasicMaterial color={planet.color} transparent opacity={0.3} blending={THREE.AdditiveBlending} toneMapped={false} depthWrite={false} />
         </mesh>
       )}
+      {showGlyphOverlay && BODY_SYMBOLS[planet.name] && (
+        <BodyGlyph
+          symbolKey={planet.name}
+          color={planet.color}
+          distanceFactor={glyphDistanceFactor}
+          size={glyphSize}
+        />
+      )}
       {/* Always-visible label */}
       <Html
-        position={[0, r + 0.02, 0]}
+        position={[0, labelOffset, 0]}
         center
-        distanceFactor={planet.isDwarf ? 1.5 : 3}
+        distanceFactor={planet.isDwarf ? Math.min(labelDistanceFactor, 1.9) : labelDistanceFactor}
         style={{ pointerEvents: 'none' }}
         zIndexRange={[1, 0]}
       >
         <div style={{
           color: hovered || selected ? '#fff' : 'rgba(255,255,255,0.85)',
-          fontSize: 9,
+          fontSize: labelFontSize,
           fontFamily: "'Cormorant Garamond', serif",
           fontWeight: selected ? 600 : 400,
-          letterSpacing: 1,
+          letterSpacing: 0.35 + labelScale * 0.55,
           whiteSpace: 'nowrap',
           userSelect: 'none',
           textShadow: '0 0 6px rgba(0,0,0,0.9)',
@@ -325,6 +319,10 @@ export function Satellite({ moon, parentPos, jd, selected, onSelect, hovered, on
     parentPos[1] + moon.a * Math.sin(inc) * Math.sin(angle),
     parentPos[2] + moon.a * Math.sin(angle) * Math.cos(inc),
   ];
+  const labelScale = moonLabelScale(moon.radius);
+  const labelDistanceFactor = THREE.MathUtils.lerp(0.7, 1.5, labelScale / 1.05);
+  const labelFontSize = THREE.MathUtils.lerp(3.4, 8.2, labelScale / 1.05);
+  const labelOffset = moon.radius + THREE.MathUtils.lerp(0.004, 0.012, labelScale / 1.05);
 
   useFrame((_, dt) => { if (ref.current) ref.current.rotation.y += dt * 0.05; });
 
@@ -348,19 +346,19 @@ export function Satellite({ moon, parentPos, jd, selected, onSelect, hovered, on
       {/* Always-visible label */}
       <group position={pos}>
         <Html
-          position={[0, moon.radius + 0.008, 0]}
+          position={[0, labelOffset, 0]}
           center
-          distanceFactor={1.5}
+          distanceFactor={labelDistanceFactor}
           style={{ pointerEvents: 'none' }}
           zIndexRange={[1, 0]}
         >
           <div style={{
             color: hovered || selected ? '#fff' : 'rgba(255,255,255,0.75)',
-            fontSize: 8,
+            fontSize: labelFontSize,
             fontFamily: "'Cormorant Garamond', serif",
             fontWeight: 400,
             fontStyle: 'italic',
-            letterSpacing: 0.5,
+            letterSpacing: 0.2 + labelScale * 0.45,
             whiteSpace: 'nowrap',
             userSelect: 'none',
             textShadow: '0 0 6px rgba(0,0,0,0.9)',
@@ -415,9 +413,9 @@ export function OrbitRing({ planet, T, dim, highlighted, cameraDistance = 0 }: {
     <Line
       points={pts}
       color={highlighted ? theme.selectedRing : planet.color}
-      lineWidth={baseWidth * (1 + glow * 0.5)}
+      lineWidth={baseWidth * (1 + glow * 0.18)}
       transparent
-      opacity={Math.min(baseOpacity * (1 + glow), 0.9)}
+      opacity={Math.min(baseOpacity * (1 + glow * 0.32), 0.5)}
     />
   );
 }

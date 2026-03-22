@@ -55,12 +55,14 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, cinematicRotate
 }) {
   const { camera } = useThree();
   const ctrlRef = useRef<ElementRef<typeof OrbitControls> | null>(null);
+  const interactiveFreePreset = camPreset?.label === 'Stargazer';
   const tPos = useRef(new THREE.Vector3(...HOME_POS));
   const tLook = useRef(new THREE.Vector3(...HOME_TGT));
   const settling = useRef(true);
   const prevTrackPos = useRef(new THREE.Vector3());
   const lastDistanceReportRef = useRef(0);
   const lastDistanceValueRef = useRef(0);
+  const presetTrackPos = useRef(new THREE.Vector3());
 
   // Compute camera offset from angle/elevation/distance
   const offsetFromAngle = useCallback((dist: number, angle: number, elevation: number): [number, number, number] => [
@@ -91,6 +93,11 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, cinematicRotate
     return undefined;
   }, [focusTarget, offsetFromAngle]);
 
+  const computePresetFollowOffset = useCallback((pp: [number, number, number], preset: CamPreset) => ({
+    pos: [pp[0] + preset.pos[0], pp[1] + preset.pos[1], pp[2] + preset.pos[2]] as [number, number, number],
+    look: pp,
+  }), []);
+
   // Trigger transition on focus or preset changes
   // Both cinematic and interactive use the same settling approach so the
   // zoom feel is identical (snappy lerp instead of floaty two-stage drift).
@@ -106,6 +113,17 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, cinematicRotate
           prevTrackPos.current.set(...pp);
         }
       }
+    } else if (camPreset?.follow !== undefined) {
+      const pp = positions.get(camPreset.follow);
+      if (pp) {
+        const followView = computePresetFollowOffset(pp, camPreset);
+        tLook.current.set(...followView.look);
+        tPos.current.set(...followView.pos);
+        presetTrackPos.current.set(...pp);
+      } else {
+        tPos.current.set(...camPreset.pos);
+        tLook.current.set(...camPreset.tgt);
+      }
     } else if (camPreset) {
       tPos.current.set(...camPreset.pos);
       tLook.current.set(...camPreset.tgt);
@@ -113,7 +131,7 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, cinematicRotate
       tPos.current.set(...HOME_POS);
       tLook.current.set(...HOME_TGT);
     }
-  }, [focusTarget, camPreset, cinematic, computeFocusOffset, positions]);
+  }, [focusTarget, camPreset, cinematic, computeFocusOffset, computePresetFollowOffset, positions]);
 
   // Stop transition when user grabs orbit controls
   useEffect(() => {
@@ -124,17 +142,20 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, cinematicRotate
     return () => ctrl.removeEventListener('start', stop);
   }, [cinematic]);
 
-  useFrame(() => {
+  useFrame((_, dt) => {
     const ctrl = ctrlRef.current;
-    const trackIdx = focusTarget?.planetIdx ?? null;
+    const trackIdx = interactiveFreePreset && !cinematic
+      ? focusTarget?.planetIdx ?? null
+      : focusTarget?.planetIdx ?? camPreset?.follow ?? null;
 
     // Distance-adaptive lerp: faster when far from target so deep-space
     // transitions (Oort→Galaxy) don't crawl through empty blackness.
     const remainDist = camera.position.distanceTo(tPos.current);
-    const lerpFactor = cinematic
-      ? (remainDist > 10000 ? 0.015 : remainDist > 1000 ? 0.025 : remainDist > 100 ? 0.02 : 0.015)
-      : (remainDist > 10000 ? 0.018 : remainDist > 1000 ? 0.035 : remainDist > 100 ? 0.045 : 0.03);
-    const settleThreshold = remainDist > 10000 ? 150 : remainDist > 1000 ? 50 : remainDist > 100 ? 5 : 0.05;
+    const smoothBase = cinematic ? 1.35 : 2.2;
+    const smoothBoost = remainDist > 10000 ? 1.15 : remainDist > 1000 ? 0.75 : remainDist > 100 ? 0.35 : 0;
+    const posAlpha = 1 - Math.exp(-(smoothBase + smoothBoost) * dt);
+    const lookAlpha = 1 - Math.exp(-(smoothBase + smoothBoost * 0.7) * dt);
+    const settleThreshold = remainDist > 10000 ? 120 : remainDist > 1000 ? 32 : remainDist > 100 ? 3 : 0.035;
 
     // In cinematic mode, always keep gliding (never settle)
     if (cinematic) {
@@ -149,13 +170,16 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, cinematicRotate
             const d = Math.max(planet.radius * 8, maxMoonA * 2.5);
             const [ox, oy, oz] = offsetFromAngle(d, 0.7, 0.4);
             tPos.current.set(pp[0] + ox, pp[1] + oy, pp[2] + oz);
+          } else if (camPreset?.follow === trackIdx) {
+            const followView = computePresetFollowOffset(pp, camPreset);
+            tPos.current.set(...followView.pos);
           }
           tLook.current.set(...pp);
         }
       }
       // Continuously glide toward current target
-      camera.position.lerp(tPos.current, lerpFactor);
-      if (ctrl) ctrl.target.lerp(tLook.current, lerpFactor);
+      camera.position.lerp(tPos.current, posAlpha);
+      if (ctrl) ctrl.target.lerp(tLook.current, lookAlpha);
     } else if (trackIdx !== null) {
       // Interactive planet tracking
       const pp = positions.get(trackIdx);
@@ -170,26 +194,31 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, cinematicRotate
             const d = Math.max(planet.radius * 8, maxMoonA * 2.5);
             const [ox, oy, oz] = offsetFromAngle(d, 0.7, 0.4);
             tPos.current.set(pp[0] + ox, pp[1] + oy, pp[2] + oz);
+          } else if (camPreset?.follow === trackIdx) {
+            const followView = computePresetFollowOffset(pp, camPreset);
+            tPos.current.set(...followView.pos);
           }
           tLook.current.copy(newTarget);
-          camera.position.lerp(tPos.current, lerpFactor);
-          if (ctrl) ctrl.target.lerp(tLook.current, lerpFactor);
-          if (camera.position.distanceTo(tPos.current) < 0.1) {
+          camera.position.lerp(tPos.current, posAlpha);
+          if (ctrl) ctrl.target.lerp(tLook.current, lookAlpha);
+          if (camera.position.distanceTo(tPos.current) < settleThreshold) {
             settling.current = false;
           }
         } else {
-          const delta = newTarget.clone().sub(prevTrackPos.current);
+          const prevTrackedPos = focusTarget !== null ? prevTrackPos.current : presetTrackPos.current;
+          const delta = newTarget.clone().sub(prevTrackedPos);
           if (delta.length() > 0.00001) {
             camera.position.add(delta);
             if (ctrl) ctrl.target.add(delta);
           }
         }
-        prevTrackPos.current.copy(newTarget);
+        if (focusTarget !== null) prevTrackPos.current.copy(newTarget);
+        else presetTrackPos.current.copy(newTarget);
       }
     } else {
       if (settling.current) {
-        camera.position.lerp(tPos.current, lerpFactor);
-        if (ctrl) ctrl.target.lerp(tLook.current, lerpFactor);
+        camera.position.lerp(tPos.current, posAlpha);
+        if (ctrl) ctrl.target.lerp(tLook.current, lookAlpha);
         if (camera.position.distanceTo(tPos.current) < settleThreshold) {
           settling.current = false;
         }
@@ -217,11 +246,11 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, cinematicRotate
     <OrbitControls
       ref={ctrlRef}
       enableDamping
-      dampingFactor={0.06}
+      dampingFactor={0.08}
       minDistance={0.05}
       maxDistance={100000}
       autoRotate={cinematic || camPreset?.autoRotate || false}
-      autoRotateSpeed={cinematic ? cinematicRotateSpeed : camPreset?.autoRotate ? 0.15 : 0}
+      autoRotateSpeed={cinematic ? cinematicRotateSpeed * 0.78 : camPreset?.autoRotate ? 0.1 : 0}
     />
   );
 }
@@ -252,6 +281,7 @@ export interface SceneProps {
   onCameraDistance?: (d: number) => void;
   cameraDistance: number;
   camPreset?: CamPreset | null;
+  showBodyGlyphs?: boolean;
   selComet: CometDef | null; setSelComet: (c: CometDef | null) => void;
   selMeteor: MeteorShower | null; setSelMeteor: (m: MeteorShower | null) => void;
   selSatellite: SatellitePosition | null; setSelSatellite: (s: SatellitePosition | null) => void;
@@ -265,6 +295,7 @@ export default function Scene({
   showStars, showConstellations, showAsteroidBelt,
   showComets, showMeteors, showSatellites, showDeepSky, showDeepSpace,
   constellationFocus, cinematic, cinematicRotateSpeed, onMoonSelect, selMoonIdx, onCameraDistance, cameraDistance, camPreset,
+  showBodyGlyphs = false,
   selComet, setSelComet, selMeteor, setSelMeteor, selSatellite, setSelSatellite,
   selSpacecraft, setSelSpacecraft,
   onConstellationSelect,
@@ -288,7 +319,7 @@ export default function Scene({
     <>
       <color attach="background" args={['#000000']} />
       <ambientLight intensity={0.15} />
-      <Sun cameraDistance={cameraDistance} />
+      <Sun cameraDistance={cameraDistance} showGlyphOverlay={showBodyGlyphs} />
       <AUGrid />
       {showAsteroidBelt && <RealAsteroidBelt jd={jd} />}
       {visibleBodies.map((p) => {
@@ -309,6 +340,7 @@ export default function Scene({
               onHover={h => setHov(h ? bodyIdx : null)}
               moonFocused={focusTarget?.planetIdx === bodyIdx && focusTarget?.moonIdx !== undefined}
               cameraDistance={cameraDistance}
+              showGlyphOverlay={showBodyGlyphs}
             />
           </group>
         );

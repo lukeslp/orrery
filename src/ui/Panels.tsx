@@ -8,6 +8,7 @@
  * No emoji anywhere.
  */
 
+import { useEffect, useState } from 'react';
 import type { NEO, CamPreset } from '../lib/kepler';
 import { ALL_BODIES } from '../data/planets';
 import { getMoonsForPlanet } from '../data/moons';
@@ -145,6 +146,118 @@ const sectionDivider: React.CSSProperties = {
   height: 1, background: 'rgba(255,255,255,0.06)', margin: '4px 0',
 };
 
+const PANEL_FONT_SCALE_KEY = 'orrery-panel-font-scale';
+
+function loadPanelFontScale() {
+  try {
+    const raw = localStorage.getItem(PANEL_FONT_SCALE_KEY);
+    const value = raw ? Number(raw) : 1;
+    if (Number.isFinite(value) && value >= 0.92 && value <= 1.12) return value;
+  } catch { /* ignore */ }
+  return 1;
+}
+
+function AccordionSection({
+  title,
+  accent,
+  defaultOpen = false,
+  children,
+}: {
+  title: React.ReactNode;
+  accent: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  return (
+    <>
+      <button
+        onClick={() => setOpen(p => !p)}
+        aria-expanded={open}
+        style={{
+          width: '100%',
+          background: 'transparent',
+          border: 'none',
+          padding: 0,
+          margin: 0,
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          textAlign: 'left',
+          fontFamily: 'inherit',
+        }}
+      >
+        <SectionHeader>{title}</SectionHeader>
+        <span
+          aria-hidden="true"
+          style={{
+            paddingRight: 16,
+            color: open ? accent : 'rgba(255,255,255,0.32)',
+            fontSize: 14,
+            transform: open ? 'rotate(90deg)' : 'rotate(0deg)',
+            transition: 'transform 0.18s ease, color 0.18s ease',
+          }}
+        >
+          {'\u203a'}
+        </span>
+      </button>
+      {open && children}
+      <div style={sectionDivider} />
+    </>
+  );
+}
+
+function MiniAccordion({
+  title,
+  children,
+  defaultOpen = false,
+}: {
+  title: React.ReactNode;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  return (
+    <div style={{ marginBottom: 6 }}>
+      <button
+        onClick={() => setOpen(p => !p)}
+        aria-expanded={open}
+        style={{
+          width: '100%',
+          background: 'rgba(255,255,255,0.03)',
+          border: '1px solid rgba(255,255,255,0.06)',
+          borderRadius: 6,
+          padding: '7px 10px',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          textAlign: 'left',
+          fontFamily: 'inherit',
+          color: 'rgba(255,255,255,0.72)',
+          fontSize: 12,
+        }}
+      >
+        <span>{title}</span>
+        <span
+          aria-hidden="true"
+          style={{
+            color: 'rgba(255,255,255,0.35)',
+            transform: open ? 'rotate(90deg)' : 'rotate(0deg)',
+            transition: 'transform 0.18s ease',
+          }}
+        >
+          {'\u203a'}
+        </span>
+      </button>
+      {open && <div style={{ paddingTop: 8 }}>{children}</div>}
+    </div>
+  );
+}
+
 // ─── Side Drawer ────────────────────────────────────────────────────────────────
 
 function SideDrawer({
@@ -162,6 +275,9 @@ function SideDrawer({
   setShowDeepSpace,
   selConstellation, setSelConstellation,
   selSpacecraft, setSelSpacecraft,
+  onHoverStart,
+  onHoverEnd,
+  panelFontScale,
 }: {
   open: boolean;
   accent: string;
@@ -198,6 +314,9 @@ function SideDrawer({
   selConstellation: string | null; setSelConstellation: (id: string | null) => void;
   selSpacecraft: import('../data/deepspace').Spacecraft | null;
   setSelSpacecraft: (s: import('../data/deepspace').Spacecraft | null) => void;
+  onHoverStart?: () => void;
+  onHoverEnd?: () => void;
+  panelFontScale: number;
 }) {
   const { theme, setTheme } = useTheme();
 
@@ -221,12 +340,6 @@ function SideDrawer({
     { label: 'Deep Space', key: 'O', on: showDeepSpace, fn: () => setShowDeepSpace(p => !p) },
   ];
 
-  // Shared styles
-  const sectionTitle: React.CSSProperties = {
-    color: 'rgba(255,255,255,0.3)', fontSize: 11, letterSpacing: 2,
-    textTransform: 'uppercase', fontWeight: 300, marginTop: 16, marginBottom: 6,
-  };
-
   const sourceItem: React.CSSProperties = {
     color: 'rgba(255,255,255,0.55)', fontSize: 13, lineHeight: 1.8, fontWeight: 300,
   };
@@ -239,16 +352,43 @@ function SideDrawer({
   const kbd: React.CSSProperties = {
     color: 'rgba(255,255,255,0.7)', fontWeight: 400, minWidth: 28, display: 'inline-block',
   };
+  const openCore = !mobile;
+  const sourceLink: React.CSSProperties = {
+    color: accent,
+    textDecoration: 'none',
+    borderBottom: `1px solid rgba(${accentRgb},0.24)`,
+  };
+  const statusText: React.CSSProperties = {
+    color: 'rgba(255,255,255,0.58)', fontSize: 12, lineHeight: 1.65, fontWeight: 300,
+  };
+  const liveSources = [
+    { label: 'NOAA SWPC solar wind summary', url: 'https://services.swpc.noaa.gov/products/summary/solar-wind-speed.json', note: 'Live solar-wind speed in the HUD.' },
+    { label: 'NASA NeoWs API', url: 'https://api.nasa.gov/', note: 'Today’s near-Earth objects are fetched live by date.' },
+    { label: 'JPL SBDB API', url: 'https://ssd-api.jpl.nasa.gov/doc/sbdb.html', note: 'Asteroid orbit details are fetched on demand when you select an NEO.' },
+    { label: 'CelesTrak stations / GP elements', url: 'https://celestrak.org/NORAD/elements/', note: 'Current station TLEs are used when the remote fetch succeeds; otherwise the bundled local fallback is used.' },
+  ];
+  const catalogSources = [
+    { label: 'JPL Horizons', url: 'https://ssd.jpl.nasa.gov/horizons/' },
+    { label: 'Solar System Scope textures', url: 'https://www.solarsystemscope.com/textures/' },
+    { label: 'd3-celestial', url: 'https://github.com/ofrohn/d3-celestial' },
+    { label: 'HYG star database', url: 'https://astronexus.com/projects/hyg' },
+    { label: 'OpenNGC', url: 'https://github.com/mattiaverga/OpenNGC' },
+    { label: 'Minor Planet Center data', url: 'https://minorplanetcenter.net/data' },
+    { label: 'IAU Meteor Data Center', url: 'https://www.ta3.sk/IAUC22DB/MDC2007/' },
+  ];
 
   return (
     <div
       role="complementary"
       aria-label="Side panel"
       aria-hidden={!open}
+      onMouseEnter={onHoverStart}
+      onMouseLeave={onHoverEnd}
       style={mobile ? {
         ...drawerPanel,
         ...bottomSheet('70vh'),
-        maxHeight: '44vh',
+        background: `linear-gradient(180deg, rgba(${accentRgb},0.18) 0%, rgba(10,12,18,0.88) 22%, rgba(6,8,14,0.94) 100%)`,
+        maxHeight: '38vh',
         overflowY: 'auto',
         zIndex: 30,
         padding: '8px 0 0',
@@ -256,8 +396,10 @@ function SideDrawer({
         borderLeft: 'none',
         transform: open ? 'translateY(0)' : 'translateY(100%)',
         transition: 'transform 0.25s ease',
+        ...({ zoom: panelFontScale } as React.CSSProperties),
       } : {
         ...drawerPanel,
+        background: `linear-gradient(180deg, rgba(${accentRgb},0.12) 0%, rgba(10,12,18,0.82) 14%, rgba(6,8,14,0.9) 100%)`,
         position: 'fixed',
         top: 12, right: 12, bottom: 12,
         width: 320,
@@ -265,68 +407,65 @@ function SideDrawer({
         zIndex: 30,
         padding: '8px 0 0',
         borderRadius: 12,
-        borderRight: '1px solid rgba(255,255,255,0.08)',
-        boxShadow: '0 18px 48px rgba(0,0,0,0.38)',
+        borderRight: `1px solid rgba(${accentRgb},0.24)`,
+        boxShadow: `0 18px 48px rgba(0,0,0,0.38), 0 0 0 1px rgba(${accentRgb},0.08)`,
         transform: open ? 'translateX(0)' : 'translateX(calc(100% + 24px))',
         transition: 'transform 0.25s ease',
+        ...({ zoom: panelFontScale } as React.CSSProperties),
       }}
     >
-      <SectionHeader>Status</SectionHeader>
-      <div style={{ padding: '0 16px 10px' }}>
-        <div style={{ color: '#fff', fontSize: mobile ? 22 : 26, fontWeight: 300, letterSpacing: 2, fontFamily: "'Cormorant', serif" }}>
-          {fmtTime(simTime)}
+      <AccordionSection title="Status" accent={accent} defaultOpen>
+        <div style={{ padding: '0 16px 10px' }}>
+          <div style={{ color: '#fff', fontSize: mobile ? 22 : 26, fontWeight: 300, letterSpacing: 2, fontFamily: "'Cormorant', serif" }}>
+            {fmtTime(simTime)}
+          </div>
+          <div style={{ color: 'rgba(255,255,255,0.42)', fontSize: 12, fontStyle: 'italic', fontWeight: 300 }}>
+            {fmtDate(simTime)}
+          </div>
+          <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 14px' }}>
+            <Stat label="Moon" val={`${moon.name}, ${moon.ill}%`} c={accent} />
+            <Stat label="View" val={camIdx >= 0 && camIdx < cams.length ? cams[camIdx].label : 'Focused'} />
+            <Stat label="Rate" val={speedLabel(speed)} />
+            {solarWind ? <Stat label="Solar Wind" val={solarWind} /> : <Stat label="Solar Wind" val="Unavailable" />}
+          </div>
         </div>
-        <div style={{ color: 'rgba(255,255,255,0.42)', fontSize: 12, fontStyle: 'italic', fontWeight: 300 }}>
-          {fmtDate(simTime)}
-        </div>
-        <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 14px' }}>
-          <Stat label="Moon" val={`${moon.name}, ${moon.ill}%`} c={accent} />
-          <Stat label="View" val={camIdx >= 0 && camIdx < cams.length ? cams[camIdx].label : 'Focused'} />
-          <Stat label="Rate" val={speedLabel(speed)} />
-          {solarWind ? <Stat label="Solar Wind" val={solarWind} /> : <Stat label="Solar Wind" val="Unavailable" />}
-        </div>
-      </div>
+      </AccordionSection>
 
-      <div style={sectionDivider} />
-
-      {/* ── Speed ── */}
-      <SectionHeader>Speed</SectionHeader>
-      <div style={{ padding: '0 16px 8px' }}>
-        <button
-          onClick={() => setPlaying(p => !p)}
-          style={{
-            background: playing ? `rgba(${accentRgb},0.16)` : 'rgba(255,255,255,0.04)',
-            border: `1px solid ${playing ? `rgba(${accentRgb},0.35)` : 'rgba(255,255,255,0.08)'}`,
-            color: playing ? accent : 'rgba(255,255,255,0.65)',
-            fontSize: 12, fontFamily: 'inherit', fontWeight: 400,
-            padding: '6px 12px', borderRadius: 4, cursor: 'pointer', minHeight: mobile ? 38 : 30,
-          }}
-        >
-          {playing ? 'Pause' : 'Play'}
-        </button>
-      </div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, padding: '0 16px 8px' }}>
-        {SPEED_PRESETS.map(p => (
+      <AccordionSection title="Speed" accent={accent} defaultOpen={openCore}>
+        <div style={{ padding: '0 16px 8px' }}>
           <button
-            key={p.value}
-            onClick={() => setSpeed(() => p.value)}
+            onClick={() => setPlaying(p => !p)}
             style={{
-              background: speed === p.value ? `rgba(${accentRgb},0.2)` : 'rgba(255,255,255,0.04)',
-              border: speed === p.value ? `1px solid rgba(${accentRgb},0.3)` : '1px solid rgba(255,255,255,0.08)',
-              color: speed === p.value ? accent : 'rgba(255,255,255,0.5)',
-              fontSize: 12, fontFamily: 'inherit', fontWeight: speed === p.value ? 500 : 300,
-              padding: '5px 10px', borderRadius: 4, cursor: 'pointer',
-              minHeight: mobile ? 36 : 28,
+              background: playing ? `rgba(${accentRgb},0.16)` : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${playing ? `rgba(${accentRgb},0.35)` : 'rgba(255,255,255,0.08)'}`,
+              color: playing ? accent : 'rgba(255,255,255,0.65)',
+              fontSize: 12, fontFamily: 'inherit', fontWeight: 400,
+              padding: '6px 12px', borderRadius: 4, cursor: 'pointer', minHeight: mobile ? 38 : 30,
             }}
-          >{p.label}</button>
-        ))}
-      </div>
+          >
+            {playing ? 'Pause' : 'Play'}
+          </button>
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, padding: '0 16px 8px' }}>
+          {SPEED_PRESETS.map(p => (
+            <button
+              key={p.value}
+              onClick={() => setSpeed(() => p.value)}
+              style={{
+                background: speed === p.value ? `rgba(${accentRgb},0.2)` : 'rgba(255,255,255,0.04)',
+                border: speed === p.value ? `1px solid rgba(${accentRgb},0.3)` : '1px solid rgba(255,255,255,0.08)',
+                color: speed === p.value ? accent : 'rgba(255,255,255,0.5)',
+                fontSize: 12, fontFamily: 'inherit', fontWeight: speed === p.value ? 500 : 300,
+                padding: '5px 10px', borderRadius: 4, cursor: 'pointer',
+                minHeight: mobile ? 36 : 28,
+              }}
+            >{p.label}</button>
+          ))}
+        </div>
+      </AccordionSection>
 
-      <div style={sectionDivider} />
-
-      {/* ── Go To ── */}
-      <SectionHeader>Go To</SectionHeader>
-      {(() => {
+      <AccordionSection title="Go To" accent={accent} defaultOpen={openCore}>
+        {(() => {
         // Group presets logically: close → system → far → special
         const groups: { title: string; items: { label: string; idx: number }[] }[] = [
           { title: 'Close', items: ['Sun', 'Inner', 'Belt'].map(l => ({ label: l, idx: cams.findIndex(c => c.label === l) })).filter(x => x.idx >= 0) },
@@ -342,23 +481,24 @@ function SideDrawer({
           padding: '5px 10px', borderRadius: 4, cursor: 'pointer',
           minHeight: mobile ? 36 : 28,
         };
-        return groups.map(g => (
-          <div key={g.title} style={{ padding: '0 16px 6px' }}>
-            <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1.2, textTransform: 'uppercase' as const, color: 'rgba(255,255,255,0.25)', marginBottom: 3 }}>{g.title}</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-              {g.items.map(item => (
-                <button key={item.label} onClick={() => onPresetSelect(item.idx)} style={btnStyle}>{item.label}</button>
-              ))}
-            </div>
+        return (
+          <div style={{ padding: '0 16px 6px' }}>
+            {groups.map(g => (
+              <MiniAccordion key={g.title} title={g.title} defaultOpen={!mobile && (g.title === 'Close' || g.title === 'Views')}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                  {g.items.map(item => (
+                    <button key={item.label} onClick={() => onPresetSelect(item.idx)} style={btnStyle}>{item.label}</button>
+                  ))}
+                </div>
+              </MiniAccordion>
+            ))}
           </div>
-        ));
+        );
       })()}
+      </AccordionSection>
 
-      <div style={sectionDivider} />
-
-      {/* ── Bodies ── */}
-      <SectionHeader>Bodies</SectionHeader>
-      <div role="tree" aria-label="Celestial bodies">
+      <AccordionSection title="Bodies" accent={accent} defaultOpen={false}>
+        <div role="tree" aria-label="Celestial bodies">
         {/* Sun */}
         <div role="treeitem">
           <button
@@ -466,13 +606,11 @@ function SideDrawer({
             </div>
           );
         })}
-      </div>
+        </div>
+      </AccordionSection>
 
-      <div style={sectionDivider} />
-
-      {/* ── Layers ── */}
-      <SectionHeader>Layers</SectionHeader>
-      <div role="group" aria-label="Display layers">
+      <AccordionSection title="Layers" accent={accent} defaultOpen={openCore}>
+        <div role="group" aria-label="Display layers">
         {layers.map(l => (
           <button
             key={l.label}
@@ -500,13 +638,11 @@ function SideDrawer({
             )}
           </button>
         ))}
-      </div>
+        </div>
+      </AccordionSection>
 
-      <div style={sectionDivider} />
-
-      {/* ── Theme ── */}
-      <SectionHeader>Theme</SectionHeader>
-      <div role="radiogroup" aria-label="Color theme">
+      <AccordionSection title="Theme" accent={accent} defaultOpen={false}>
+        <div role="radiogroup" aria-label="Color theme">
         {THEMES.map(t => (
           <button
             key={t.id}
@@ -531,14 +667,51 @@ function SideDrawer({
             {t.name}
           </button>
         ))}
-      </div>
+        </div>
+      </AccordionSection>
 
-      <div style={sectionDivider} />
+      <AccordionSection title="Settings" accent={accent} defaultOpen={false}>
+        <div style={{ padding: '0 16px 10px' }}>
+          <div style={{ color: 'rgba(255,255,255,0.28)', fontSize: 10, letterSpacing: 1.8, textTransform: 'uppercase', marginBottom: 8 }}>
+            Panel Text Size
+          </div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {[
+              { label: 'Small', value: 0.94 },
+              { label: 'Default', value: 1 },
+              { label: 'Large', value: 1.08 },
+            ].map(option => (
+              <button
+                key={option.label}
+                onClick={() => {
+                  try { localStorage.setItem(PANEL_FONT_SCALE_KEY, String(option.value)); } catch { /* ignore */ }
+                  window.dispatchEvent(new CustomEvent('orrery-panel-font-scale', { detail: option.value }));
+                }}
+                style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  color: 'rgba(255,255,255,0.72)',
+                  fontSize: 12,
+                  fontFamily: 'inherit',
+                  padding: '6px 10px',
+                  borderRadius: 4,
+                  cursor: 'pointer',
+                  minHeight: mobile ? 36 : 28,
+                }}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          <div style={{ color: 'rgba(255,255,255,0.42)', fontSize: 11, lineHeight: 1.5, marginTop: 8 }}>
+            Keeps the panel denser on mobile without changing the 3D scene.
+          </div>
+        </div>
+      </AccordionSection>
 
       {/* ── NEO (when layer is on) ── */}
       {showNeo && (
-        <>
-          <SectionHeader>NEO Today</SectionHeader>
+        <AccordionSection title="NEO Today" accent={accent} defaultOpen={false}>
           <div style={{ padding: '0 16px' }}>
             {neoStatus === 'loading' && (
               <div style={{ color: 'rgba(255,255,255,0.25)', fontSize: 11, fontStyle: 'italic', padding: '8px 0' }}>Loading NASA data...</div>
@@ -576,32 +749,32 @@ function SideDrawer({
             ))}
             <div style={{ color: 'rgba(255,255,255,0.15)', fontSize: 9, marginTop: 8, fontStyle: 'italic', fontWeight: 300 }}>Source: NASA JPL NeoWs / SBDB</div>
           </div>
-          <div style={sectionDivider} />
-        </>
+        </AccordionSection>
       )}
 
       {/* ── Constellation Info (when selected) ── */}
       {selConstellation && MYTHOLOGY[selConstellation] && (() => {
         const info = MYTHOLOGY[selConstellation];
         return (
-          <>
-            <SectionHeader>
-              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                <span>Constellation</span>
+          <AccordionSection
+            title="Constellation"
+            accent={accent}
+            defaultOpen
+          >
+            <div style={{ padding: '0 16px 12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <button
                   onClick={() => setSelConstellation(null)}
                   aria-label="Close constellation info"
                   style={{
                     background: 'none', border: 'none', cursor: 'pointer',
                     color: 'rgba(255,255,255,0.3)', fontSize: 14, fontFamily: 'inherit',
-                    padding: '0 4px', lineHeight: 1,
+                    padding: '0 0 4px', lineHeight: 1,
                   }}
                 >
                   {'\u00d7'}
                 </button>
-              </span>
-            </SectionHeader>
-            <div style={{ padding: '0 16px 12px' }}>
+              </div>
               <div style={{ color: accent, fontSize: 17, fontWeight: 500, letterSpacing: 1 }}>
                 {selConstellation}
               </div>
@@ -630,8 +803,7 @@ function SideDrawer({
                 </>
               )}
             </div>
-            <div style={sectionDivider} />
-          </>
+          </AccordionSection>
         );
       })()}
 
@@ -639,24 +811,25 @@ function SideDrawer({
       {selSpacecraft && (() => {
         const craft = selSpacecraft;
         return (
-          <>
-            <SectionHeader>
-              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                <span>Spacecraft</span>
+          <AccordionSection
+            title="Spacecraft"
+            accent={accent}
+            defaultOpen
+          >
+            <div style={{ padding: '0 16px 12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <button
                   onClick={() => setSelSpacecraft(null)}
                   aria-label="Close spacecraft info"
                   style={{
                     background: 'none', border: 'none', cursor: 'pointer',
                     color: 'rgba(255,255,255,0.3)', fontSize: 14, fontFamily: 'inherit',
-                    padding: '0 4px', lineHeight: 1,
+                    padding: '0 0 4px', lineHeight: 1,
                   }}
                 >
                   {'\u00d7'}
                 </button>
-              </span>
-            </SectionHeader>
-            <div style={{ padding: '0 16px 12px' }}>
+              </div>
               <div style={{ color: accent, fontSize: 17, fontWeight: 500, letterSpacing: 1 }}>
                 {craft.name}
               </div>
@@ -679,53 +852,65 @@ function SideDrawer({
                 <div>Light-years <span style={{ color: '#fff', fontWeight: 400 }}>{(craft.distAU / 63241).toFixed(4)}</span></div>
               </div>
             </div>
-            <div style={sectionDivider} />
-          </>
+          </AccordionSection>
         );
       })()}
 
-      {/* ── About ── */}
-      <SectionHeader>About</SectionHeader>
-      <div style={{ padding: '0 16px 20px' }}>
+      <AccordionSection title="About" accent={accent} defaultOpen={false}>
+        <div style={{ padding: '0 16px 20px' }}>
         <div style={{ color: '#fff', fontSize: 18, fontWeight: 600, letterSpacing: 3, textTransform: 'uppercase' }}>Orrery</div>
         <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13, fontStyle: 'italic', fontWeight: 300, marginTop: 2 }}>Interactive Solar System</div>
 
-        <div style={sectionTitle}>Data Sources</div>
-        <div style={{ borderLeft: '1px solid rgba(255,255,255,0.06)', paddingLeft: 10 }}>
-          <div style={{ ...sectionTitle, marginTop: 0 }}>Orbital Elements</div>
-          <div style={sourceItem}>JPL Horizons (J2000 epoch)</div>
-          <div style={sourceItem}>NASA NeoWs API (NEO tracking)</div>
-          <div style={sourceItem}>NASA SBDB API (asteroid orbits)</div>
-          <div style={sourceItem}>MPC Comet Elements (comets)</div>
-          <div style={{ ...sectionTitle, marginTop: 10 }}>Visual Data</div>
-          <div style={sourceItem}>Solar System Scope (CC BY 4.0)</div>
-          <div style={sourceItem}>d3-celestial star catalogs</div>
-          <div style={sourceItem}>HYG Database (bright stars)</div>
-          <div style={sourceItem}>IAU constellation boundaries</div>
-          <div style={sourceItem}>OpenNGC deep sky catalog</div>
-          <div style={sourceItem}>IAU Meteor Data Center (showers)</div>
-          <div style={sourceItem}>CelesTrak TLE (satellites)</div>
+        <MiniAccordion title="Data Status" defaultOpen={!mobile}>
+          <div style={statusText}>This scene uses real astronomical datasets throughout.</div>
+          <div style={{ ...statusText, marginTop: 8 }}>
+            Live/current where available: solar wind, today’s NASA NEO feed, on-demand JPL asteroid orbit details, and current station TLEs.
+          </div>
+          <div style={{ ...statusText, marginTop: 8 }}>
+            Catalog/prebaked but still real data: planetary elements, star catalogs, constellations, comets, meteor showers, and deep-sky objects.
+          </div>
+        </MiniAccordion>
+
+        <MiniAccordion title="Live / Current Sources" defaultOpen={false}>
+          {liveSources.map(source => (
+            <div key={source.label} style={{ marginBottom: 10 }}>
+              <a href={source.url} target="_blank" rel="noreferrer" style={sourceLink}>{source.label}</a>
+              <div style={statusText}>{source.note}</div>
+            </div>
+          ))}
+        </MiniAccordion>
+
+        <MiniAccordion title="Catalog Sources" defaultOpen={false}>
+          {catalogSources.map(source => (
+            <div key={source.label} style={{ ...sourceItem, marginBottom: 8 }}>
+              <a href={source.url} target="_blank" rel="noreferrer" style={sourceLink}>{source.label}</a>
+            </div>
+          ))}
+        </MiniAccordion>
+
+        <MiniAccordion title="Technology" defaultOpen={false}>
+          <div style={sourceItem}>React {'\u00b7'} Three.js {'\u00b7'} TypeScript</div>
+        </MiniAccordion>
+
+        <MiniAccordion title="Built By" defaultOpen={false}>
+          <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: 400 }}>Luke Steuber</div>
+          <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, fontWeight: 300, fontStyle: 'italic' }}>lukesteuber.com</div>
+        </MiniAccordion>
+
+        <MiniAccordion title="Keyboard Shortcuts" defaultOpen={false}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <div style={kbdRow}><span style={kbd}>1-0</span> Camera presets {'\u00b7'} <span style={kbd}>-</span> Stargazer</div>
+            <div style={kbdRow}><span style={kbd}>S</span> Stars {'\u00b7'} <span style={kbd}>L</span> Constellations</div>
+            <div style={kbdRow}><span style={kbd}>G</span> Stargazer {'\u00b7'} <span style={kbd}>D</span> Dwarf planets</div>
+            <div style={kbdRow}><span style={kbd}>K</span> Deep Sky {'\u00b7'} <span style={kbd}>N</span> NEO</div>
+            <div style={kbdRow}><span style={kbd}>C</span> Comets {'\u00b7'} <span style={kbd}>R</span> Radiants</div>
+            <div style={kbdRow}><span style={kbd}>I</span> Satellites {'\u00b7'} <span style={kbd}>O</span> Deep Space</div>
+            <div style={kbdRow}><span style={kbd}>F</span> Tour {'\u00b7'} <span style={kbd}>Space</span> Pause</div>
+            <div style={kbdRow}><span style={kbd}>Esc</span> Back/Deselect</div>
+          </div>
+        </MiniAccordion>
         </div>
-
-        <div style={sectionTitle}>Technology</div>
-        <div style={sourceItem}>React {'\u00b7'} Three.js {'\u00b7'} TypeScript</div>
-
-        <div style={{ ...sectionTitle, marginTop: 16 }}>Built by</div>
-        <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: 400 }}>Luke Steuber</div>
-        <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, fontWeight: 300, fontStyle: 'italic' }}>lukesteuber.com</div>
-
-        <div style={sectionTitle}>Keyboard Shortcuts</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <div style={kbdRow}><span style={kbd}>1-0</span> Camera presets {'\u00b7'} <span style={kbd}>-</span> Stargazer</div>
-          <div style={kbdRow}><span style={kbd}>S</span> Stars {'\u00b7'} <span style={kbd}>L</span> Constellations</div>
-          <div style={kbdRow}><span style={kbd}>G</span> Stargazer {'\u00b7'} <span style={kbd}>D</span> Dwarf planets</div>
-          <div style={kbdRow}><span style={kbd}>K</span> Deep Sky {'\u00b7'} <span style={kbd}>N</span> NEO</div>
-          <div style={kbdRow}><span style={kbd}>C</span> Comets {'\u00b7'} <span style={kbd}>R</span> Radiants</div>
-          <div style={kbdRow}><span style={kbd}>I</span> Satellites {'\u00b7'} <span style={kbd}>O</span> Deep Space</div>
-          <div style={kbdRow}><span style={kbd}>F</span> Tour {'\u00b7'} <span style={kbd}>Space</span> Pause</div>
-          <div style={kbdRow}><span style={kbd}>Esc</span> Back/Deselect</div>
-        </div>
-      </div>
+      </AccordionSection>
     </div>
   );
 }
@@ -800,9 +985,33 @@ export default function Panels(props: PanelProps) {
   const accent = theme.uiAccent;
   const accentRgb = theme.uiAccentRgb;
   const mobile = useIsMobile();
+  const [panelPeek, setPanelPeek] = useState(false);
+  const [panelNudge, setPanelNudge] = useState(false);
+  const [panelFontScale, setPanelFontScale] = useState(loadPanelFontScale);
   const sp = selPlanet !== null ? ALL_BODIES[selPlanet] : null;
-  const mobilePanelHeight = '44vh';
+  const mobilePanelHeight = '38vh';
   const mobilePanelOffset = panelOpen ? `calc(${mobilePanelHeight} + 8px)` : '8px';
+  const panelVisible = panelOpen || (!mobile && panelPeek);
+  const showPanelNudge = panelNudge && !mobile && !panelVisible;
+
+  useEffect(() => {
+    if (mobile || panelOpen || panelPeek) return;
+    const start = window.setTimeout(() => setPanelNudge(true), 1600);
+    const stop = window.setTimeout(() => setPanelNudge(false), 2600);
+    return () => {
+      window.clearTimeout(start);
+      window.clearTimeout(stop);
+    };
+  }, [mobile, panelOpen, panelPeek]);
+
+  useEffect(() => {
+    const handleScale = (event: Event) => {
+      const detail = (event as CustomEvent<number>).detail;
+      if (typeof detail === 'number') setPanelFontScale(detail);
+    };
+    window.addEventListener('orrery-panel-font-scale', handleScale as EventListener);
+    return () => window.removeEventListener('orrery-panel-font-scale', handleScale as EventListener);
+  }, []);
 
   // Selected moon info
   const selectedMoon = selPlanet !== null && selMoonIdx !== null
@@ -874,7 +1083,7 @@ export default function Panels(props: PanelProps) {
 
         {/* Exit hint */}
         <div style={{
-          position: 'absolute', bottom: mobile ? (panelOpen ? `calc(${mobilePanelHeight} + 16px)` : 60) : 56,
+          position: 'absolute', bottom: mobile ? (panelVisible ? `calc(${mobilePanelHeight} + 16px)` : 60) : 56,
           color: 'rgba(255,255,255,0.3)', fontSize: 11,
           letterSpacing: 2, fontWeight: 300, fontStyle: 'italic',
         }}>
@@ -898,37 +1107,63 @@ export default function Panels(props: PanelProps) {
       {cinematicOverlay}
       <button
         onClick={() => setPanelOpen((p: boolean) => !p)}
+        onMouseEnter={() => { if (!mobile) setPanelPeek(true); }}
+        onMouseLeave={() => { if (!mobile && !panelOpen) setPanelPeek(false); }}
         aria-label={panelOpen ? 'Collapse panel' : 'Open panel'}
         aria-expanded={panelOpen}
         style={{
           ...drawerTab,
-          ...(mobile ? {
-            top: 'auto',
-            bottom: 16,
-            right: 12,
-            transform: 'none',
-            width: 112,
-            height: 40,
-            borderRadius: 999,
-            borderRight: '1px solid rgba(255,255,255,0.08)',
-          } : {}),
-          color: 'rgba(255,255,255,0.75)',
-          fontSize: 12,
-          fontFamily: 'inherit',
-          letterSpacing: 1.6,
-          textTransform: 'uppercase',
-          background: 'rgba(0,0,0,0.68)',
+          ...(mobile
+            ? {
+                top: 'auto',
+                bottom: 16,
+                right: 12,
+                transform: 'none',
+                width: 44,
+                height: 44,
+                borderRadius: 999,
+                borderRight: '1px solid rgba(255,255,255,0.08)',
+              }
+            : {
+                top: '50%',
+                right: 0,
+                transform: `translateY(-50%) translateX(${showPanelNudge ? -8 : 0}px)`,
+                width: 36,
+                height: 76,
+                borderRadius: '12px 0 0 12px',
+                borderRight: 'none',
+              }),
+          color: panelVisible ? accent : 'rgba(255,255,255,0.72)',
+          background: panelVisible
+            ? `linear-gradient(180deg, rgba(${accentRgb},0.18) 0%, rgba(0,0,0,0.78) 100%)`
+            : `linear-gradient(180deg, rgba(${accentRgb},0.12) 0%, rgba(0,0,0,0.66) 100%)`,
           backdropFilter: 'blur(14px)',
           WebkitBackdropFilter: 'blur(14px)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          borderRight: mobile ? '1px solid rgba(255,255,255,0.08)' : 'none',
+          border: `1px solid rgba(${accentRgb},${panelVisible ? '0.26' : '0.14'})`,
+          borderRight: mobile ? `1px solid rgba(${accentRgb},0.16)` : 'none',
           zIndex: 31,
+          transition: 'transform 0.28s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease',
         }}
       >
-        {mobile ? (panelOpen ? 'Hide Panel' : 'Open Panel') : (panelOpen ? '<' : 'Panel')}
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 18 18"
+          aria-hidden="true"
+          style={{ display: 'block' }}
+        >
+          <g fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+            <path d="M3 4.5h12" />
+            <path d="M3 9h12" />
+            <path d="M3 13.5h12" />
+            <circle cx="6" cy="4.5" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="12" cy="9" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="8" cy="13.5" r="1.5" fill="currentColor" stroke="none" />
+          </g>
+        </svg>
       </button>
       <SideDrawer
-        open={panelOpen}
+        open={panelVisible}
         accent={accent}
         accentRgb={accentRgb}
         mobile={mobile}
@@ -962,6 +1197,9 @@ export default function Panels(props: PanelProps) {
         showDeepSpace={showDeepSpace} setShowDeepSpace={setShowDeepSpace}
         selConstellation={selConstellation} setSelConstellation={setSelConstellation}
         selSpacecraft={selSpacecraft} setSelSpacecraft={setSelSpacecraft}
+        onHoverStart={() => { if (!mobile) setPanelPeek(true); }}
+        onHoverEnd={() => { if (!mobile && !panelOpen) setPanelPeek(false); }}
+        panelFontScale={panelFontScale}
       />
 
       {/* ── Background blur overlay when body selected ── */}
