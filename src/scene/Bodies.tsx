@@ -12,11 +12,32 @@ import { planetXYZ, orbitPath } from '../lib/kepler';
 import type { MoonDef } from '../data/moons';
 import { useTheme } from '../lib/themes';
 
+// ─── Radial glow texture (generated once) ────────────────────────────────────
+
+let _glowTex: THREE.Texture | null = null;
+function getGlowTexture(): THREE.Texture {
+  if (_glowTex) return _glowTex;
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  grad.addColorStop(0, 'rgba(255,255,255,1)');
+  grad.addColorStop(0.3, 'rgba(255,255,255,0.6)');
+  grad.addColorStop(0.7, 'rgba(255,255,255,0.1)');
+  grad.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+  _glowTex = new THREE.CanvasTexture(canvas);
+  return _glowTex;
+}
+
 // ─── Sun ────────────────────────────────────────────────────────────────────────
 
 export function Sun({ cameraDistance = 0 }: { cameraDistance?: number }) {
   const ref = useRef<THREE.Mesh>(null);
   const tex = useLoader(THREE.TextureLoader, TEX.sun);
+  const glowTex = useMemo(() => getGlowTexture(), []);
   useFrame((_, dt) => { if (ref.current) ref.current.rotation.y += dt * 0.02; });
   const farGlow = Math.min(cameraDistance / 50, 4);
   return (
@@ -33,16 +54,16 @@ export function Sun({ cameraDistance = 0 }: { cameraDistance?: number }) {
       </mesh>
       {/* Inner warm glow — always visible */}
       <sprite scale={[0.6, 0.6, 1]}>
-        <spriteMaterial color="#fff8e0" transparent opacity={0.6} blending={THREE.AdditiveBlending} toneMapped={false} />
+        <spriteMaterial map={glowTex} color="#fff8e0" transparent opacity={0.6} blending={THREE.AdditiveBlending} toneMapped={false} />
       </sprite>
       {/* Outer soft corona glow — always visible */}
       <sprite scale={[1.2, 1.2, 1]}>
-        <spriteMaterial color="#ffcc66" transparent opacity={0.2} blending={THREE.AdditiveBlending} toneMapped={false} />
+        <spriteMaterial map={glowTex} color="#ffcc66" transparent opacity={0.2} blending={THREE.AdditiveBlending} toneMapped={false} />
       </sprite>
       {/* Distance-adaptive beacon for far zoom */}
       {cameraDistance > 30 && (
         <sprite scale={[0.15 * farGlow * 3, 0.15 * farGlow * 3, 1]}>
-          <spriteMaterial color="#ffdd88" transparent opacity={0.5} blending={THREE.AdditiveBlending} toneMapped={false} />
+          <spriteMaterial map={glowTex} color="#ffdd88" transparent opacity={0.5} blending={THREE.AdditiveBlending} toneMapped={false} />
         </sprite>
       )}
       <pointLight intensity={5} color="#fff5e0" distance={200} />
