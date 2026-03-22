@@ -466,11 +466,14 @@ function SideDrawer({
           <div style={sourceItem}>JPL Horizons (J2000 epoch)</div>
           <div style={sourceItem}>NASA NeoWs API (NEO tracking)</div>
           <div style={sourceItem}>NASA SBDB API (asteroid orbits)</div>
+          <div style={sourceItem}>MPC Comet Elements (comets)</div>
           <div style={{ ...sectionTitle, marginTop: 10 }}>Visual Data</div>
           <div style={sourceItem}>Solar System Scope (CC BY 4.0)</div>
           <div style={sourceItem}>d3-celestial star catalogs</div>
           <div style={sourceItem}>HYG Database (bright stars)</div>
           <div style={sourceItem}>IAU constellation boundaries</div>
+          <div style={sourceItem}>IAU Meteor Data Center (showers)</div>
+          <div style={sourceItem}>CelesTrak TLE (satellites)</div>
         </div>
 
         <div style={sectionTitle}>Technology</div>
@@ -483,11 +486,12 @@ function SideDrawer({
         <div style={sectionTitle}>Keyboard Shortcuts</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <div style={kbdRow}><span style={kbd}>1-7</span> Camera presets</div>
-          <div style={kbdRow}><span style={kbd}>S</span> Stars {'\u00b7'} <span style={kbd}>C</span> Constellations</div>
+          <div style={kbdRow}><span style={kbd}>S</span> Stars {'\u00b7'} <span style={kbd}>L</span> Constellations</div>
           <div style={kbdRow}><span style={kbd}>G</span> Stargazer {'\u00b7'} <span style={kbd}>D</span> Dwarf planets</div>
-          <div style={kbdRow}><span style={kbd}>N</span> NEO {'\u00b7'} <span style={kbd}>F</span> Tour</div>
+          <div style={kbdRow}><span style={kbd}>N</span> NEO {'\u00b7'} <span style={kbd}>C</span> Comets</div>
+          <div style={kbdRow}><span style={kbd}>R</span> Radiants {'\u00b7'} <span style={kbd}>I</span> Satellites</div>
+          <div style={kbdRow}><span style={kbd}>F</span> Tour {'\u00b7'} <span style={kbd}>M</span> Panel</div>
           <div style={kbdRow}><span style={kbd}>Space</span> Pause {'\u00b7'} <span style={kbd}>Esc</span> Back/Deselect</div>
-          <div style={kbdRow}><span style={kbd}>M</span> Toggle panel</div>
         </div>
       </div>
     </div>
