@@ -469,9 +469,9 @@ function OrreryInner() {
         camIdx={camIdx}
         onPresetSelect={handlePresetSelect}
         onMoonSelect={handleMoonSelect}
-        selComet={selComet}
-        selMeteor={selMeteor}
-        selSatellite={selSatellite}
+        selComet={selComet} setSelComet={setSelComet}
+        selMeteor={selMeteor} setSelMeteor={setSelMeteor}
+        selSatellite={selSatellite} setSelSatellite={setSelSatellite}
         jd={jd}
       />
     </div>
