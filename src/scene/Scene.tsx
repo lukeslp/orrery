@@ -18,9 +18,11 @@ import { DeepSkyField } from './DeepSky';
 import { CometField } from './Comets';
 import { MeteorField } from './Meteors';
 import { SatelliteField } from './Satellites';
+import { DeepSpaceField } from './DeepSpace';
 import type { CometDef } from '../data/comets';
 import type { MeteorShower } from './Meteors';
 import type { SatellitePosition } from '../lib/satellites';
+import type { Spacecraft } from '../data/deepspace';
 
 // Default home camera position (replaces CAMS[1] "System" view)
 const HOME_POS: [number, number, number] = [0, 30, 40];
@@ -229,15 +231,18 @@ export interface SceneProps {
   showMeteors: boolean;
   showSatellites: boolean;
   showDeepSky: boolean;
+  showDeepSpace: boolean;
   constellationFocus: boolean;
   cinematic: boolean;
   onMoonSelect?: (planetIdx: number, moonIdx: number) => void;
   selMoonIdx?: number | null;
   onCameraDistance?: (d: number) => void;
+  cameraDistance: number;
   camPreset?: CamPreset | null;
   selComet: CometDef | null; setSelComet: (c: CometDef | null) => void;
   selMeteor: MeteorShower | null; setSelMeteor: (m: MeteorShower | null) => void;
   selSatellite: SatellitePosition | null; setSelSatellite: (s: SatellitePosition | null) => void;
+  selSpacecraft: Spacecraft | null; setSelSpacecraft: (s: Spacecraft | null) => void;
   onConstellationSelect?: (id: string) => void;
 }
 
@@ -245,9 +250,10 @@ export default function Scene({
   jd, T, simTime, neos, selNeo, setSelNeo, selPlanet, setSelPlanet,
   focusTarget, onPositionsUpdate, showDwarf,
   showStars, showConstellations, showAsteroidBelt,
-  showComets, showMeteors, showSatellites, showDeepSky,
-  constellationFocus, cinematic, onMoonSelect, selMoonIdx, onCameraDistance, camPreset,
+  showComets, showMeteors, showSatellites, showDeepSky, showDeepSpace,
+  constellationFocus, cinematic, onMoonSelect, selMoonIdx, onCameraDistance, cameraDistance, camPreset,
   selComet, setSelComet, selMeteor, setSelMeteor, selSatellite, setSelSatellite,
+  selSpacecraft, setSelSpacecraft,
   onConstellationSelect,
 }: SceneProps) {
   const [hov, setHov] = useState<number | null>(null);
