@@ -922,9 +922,9 @@ export default function Panels(props: PanelProps) {
                   ...glass, padding: mobile ? '6px 14px' : '5px 14px',
                   display: 'flex', alignItems: 'center', gap: 8,
                   cursor: 'pointer', border: '1px solid rgba(255,255,255,0.08)',
-                  fontFamily: 'inherit', fontSize: mobile ? 12 : 13,
+                  fontFamily: 'inherit', fontSize: mobile ? 14 : 15,
                   color: 'rgba(255,255,255,0.7)', fontWeight: 300, letterSpacing: 0.5,
-                  borderRadius: 4, minHeight: mobile ? 36 : 28,
+                  borderRadius: 4, minHeight: mobile ? 36 : 32,
                 }}
               >
                 <span style={{ color: accent, fontWeight: 400 }}>Layers ({activeCount})</span>
