@@ -15,6 +15,10 @@ import { ALL_BODIES } from '../data/planets';
 import { getMoonsForPlanet } from '../data/moons';
 import { useTheme, THEMES } from '../lib/themes';
 import { glass, bokehCard, drawerPanel, drawerTab, bottomSheet, useIsMobile } from './styles';
+import type { CometDef } from '../data/comets';
+import { getCometInfo } from '../data/comets';
+import type { MeteorShower } from '../scene/Meteors';
+import type { SatellitePosition } from '../lib/satellites';
 
 // ─── Tiny UI primitives ─────────────────────────────────────────────────────────
 
