@@ -814,6 +814,8 @@ export default function Panels(props: PanelProps) {
           display: 'flex', flexDirection: 'column',
           alignItems: 'center',
           cursor: 'pointer',
+          backdropFilter: 'blur(0.5px)',
+          WebkitBackdropFilter: 'blur(0.5px)',
         }}
       >
         {/* Top cluster: time, date, celestial data */}
