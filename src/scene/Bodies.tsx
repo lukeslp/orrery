@@ -157,7 +157,7 @@ export function Planet({ planet, T, selected, onSelect, hovered, onHover, moonFo
         onPointerLeave={() => onHover(false)}
       >
         <sphereGeometry args={[r, 48, 48]} />
-        <meshStandardMaterial map={tex} roughness={0.8} metalness={0.0} depthWrite={true} />
+        <meshStandardMaterial map={tex} roughness={0.8} metalness={0.0} transparent={!!moonFocused} opacity={moonFocused ? 0.3 : 1} depthWrite={!moonFocused} />
       </mesh>
       {planet.tex === 'earth' && <EarthClouds radius={r} />}
       {planet.hasRings && <SaturnRings radius={r} />}
