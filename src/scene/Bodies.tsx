@@ -21,25 +21,30 @@ export function Sun({ cameraDistance = 0 }: { cameraDistance?: number }) {
   const farGlow = Math.min(cameraDistance / 50, 4);
   return (
     <group>
-      {/* Textured sun sphere */}
+      {/* Bright opaque core — ensures Sun is never transparent */}
+      <mesh>
+        <sphereGeometry args={[0.14, 32, 32]} />
+        <meshBasicMaterial color="#fff8e0" toneMapped={false} />
+      </mesh>
+      {/* Textured sun sphere on top of core */}
       <mesh ref={ref}>
         <sphereGeometry args={[0.15, 48, 48]} />
         <meshBasicMaterial map={tex} toneMapped={false} color="#ffffff" />
       </mesh>
-      {/* Inner corona glow — sphere mesh, no square artifacts */}
+      {/* Inner corona glow */}
       <mesh>
         <sphereGeometry args={[0.20, 32, 32]} />
-        <meshBasicMaterial color="#ffeecc" transparent opacity={0.12} blending={THREE.AdditiveBlending} toneMapped={false} depthWrite={false} />
+        <meshBasicMaterial color="#ffeecc" transparent opacity={0.12} blending={THREE.AdditiveBlending} toneMapped={false} depthWrite={false} side={THREE.BackSide} />
       </mesh>
       {/* Middle corona */}
       <mesh>
         <sphereGeometry args={[0.28, 32, 32]} />
-        <meshBasicMaterial color="#ffcc66" transparent opacity={0.06} blending={THREE.AdditiveBlending} toneMapped={false} depthWrite={false} />
+        <meshBasicMaterial color="#ffcc66" transparent opacity={0.06} blending={THREE.AdditiveBlending} toneMapped={false} depthWrite={false} side={THREE.BackSide} />
       </mesh>
       {/* Outer soft glow */}
       <mesh>
         <sphereGeometry args={[0.40, 32, 32]} />
-        <meshBasicMaterial color="#ffaa44" transparent opacity={0.03} blending={THREE.AdditiveBlending} toneMapped={false} depthWrite={false} />
+        <meshBasicMaterial color="#ffaa44" transparent opacity={0.03} blending={THREE.AdditiveBlending} toneMapped={false} depthWrite={false} side={THREE.BackSide} />
       </mesh>
       {/* Distance-adaptive beacon for far zoom */}
       {cameraDistance > 30 && (

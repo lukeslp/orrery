@@ -633,12 +633,13 @@ export function ConstellationLabels({ visible, focus, onSelect }: { visible: boo
                   {CONSTELLATION_SYMBOLS[c.id] && (
                     <span style={{
                       display: 'block',
-                      fontSize: isZodiac(c.id) ? 18 : 13,
+                      fontSize: isZodiac(c.id) ? 28 : 20,
                       fontStyle: 'normal',
                       fontWeight: 400,
                       lineHeight: 1.1,
-                      textShadow: `0 0 12px ${c.color}, 0 0 24px ${c.color}, 0 0 40px rgba(0,0,0,0.8)`,
-                      filter: isZodiac(c.id) ? `drop-shadow(0 0 6px ${c.color})` : 'none',
+                      marginBottom: 2,
+                      textShadow: `0 0 8px ${c.color}, 0 0 16px ${c.color}, 0 0 32px ${c.color}`,
+                      filter: `drop-shadow(0 0 ${isZodiac(c.id) ? 8 : 4}px ${c.color})`,
                     }}>{CONSTELLATION_SYMBOLS[c.id]}</span>
                   )}
                   <span style={{ display: 'block', fontSize: 9, fontWeight: 500, fontStyle: 'normal' }}>{c.latin}</span>
