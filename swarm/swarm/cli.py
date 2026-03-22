@@ -7,6 +7,7 @@ from pathlib import Path
 from .claude_plugin import materialize_claude_plugin
 from .commands import COMMAND_SPECS, get_command
 from .consensus import probe_agents
+from .codex_skills import materialize_codex_skills
 from .inventory import inventory_local_sources
 from .manifests import (
     build_codex_package_manifest,
@@ -55,6 +56,8 @@ def _write_manifest(output_dir: Path) -> None:
         (output_dir / filename).write_text(_json_dump(payload), encoding="utf-8")
         print(f"wrote {output_dir / filename}")
     for path in materialize_claude_plugin(output_dir):
+        print(f"wrote {path}")
+    for path in materialize_codex_skills(output_dir):
         print(f"wrote {path}")
 
 
