@@ -59,18 +59,25 @@ function bvToColor(bv: number): [number, number, number] {
   return [1.0, 0.667, 0.467];                   // #ffaa77 — orange
 }
 
+interface NamedStar {
+  name: string;
+  pos: [number, number, number];
+  mag: number;
+}
+
 interface StarData {
   positions: Float32Array;
   sizes: Float32Array;
   colors: Float32Array;
   count: number;
+  namedStars: NamedStar[];
 }
 
 function useStarData(): StarData | null {
   const [data, setData] = useState<StarData | null>(null);
 
   useEffect(() => {
-    fetch(BASE_PATH + 'stars.8.json')
+    fetch(BASE_PATH + 'stars.hyg-8.json')
       .then(r => r.json())
       .then((geojson: any) => {
         const features = geojson.features;
