@@ -143,14 +143,18 @@ function SaturnRings({ radius }: { radius: number }) {
 
 // ─── Planet ─────────────────────────────────────────────────────────────────────
 
-export function Planet({ planet, T, selected, onSelect, hovered, onHover, moonFocused }: {
+export function Planet({ planet, T, selected, onSelect, hovered, onHover, moonFocused, cameraDistance = 0 }: {
   planet: PlanetDef; T: number; selected: boolean; onSelect: () => void;
   hovered: boolean; onHover: (h: boolean) => void; moonFocused?: boolean;
+  cameraDistance?: number;
 }) {
   const ref = useRef<THREE.Mesh>(null);
   const pos = useMemo(() => planetXYZ(planet, T), [planet, T]);
   const tex = useLoader(THREE.TextureLoader, TEX[planet.tex]);
   const r = planet.radius;
+  const glow = Math.min(cameraDistance / 50, 4);
+  // Invisible click target: larger sphere for easier selection
+  const hitRadius = Math.max(r * 3, 0.15);
 
   useFrame((_, dt) => {
     if (ref.current) ref.current.rotation.y += dt * 0.12;
@@ -158,18 +162,31 @@ export function Planet({ planet, T, selected, onSelect, hovered, onHover, moonFo
 
   return (
     <group position={pos}>
+      {/* Invisible larger click target */}
       <mesh
-        ref={ref}
-        renderOrder={10}
+        renderOrder={9}
         onClick={e => { e.stopPropagation(); onSelect(); }}
         onPointerEnter={() => onHover(true)}
         onPointerLeave={() => onHover(false)}
+      >
+        <sphereGeometry args={[hitRadius, 16, 16]} />
+        <meshBasicMaterial visible={false} />
+      </mesh>
+      <mesh
+        ref={ref}
+        renderOrder={10}
       >
         <sphereGeometry args={[r, 48, 48]} />
         <meshStandardMaterial map={tex} roughness={0.8} metalness={0.0} transparent={!!moonFocused} opacity={moonFocused ? 0.3 : 1} depthWrite={!moonFocused} />
       </mesh>
       {planet.tex === 'earth' && <EarthClouds radius={r} />}
       {planet.hasRings && <SaturnRings radius={r} />}
+      {/* Distance-adaptive glow beacon */}
+      {cameraDistance > 30 && (
+        <sprite scale={[r * glow * 2, r * glow * 2, 1]}>
+          <spriteMaterial color={planet.color} transparent opacity={0.4} blending={THREE.AdditiveBlending} toneMapped={false} />
+        </sprite>
+      )}
       {/* Always-visible label */}
       <Html
         position={[0, r + 0.02, 0]}
@@ -293,16 +310,21 @@ export function SatelliteOrbit({ moon, parentPos }: { moon: MoonDef; parentPos: 
 
 // ─── Orbit ring ─────────────────────────────────────────────────────────────────
 
-export function OrbitRing({ planet, T, dim, highlighted }: { planet: PlanetDef; T: number; dim: boolean; highlighted: boolean }) {
+export function OrbitRing({ planet, T, dim, highlighted, cameraDistance = 0 }: {
+  planet: PlanetDef; T: number; dim: boolean; highlighted: boolean; cameraDistance?: number;
+}) {
   const pts = useMemo(() => orbitPath(planet, T), [planet, T]);
   const { theme } = useTheme();
+  const glow = Math.min(cameraDistance / 50, 4);
+  const baseWidth = highlighted ? 1.2 : dim ? 0.3 : 0.6;
+  const baseOpacity = highlighted ? 0.6 : dim ? 0.08 : 0.25;
   return (
     <Line
       points={pts}
       color={highlighted ? theme.selectedRing : planet.color}
-      lineWidth={highlighted ? 1.2 : dim ? 0.3 : 0.6}
+      lineWidth={baseWidth * (1 + glow * 0.5)}
       transparent
-      opacity={highlighted ? 0.6 : dim ? 0.08 : 0.25}
+      opacity={Math.min(baseOpacity * (1 + glow), 0.9)}
     />
   );
 }
