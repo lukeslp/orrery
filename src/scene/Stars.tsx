@@ -549,7 +549,7 @@ function useConstellationCentroids(): ConstellationCentroid[] {
   return centroids;
 }
 
-export function ConstellationLabels({ visible, focus }: { visible: boolean; focus?: boolean }) {
+export function ConstellationLabels({ visible, focus, onSelect }: { visible: boolean; focus?: boolean; onSelect?: (id: string) => void }) {
   const centroids = useConstellationCentroids();
   const { camera } = useThree();
   const groupRef = useRef<THREE.Group>(null);
