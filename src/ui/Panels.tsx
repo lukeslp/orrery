@@ -28,7 +28,7 @@ function Btn({ children, onClick, style, label }: {
   return (
     <button onClick={onClick} aria-label={label} style={{
       background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)',
-      fontSize: 13, cursor: 'pointer', fontFamily: 'inherit',
+      fontSize: 15, cursor: 'pointer', fontFamily: 'inherit',
       padding: '4px 8px', lineHeight: 1.4, minWidth: 44, minHeight: 44,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       ...style,
@@ -717,7 +717,7 @@ export default function Panels(props: PanelProps) {
 
   if (cinematic) {
     const dim: React.CSSProperties = {
-      color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: 300,
+      color: 'rgba(255,255,255,0.5)', fontSize: 15, fontWeight: 300,
       letterSpacing: 1.5, fontStyle: 'italic',
     };
     return (
@@ -807,10 +807,10 @@ export default function Panels(props: PanelProps) {
             ...glass, padding: mobile ? '6px 12px' : '5px 16px',
           }}
         >
-          <span style={{ color: '#fff', fontSize: mobile ? 16 : 22, fontWeight: 300, letterSpacing: 3, fontFamily: "'Cormorant', serif" }}>{fmtTime(simTime)}</span>
-          <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: mobile ? 10 : 13, fontStyle: 'italic', fontWeight: 300 }}>{fmtDate(simTime)}</span>
-          {!mobile && <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, fontStyle: 'italic', fontWeight: 300 }}>{moon.name}, {moon.ill}%</span>}
-          {speed !== 1 && <span style={{ color: accent, fontSize: 12, fontWeight: 400 }}>{speedLabel(speed)}</span>}
+          <span style={{ color: '#fff', fontSize: mobile ? 18 : 24, fontWeight: 300, letterSpacing: 3, fontFamily: "'Cormorant', serif" }}>{fmtTime(simTime)}</span>
+          <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: mobile ? 12 : 14, fontStyle: 'italic', fontWeight: 300 }}>{fmtDate(simTime)}</span>
+          {!mobile && <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 14, fontStyle: 'italic', fontWeight: 300 }}>{moon.name}, {moon.ill}%</span>}
+          {speed !== 1 && <span style={{ color: accent, fontSize: 14, fontWeight: 400 }}>{speedLabel(speed)}</span>}
           <div style={{ display: 'flex', alignItems: 'center', gap: 2, marginLeft: 4 }}>
             <button
               onClick={() => props.setSpeed(s => Math.max(1, Math.round(s / 10) || 1))}
@@ -856,9 +856,9 @@ export default function Panels(props: PanelProps) {
               ...glass, padding: mobile ? '6px 14px' : '5px 14px',
               display: 'flex', alignItems: 'center', gap: 8,
               cursor: 'pointer', border: '1px solid rgba(255,255,255,0.08)',
-              fontFamily: 'inherit', fontSize: mobile ? 12 : 13,
+              fontFamily: 'inherit', fontSize: mobile ? 14 : 15,
               color: 'rgba(255,255,255,0.7)', fontWeight: 300, letterSpacing: 0.5,
-              borderRadius: 4, minHeight: mobile ? 36 : 28,
+              borderRadius: 4, minHeight: mobile ? 36 : 32,
             }}
           >
             <span style={{ color: accent, fontWeight: 400 }}>
@@ -883,7 +883,7 @@ export default function Panels(props: PanelProps) {
                       width: '100%', padding: mobile ? '10px 14px' : '6px 14px',
                       background: active ? `rgba(${accentRgb},0.1)` : 'transparent',
                       border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-                      fontSize: mobile ? 13 : 12, color: active ? accent : 'rgba(255,255,255,0.6)',
+                      fontSize: mobile ? 14 : 14, color: active ? accent : 'rgba(255,255,255,0.6)',
                       fontWeight: active ? 400 : 300, textAlign: 'left',
                       minHeight: mobile ? 40 : 'auto',
                     }}
