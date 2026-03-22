@@ -11,7 +11,7 @@ import { getMoonsForPlanet } from '../data/moons';
 import type { PlanetDef, NEO, FocusTarget, CamPreset } from '../lib/kepler';
 import { planetXYZ } from '../lib/kepler';
 import { Sun, Planet, OrbitRing, Satellite as MoonSatellite, SatelliteOrbit } from './Bodies';
-import { AsteroidBelt, RealAsteroidBelt, NeoDot, AsteroidOrbitLine } from './Asteroids';
+import { RealAsteroidBelt, NeoDot, AsteroidOrbitLine } from './Asteroids';
 import { StarField, ConstellationLines, ConstellationLabels } from './Stars';
 import { CometField } from './Comets';
 import { MeteorField } from './Meteors';
