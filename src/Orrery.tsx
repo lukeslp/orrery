@@ -44,6 +44,8 @@ function OrreryInner() {
   const [showMeteors, setShowMeteors] = useState(false);
   const [showSatellites, setShowSatellites] = useState(false);
   const [showDeepSky, setShowDeepSky] = useState(false);
+  const [showDeepSpace, setShowDeepSpace] = useState(false);
+  const [selSpacecraft, setSelSpacecraft] = useState<Spacecraft | null>(null);
   const [selConstellation, setSelConstellation] = useState<string | null>(null);
   const [selComet, setSelComet] = useState<CometDef | null>(null);
   const [selMeteor, setSelMeteor] = useState<MeteorShower | null>(null);
@@ -367,9 +369,13 @@ function OrreryInner() {
         return;
       }
 
-      // Camera presets 1-9
+      // Camera presets: 1-9 map to indices 0-8, 0 maps to index 9
       if (e.key >= '1' && e.key <= '9') {
         handlePresetSelect(parseInt(e.key) - 1);
+        return;
+      }
+      if (e.key === '0') {
+        handlePresetSelect(9);
         return;
       }
 
@@ -383,6 +389,7 @@ function OrreryInner() {
       if (k === 'c') setShowComets(p => !p);
       if (k === 'r') setShowMeteors(p => !p);
       if (k === 'i') setShowSatellites(p => !p);
+      if (k === 'o') setShowDeepSpace(p => !p);
       if (k === 'f') setCinematic(true);
       if (k === 'escape') {
         if (drawerOpen) { setDrawerOpen(false); return; }
@@ -433,16 +440,19 @@ function OrreryInner() {
             showMeteors={showMeteors}
             showSatellites={showSatellites}
             showDeepSky={showDeepSky}
+            showDeepSpace={showDeepSpace}
             onConstellationSelect={(id) => { setSelConstellation(id); setDrawerOpen(true); }}
             constellationFocus={constellationFocus}
             cinematic={cinematic}
             onMoonSelect={handleMoonSelect}
             selMoonIdx={selMoonIdx}
             onCameraDistance={setCameraDistance}
+            cameraDistance={cameraDistance}
             camPreset={camPreset}
             selComet={selComet} setSelComet={setSelComet}
             selMeteor={selMeteor} setSelMeteor={setSelMeteor}
             selSatellite={selSatellite} setSelSatellite={setSelSatellite}
+            selSpacecraft={selSpacecraft} setSelSpacecraft={setSelSpacecraft}
           />
         </Suspense>
       </Canvas>
