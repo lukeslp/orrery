@@ -18,7 +18,8 @@ import Panels from './ui/Panels';
 import LoadingScreen from './ui/LoadingScreen';
 
 type CinematicStep = {
-  camPreset?: number; focusPlanet?: number; duration: number; label: string;
+  camPreset?: number; focusPlanet?: number; focusMoon?: number;
+  duration: number; label: string;
   desc?: string;
   stars?: boolean; constellations?: boolean; constellationFocus?: boolean;
   asteroidBelt?: boolean; dwarf?: boolean;
@@ -67,8 +68,10 @@ function OrreryInner() {
     // 3. Pull out to full system
     { camPreset: 1, duration: 5000, label: 'Solar System',
       asteroidBelt: true, dwarf: true },
-    // 4. Jupiter and Ganymede
-    { focusPlanet: 4, duration: 6000, label: 'Jupiter' },
+    // 4. Jupiter
+    { focusPlanet: 4, duration: 5000, label: 'Jupiter' },
+    // 5. Ganymede
+    { focusPlanet: 4, focusMoon: 3, duration: 5000, label: 'Ganymede' },
     // 5. Saturn
     { focusPlanet: 5, duration: 6000, label: 'Saturn',
       constellations: false },
@@ -99,7 +102,12 @@ function OrreryInner() {
       setCamIdx(-1);
       setSelPlanet(step.focusPlanet);
       const pos = positionsRef.current.get(step.focusPlanet);
-      if (pos) setFocusTarget({ planetIdx: step.focusPlanet, pos });
+      if (step.focusMoon !== undefined) {
+        setSelMoonIdx(step.focusMoon);
+        if (pos) setFocusTarget({ planetIdx: step.focusPlanet, pos, moonIdx: step.focusMoon });
+      } else {
+        if (pos) setFocusTarget({ planetIdx: step.focusPlanet, pos });
+      }
     } else {
       setSelPlanet(null);
       setFocusTarget(null);
