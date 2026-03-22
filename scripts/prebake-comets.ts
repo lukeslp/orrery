@@ -106,7 +106,7 @@ function parseLine(line: string): CometRecord | null {
   const epochStr = line.slice(81, 89).trim();
   const epoch_jd = parseEpoch(epochStr);
 
-  const H = parseFloat(line.slice(85, 90).trim()) || 10;
+  const H = parseFloat(line.slice(90, 95).trim()) || 10;
 
   const nameRaw = line.slice(102, 158).trim();
   // Clean up name: remove trailing reference info
