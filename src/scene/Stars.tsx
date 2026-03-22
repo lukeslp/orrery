@@ -464,6 +464,11 @@ export function ConstellationLabels({ visible, focus }: { visible: boolean; focu
   const [visibleLabels, setVisibleLabels] = useState<Set<string>>(new Set());
   const [labelOpacity, setLabelOpacity] = useState(0.4);
 
+  // Pre-allocated vectors to avoid GC pressure (perf fix — was creating new Vector3 every frame)
+  const camDirRef = useRef(new THREE.Vector3());
+  const dirRef = useRef(new THREE.Vector3());
+  const tiltAxisRef = useRef(new THREE.Vector3(1, 0, 0));
+
   // Cull labels outside ~60° of camera look direction + distance-based fade
   useFrame(() => {
     if (groupRef.current) {
@@ -485,15 +490,14 @@ export function ConstellationLabels({ visible, focus }: { visible: boolean; focu
     }
     setLabelOpacity(opacity);
 
-    const camDir = new THREE.Vector3();
-    camera.getWorldDirection(camDir);
+    camera.getWorldDirection(camDirRef.current);
     const threshold = Math.cos(60 * DEG);
 
     const vis = new Set<string>();
     for (const c of centroids) {
-      const dir = new THREE.Vector3(c.pos[0], c.pos[1], c.pos[2]).normalize();
-      const tiltedDir = dir.clone().applyAxisAngle(new THREE.Vector3(1, 0, 0), ECLIPTIC_TILT);
-      if (tiltedDir.dot(camDir) > threshold) {
+      dirRef.current.set(c.pos[0], c.pos[1], c.pos[2]).normalize();
+      dirRef.current.applyAxisAngle(tiltAxisRef.current, ECLIPTIC_TILT);
+      if (dirRef.current.dot(camDirRef.current) > threshold) {
         vis.add(c.id);
       }
     }
@@ -528,8 +532,8 @@ export function ConstellationLabels({ visible, focus }: { visible: boolean; focu
                   lineHeight: 1.3,
                   textShadow: `0 0 10px ${c.color}, 0 0 20px rgba(0,0,0,0.9)`,
                 }}>
-                  <span style={{ display: 'block', fontSize: 16, fontWeight: 500, fontStyle: 'normal' }}>{c.latin}</span>
-                  {c.english && <span style={{ display: 'block', fontSize: 11, opacity: 0.7 }}>{c.english}</span>}
+                  <span style={{ display: 'block', fontSize: 12, fontWeight: 500, fontStyle: 'normal' }}>{c.latin}</span>
+                  {c.english && <span style={{ display: 'block', fontSize: 9, opacity: 0.7 }}>{c.english}</span>}
                 </div>
               </Html>
             )}
