@@ -155,9 +155,9 @@ function SideDrawer({
   selPlanet, setSelPlanet, onMoonSelect,
   neos, neoStatus, selNeo, setSelNeo,
   showNeo, showStars, showConstellations, constellationFocus, showDwarf,
-  showAsteroidBelt, showMilkyWay, showDeepSpace,
+  showAsteroidBelt,
   setShowNeo, setShowStars, setShowConstellations, setConstellationFocus,
-  setShowDwarf, setShowAsteroidBelt, setShowMilkyWay, setShowDeepSpace,
+  setShowDwarf, setShowAsteroidBelt,
 }: {
   open: boolean;
   accent: string;
@@ -176,8 +176,6 @@ function SideDrawer({
   constellationFocus: boolean; setConstellationFocus: (fn: (p: boolean) => boolean) => void;
   showDwarf: boolean; setShowDwarf: (fn: (p: boolean) => boolean) => void;
   showAsteroidBelt: boolean; setShowAsteroidBelt: (fn: (p: boolean) => boolean) => void;
-  showMilkyWay: boolean; setShowMilkyWay: (fn: (p: boolean) => boolean) => void;
-  showDeepSpace: boolean; setShowDeepSpace: (fn: (p: boolean) => boolean) => void;
 }) {
   const { theme, setTheme } = useTheme();
 
