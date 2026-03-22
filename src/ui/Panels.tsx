@@ -160,6 +160,7 @@ function SideDrawer({
   showAsteroidBelt, showComets, showMeteors, showSatellites, showDeepSky,
   setShowNeo, setShowStars, setShowConstellations, setConstellationFocus,
   setShowDwarf, setShowAsteroidBelt, setShowComets, setShowMeteors, setShowSatellites, setShowDeepSky,
+  selConstellation, setSelConstellation,
 }: {
   open: boolean;
   accent: string;
