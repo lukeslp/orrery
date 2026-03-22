@@ -1,0 +1,209 @@
+{
+  "name": "dreamwalk-routes",
+  "version": "0.1.0",
+  "built_at": "2026-03-22T00:27:10.069127+00:00",
+  "routes": {
+    "/hitit": {
+      "route": [
+        "intake",
+        "decompose",
+        "execute",
+        "verify",
+        "synthesize"
+      ],
+      "handoffs": [
+        "/enhance",
+        "/plan",
+        "/doublecheck"
+      ],
+      "read_only": false,
+      "uses_parallelism": true,
+      "uses_external_agents": false
+    },
+    "/doublecheck": {
+      "route": [
+        "inspect",
+        "validate",
+        "test",
+        "audit",
+        "findings"
+      ],
+      "handoffs": [
+        "/doubt",
+        "/plan",
+        "/hitit"
+      ],
+      "read_only": true,
+      "uses_parallelism": true,
+      "uses_external_agents": false
+    },
+    "/doubt": {
+      "route": [
+        "inspect",
+        "challenge",
+        "compare",
+        "synthesize"
+      ],
+      "handoffs": [
+        "/thinkagain",
+        "/plan",
+        "/doublecheck"
+      ],
+      "read_only": true,
+      "uses_parallelism": true,
+      "uses_external_agents": false
+    },
+    "/plan": {
+      "route": [
+        "scope",
+        "architecture",
+        "sequence",
+        "acceptance",
+        "assumptions"
+      ],
+      "handoffs": [
+        "/hitit",
+        "/doublecheck"
+      ],
+      "read_only": true,
+      "uses_parallelism": true,
+      "uses_external_agents": false
+    },
+    "/enhance": {
+      "route": [
+        "search",
+        "compare",
+        "source-triage",
+        "recommend"
+      ],
+      "handoffs": [
+        "/plan",
+        "/hitit",
+        "/doublecheck"
+      ],
+      "read_only": true,
+      "uses_parallelism": true,
+      "uses_external_agents": false
+    },
+    "/humanize": {
+      "route": [
+        "audit-tone",
+        "rewrite",
+        "simplify",
+        "polish"
+      ],
+      "handoffs": [
+        "/doublecheck"
+      ],
+      "read_only": false,
+      "uses_parallelism": true,
+      "uses_external_agents": false
+    },
+    "/janitor": {
+      "route": [
+        "inventory",
+        "detect-cruft",
+        "organize",
+        "recommend-cleanup"
+      ],
+      "handoffs": [
+        "/harvest",
+        "/doublecheck"
+      ],
+      "read_only": false,
+      "uses_parallelism": true,
+      "uses_external_agents": false
+    },
+    "/pushit": {
+      "route": [
+        "prepublish",
+        "publish",
+        "sync",
+        "report"
+      ],
+      "handoffs": [
+        "/shipit"
+      ],
+      "read_only": false,
+      "uses_parallelism": true,
+      "uses_external_agents": false
+    },
+    "/shipit": {
+      "route": [
+        "preflight",
+        "release",
+        "deploy",
+        "verify",
+        "checkpoint"
+      ],
+      "handoffs": [
+        "/doublecheck"
+      ],
+      "read_only": false,
+      "uses_parallelism": true,
+      "uses_external_agents": false
+    },
+    "/accessibility": {
+      "route": [
+        "audit-a11y",
+        "classify",
+        "remediate",
+        "verify"
+      ],
+      "handoffs": [
+        "/doublecheck",
+        "/humanize"
+      ],
+      "read_only": true,
+      "uses_parallelism": true,
+      "uses_external_agents": false
+    },
+    "/harvest": {
+      "route": [
+        "extract",
+        "normalize",
+        "tag",
+        "record"
+      ],
+      "handoffs": [
+        "/plan",
+        "/janitor"
+      ],
+      "read_only": false,
+      "uses_parallelism": true,
+      "uses_external_agents": false
+    },
+    "/thinkagain": {
+      "route": [
+        "discard-frame",
+        "re-derive",
+        "compare",
+        "rebuild-plan"
+      ],
+      "handoffs": [
+        "/plan",
+        "/hitit",
+        "/doublecheck"
+      ],
+      "read_only": true,
+      "uses_parallelism": true,
+      "uses_external_agents": false
+    },
+    "/consensus": {
+      "route": [
+        "detect-agents",
+        "fan-out",
+        "compare",
+        "synthesize"
+      ],
+      "handoffs": [
+        "/doubt",
+        "/thinkagain",
+        "/doublecheck"
+      ],
+      "read_only": true,
+      "uses_parallelism": true,
+      "uses_external_agents": true
+    }
+  }
+}

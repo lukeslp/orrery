@@ -1,0 +1,77 @@
+{
+  "name": "dreamwalk-consensus",
+  "version": "0.1.0",
+  "built_at": "2026-03-22T00:27:10.069155+00:00",
+  "agents": [
+    {
+      "key": "codex",
+      "label": "Codex CLI",
+      "executable": "codex",
+      "available": true,
+      "read_only": true,
+      "notes": [
+        "Detected on PATH."
+      ]
+    },
+    {
+      "key": "claude",
+      "label": "Claude Code",
+      "executable": "claude",
+      "available": true,
+      "read_only": true,
+      "notes": [
+        "Detected on PATH."
+      ]
+    },
+    {
+      "key": "gemini",
+      "label": "Gemini CLI",
+      "executable": "gemini",
+      "available": true,
+      "read_only": true,
+      "notes": [
+        "Detected on PATH."
+      ]
+    },
+    {
+      "key": "aider",
+      "label": "Aider",
+      "executable": "aider",
+      "available": true,
+      "read_only": true,
+      "notes": [
+        "Detected on PATH."
+      ]
+    },
+    {
+      "key": "cursor-agent",
+      "label": "Cursor Agent",
+      "executable": "cursor-agent",
+      "available": true,
+      "read_only": true,
+      "notes": [
+        "Detected on PATH."
+      ]
+    },
+    {
+      "key": "cursor",
+      "label": "Cursor CLI",
+      "executable": "cursor",
+      "available": true,
+      "read_only": true,
+      "notes": [
+        "Detected on PATH."
+      ]
+    },
+    {
+      "key": "openclaw",
+      "label": "OpenClaw",
+      "executable": "openclaw",
+      "available": true,
+      "read_only": true,
+      "notes": [
+        "Detected on PATH."
+      ]
+    }
+  ]
+}

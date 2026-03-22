@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dreamwalk"
+version = "0.1.0"
+description = "Standalone command system for multi-agent software work"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [{name = "Luke Steuber"}]
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+dreamwalk = "dreamwalk.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["dreamwalk*"]
