@@ -472,7 +472,7 @@ function SideDrawer({
 
         <div style={sectionTitle}>Keyboard Shortcuts</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <div style={kbdRow}><span style={kbd}>1-9</span> Camera presets</div>
+          <div style={kbdRow}><span style={kbd}>1-7</span> Camera presets</div>
           <div style={kbdRow}><span style={kbd}>S</span> Stars {'\u00b7'} <span style={kbd}>C</span> Constellations</div>
           <div style={kbdRow}><span style={kbd}>G</span> Stargazer {'\u00b7'} <span style={kbd}>D</span> Dwarf planets</div>
           <div style={kbdRow}><span style={kbd}>N</span> NEO {'\u00b7'} <span style={kbd}>F</span> Tour</div>
