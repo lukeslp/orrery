@@ -85,17 +85,21 @@ function EarthClouds({ radius }: { radius: number }) {
 // ─── Saturn rings (procedural shader) ───────────────────────────────────────────
 
 const ringVertexShader = `
-  varying vec2 vUv;
+  varying float vT; // 0 = inner edge, 1 = outer edge
+  uniform float innerRadius;
+  uniform float outerRadius;
   void main() {
-    vUv = uv;
+    // Compute radial parameter from vertex position (ring lies in XY plane)
+    float r = length(position.xy);
+    vT = (r - innerRadius) / (outerRadius - innerRadius);
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
 `;
 
 const ringFragmentShader = `
-  varying vec2 vUv;
+  varying float vT;
   void main() {
-    float t = vUv.x; // 0 = inner edge, 1 = outer edge
+    float t = clamp(vT, 0.0, 1.0);
 
     // C Ring (innermost, faint)
     float cRing = smoothstep(0.0, 0.04, t) * smoothstep(0.18, 0.15, t) * 0.35;
@@ -122,17 +126,23 @@ const ringFragmentShader = `
 `;
 
 function SaturnRings({ radius }: { radius: number }) {
+  const inner = radius * 1.2;
+  const outer = radius * 2.6;
   const material = useMemo(() => new THREE.ShaderMaterial({
     vertexShader: ringVertexShader,
     fragmentShader: ringFragmentShader,
+    uniforms: {
+      innerRadius: { value: inner },
+      outerRadius: { value: outer },
+    },
     transparent: true,
     side: THREE.DoubleSide,
     depthWrite: false,
-  }), []);
+  }), [inner, outer]);
 
   return (
     <mesh rotation={[Math.PI / 2 + 0.47, 0, 0]} material={material}>
-      <ringGeometry args={[radius * 1.2, radius * 2.6, 128]} />
+      <ringGeometry args={[inner, outer, 128]} />
     </mesh>
   );
 }
