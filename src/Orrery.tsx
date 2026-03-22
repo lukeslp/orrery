@@ -110,8 +110,6 @@ function OrreryInner() {
     if (step.constellations !== undefined) setShowConstellations(() => step.constellations!);
     if (step.constellationFocus !== undefined) setConstellationFocus(() => step.constellationFocus!);
     if (step.asteroidBelt !== undefined) setShowAsteroidBelt(() => step.asteroidBelt!);
-    if (step.milkyWay !== undefined) setShowMilkyWay(() => step.milkyWay!);
-    if (step.deepSpace !== undefined) setShowDeepSpace(() => step.deepSpace!);
     if (step.dwarf !== undefined) setShowDwarf(() => step.dwarf!);
   }, [cinematicSteps]);
 
@@ -333,7 +331,6 @@ function OrreryInner() {
     if (preset.autoRotate && preset.follow !== undefined) {
       setShowStars(true);
       setShowConstellations(true);
-      setShowMilkyWay(true);
     }
   }, []);
 
@@ -404,8 +401,6 @@ function OrreryInner() {
             showStars={showStars}
             showConstellations={showConstellations}
             showAsteroidBelt={showAsteroidBelt}
-            showMilkyWay={showMilkyWay}
-            showDeepSpace={showDeepSpace}
             constellationFocus={constellationFocus}
             cinematic={cinematic}
             onMoonSelect={handleMoonSelect}
@@ -429,8 +424,6 @@ function OrreryInner() {
         showStars={showStars} setShowStars={setShowStars}
         showConstellations={showConstellations} setShowConstellations={setShowConstellations}
         showAsteroidBelt={showAsteroidBelt} setShowAsteroidBelt={setShowAsteroidBelt}
-        showMilkyWay={showMilkyWay} setShowMilkyWay={setShowMilkyWay}
-        showDeepSpace={showDeepSpace} setShowDeepSpace={setShowDeepSpace}
         constellationFocus={constellationFocus} setConstellationFocus={setConstellationFocus}
         drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen}
         cinematic={cinematic}

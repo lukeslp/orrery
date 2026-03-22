@@ -80,8 +80,6 @@ export const CAMS: CamPreset[] = [
   { key: '4', label: 'Ecliptic',  pos: [10, 0.2, 0],       tgt: [0, 0, 0] },
   { key: '5', label: 'Outer',     pos: [0, 60, 90],        tgt: [0, 0, 0] },
   { key: '6', label: 'Kuiper',    pos: [0, 120, 180],      tgt: [0, 0, 0] },
-  { key: '7', label: 'Oort',      pos: [0, 4000, 6000],    tgt: [0, 0, 0] },
-  { key: '8', label: 'Galaxy',    pos: [0, 60000, 90000],  tgt: [0, 0, 0] },
-  { key: '9', label: 'Screensaver', pos: [4, 2.5, 6],      tgt: [0, 0, 0], follow: 2, autoRotate: true },
+  { key: '7', label: 'Screensaver', pos: [4, 2.5, 6],      tgt: [0, 0, 0], follow: 2, autoRotate: true },
 ];
 
