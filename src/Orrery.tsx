@@ -135,6 +135,11 @@ function OrreryInner() {
     if (step.constellationFocus !== undefined) setConstellationFocus(() => step.constellationFocus!);
     if (step.asteroidBelt !== undefined) setShowAsteroidBelt(() => step.asteroidBelt!);
     if (step.dwarf !== undefined) setShowDwarf(() => step.dwarf!);
+    if (step.deepSky !== undefined) setShowDeepSky(() => step.deepSky!);
+    if (step.deepSpace !== undefined) setShowDeepSpace(() => step.deepSpace!);
+    if (step.comets !== undefined) setShowComets(() => step.comets!);
+    if (step.satellites !== undefined) setShowSatellites(() => step.satellites!);
+    if (step.meteors !== undefined) setShowMeteors(() => step.meteors!);
   }, [cinematicSteps]);
 
   // Cinematic timer — poll-based to avoid fragile setTimeout chains
