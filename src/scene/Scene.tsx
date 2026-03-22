@@ -244,7 +244,7 @@ export default function Scene({
   jd, T, simTime, neos, selNeo, setSelNeo, selPlanet, setSelPlanet,
   focusTarget, onPositionsUpdate, showDwarf,
   showStars, showConstellations, showAsteroidBelt,
-  showComets, showMeteors, showSatellites,
+  showComets, showMeteors, showSatellites, showDeepSky,
   constellationFocus, cinematic, onMoonSelect, selMoonIdx, onCameraDistance, camPreset,
   selComet, setSelComet, selMeteor, setSelMeteor, selSatellite, setSelSatellite,
 }: SceneProps) {
@@ -323,9 +323,11 @@ export default function Scene({
           {selNeo?.id === neo.id && <AsteroidOrbitLine neo={neo} />}
         </group>
       ))}
-      <StarField visible={showStars} />
+      <StarField visible={showStars} showDesignations={showConstellations} />
       <ConstellationLines visible={showConstellations} focus={constellationFocus} />
       <ConstellationLabels visible={showConstellations} focus={constellationFocus} />
+      <AsterismField visible={showConstellations} />
+      <DeepSkyField visible={showDeepSky} />
       <CometField
         jd={jd}
         visible={showComets}

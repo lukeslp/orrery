@@ -156,9 +156,9 @@ function SideDrawer({
   selPlanet, setSelPlanet, onMoonSelect, onClose,
   neos, neoStatus, selNeo, setSelNeo,
   showNeo, showStars, showConstellations, constellationFocus, showDwarf,
-  showAsteroidBelt, showComets, showMeteors, showSatellites,
+  showAsteroidBelt, showComets, showMeteors, showSatellites, showDeepSky,
   setShowNeo, setShowStars, setShowConstellations, setConstellationFocus,
-  setShowDwarf, setShowAsteroidBelt, setShowComets, setShowMeteors, setShowSatellites,
+  setShowDwarf, setShowAsteroidBelt, setShowComets, setShowMeteors, setShowSatellites, setShowDeepSky,
 }: {
   open: boolean;
   accent: string;
