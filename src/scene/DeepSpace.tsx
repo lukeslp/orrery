@@ -17,7 +17,6 @@ import type { Spacecraft } from '../data/deepspace';
 
 function OortCloud() {
   const meshRef = useRef<THREE.InstancedMesh>(null);
-  const dummy = useMemo(() => new THREE.Object3D(), []);
 
   const matrices = useMemo(() => {
     const { innerRadius, outerRadius, particleCount } = OORT_CLOUD;
