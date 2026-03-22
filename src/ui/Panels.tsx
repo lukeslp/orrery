@@ -701,50 +701,88 @@ export default function Panels(props: PanelProps) {
           </div>
         </div>
 
-        {/* Camera presets */}
-        <div
-          role="toolbar"
-          aria-label="Camera presets"
-          style={{
-            display: 'flex', alignItems: 'center', gap: mobile ? 3 : 4,
-            ...glass, padding: mobile ? '4px 8px' : '4px 10px',
-            maxWidth: mobile ? 'calc(100vw - 16px)' : 'none',
-            overflowX: mobile ? 'auto' : 'visible',
-            WebkitOverflowScrolling: 'touch',
-            scrollbarWidth: 'none',
-            flexWrap: mobile ? 'nowrap' : 'wrap',
-            justifyContent: 'center',
-          }}
-        >
-          {cams.map((cam, i) => {
-            const active = camIdx === i && selPlanet === null;
-            return (
-              <button
-                key={cam.key}
-                onClick={() => onPresetSelect(i)}
-                aria-label={`Camera preset: ${cam.label} (${cam.key})`}
-                aria-pressed={active}
-                style={{
-                  background: active ? `rgba(${accentRgb},0.12)` : 'transparent',
-                  border: `1px solid ${active ? `rgba(${accentRgb},0.4)` : 'rgba(255,255,255,0.08)'}`,
-                  borderRadius: 4,
-                  padding: mobile ? '5px 8px' : '4px 10px',
-                  fontSize: mobile ? 10 : 12,
-                  cursor: 'pointer', fontFamily: 'inherit',
-                  whiteSpace: 'nowrap',
-                  flexShrink: 0,
-                  minWidth: mobile ? 40 : 'auto',
-                  minHeight: mobile ? 32 : 28,
-                  color: active ? accent : 'rgba(255,255,255,0.5)',
-                  fontWeight: active ? 500 : 300,
-                  letterSpacing: 0.5,
-                  transition: 'all 0.15s',
-                }}
-              >
-                {cam.label}
-              </button>
-            );
-          })}
+        {/* Camera view selector — dropdown */}
+        <div style={{ position: 'relative' }}>
+          <button
+            onClick={() => setViewOpen(v => !v)}
+            aria-label="Camera view"
+            aria-expanded={viewOpen}
+            style={{
+              ...glass, padding: mobile ? '6px 14px' : '5px 14px',
+              display: 'flex', alignItems: 'center', gap: 8,
+              cursor: 'pointer', border: '1px solid rgba(255,255,255,0.08)',
+              fontFamily: 'inherit', fontSize: mobile ? 11 : 12,
+              color: 'rgba(255,255,255,0.7)', fontWeight: 300, letterSpacing: 0.5,
+              borderRadius: 4, minHeight: mobile ? 36 : 28,
+            }}
+          >
+            <span style={{ color: accent, fontWeight: 400 }}>
+              {camIdx >= 0 && camIdx < cams.length ? cams[camIdx].label : 'View'}
+            </span>
+            <span style={{ fontSize: 8, opacity: 0.4 }}>{viewOpen ? '\u25b2' : '\u25bc'}</span>
+          </button>
+          {viewOpen && (
+            <div style={{
+              position: 'absolute', top: '100%', left: 0, marginTop: 4,
+              ...glass, padding: '4px 0', minWidth: 140, borderRadius: 6,
+              border: '1px solid rgba(255,255,255,0.1)', zIndex: 50,
+            }}>
+              {cams.map((cam, i) => {
+                const active = camIdx === i && selPlanet === null;
+                return (
+                  <button
+                    key={cam.key}
+                    onClick={() => { onPresetSelect(i); setViewOpen(false); }}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      width: '100%', padding: mobile ? '10px 14px' : '6px 14px',
+                      background: active ? `rgba(${accentRgb},0.1)` : 'transparent',
+                      border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+                      fontSize: mobile ? 12 : 11, color: active ? accent : 'rgba(255,255,255,0.6)',
+                      fontWeight: active ? 400 : 300, textAlign: 'left',
+                      minHeight: mobile ? 40 : 'auto',
+                    }}
+                  >
+                    <span>{cam.label}</span>
+                    <span style={{ fontSize: 9, opacity: 0.3, fontWeight: 300 }}>{cam.key}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Layer toggles — compact pills */}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap', justifyContent: 'center',
+        }}>
+          {[
+            { label: 'Stars', on: showStars, fn: () => setShowStars((p: boolean) => !p) },
+            { label: 'Const', on: showConstellations, fn: () => setShowConstellations((p: boolean) => !p) },
+            { label: 'Belt', on: showAsteroidBelt, fn: () => setShowAsteroidBelt((p: boolean) => !p) },
+            { label: 'Dwarf', on: showDwarf, fn: () => setShowDwarf((p: boolean) => !p) },
+            { label: 'Milky Way', on: showMilkyWay, fn: () => setShowMilkyWay((p: boolean) => !p) },
+            { label: 'Deep', on: showDeepSpace, fn: () => setShowDeepSpace((p: boolean) => !p) },
+            { label: `NEO`, on: showNeo, fn: () => setShowNeo((p: boolean) => !p) },
+          ].map(l => (
+            <button
+              key={l.label}
+              onClick={l.fn}
+              aria-pressed={l.on}
+              style={{
+                background: l.on ? `rgba(${accentRgb},0.12)` : 'transparent',
+                border: `1px solid ${l.on ? `rgba(${accentRgb},0.3)` : 'rgba(255,255,255,0.06)'}`,
+                borderRadius: 12, padding: mobile ? '5px 10px' : '3px 8px',
+                fontSize: mobile ? 10 : 9, cursor: 'pointer', fontFamily: 'inherit',
+                color: l.on ? accent : 'rgba(255,255,255,0.35)',
+                fontWeight: l.on ? 400 : 300, letterSpacing: 0.5,
+                minHeight: mobile ? 32 : 'auto',
+                transition: 'all 0.15s',
+              }}
+            >
+              {l.label}
+            </button>
+          ))}
         </div>
       </div>
 
