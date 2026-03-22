@@ -276,7 +276,7 @@ export default function Scene({
   return (
     <>
       <ambientLight intensity={0.15} />
-      <Sun />
+      <Sun cameraDistance={cameraDistance} />
       <AUGrid />
       {showAsteroidBelt && <RealAsteroidBelt jd={jd} />}
       {visibleBodies.map((p) => {
@@ -287,6 +287,7 @@ export default function Scene({
               planet={p} T={T}
               dim={selPlanet !== null && selPlanet !== bodyIdx}
               highlighted={selPlanet === bodyIdx}
+              cameraDistance={cameraDistance}
             />
             <Planet
               planet={p} T={T}
@@ -295,6 +296,7 @@ export default function Scene({
               hovered={hov === bodyIdx}
               onHover={h => setHov(h ? bodyIdx : null)}
               moonFocused={focusTarget?.planetIdx === bodyIdx && focusTarget?.moonIdx !== undefined}
+              cameraDistance={cameraDistance}
             />
           </group>
         );
@@ -354,6 +356,11 @@ export default function Scene({
         earthPos={positions.get(2) ?? null}
         selSatellite={selSatellite}
         setSelSatellite={setSelSatellite}
+      />
+      <DeepSpaceField
+        visible={showDeepSpace}
+        selSpacecraft={selSpacecraft}
+        setSelSpacecraft={setSelSpacecraft}
       />
       <CamCtrl
         focusTarget={focusTarget}

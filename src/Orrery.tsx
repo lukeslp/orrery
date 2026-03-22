@@ -16,6 +16,7 @@ import { ThemeProvider } from './lib/themes';
 import type { CometDef } from './data/comets';
 import type { MeteorShower } from './scene/Meteors';
 import type { SatellitePosition } from './lib/satellites';
+import type { Spacecraft } from './data/deepspace';
 import Scene from './scene/Scene';
 import Panels from './ui/Panels';
 import LoadingScreen from './ui/LoadingScreen';
