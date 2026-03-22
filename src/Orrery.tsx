@@ -136,7 +136,7 @@ function OrreryInner() {
   const [showComets, setShowComets] = useState(false);
   const [showMeteors, setShowMeteors] = useState(false);
   const [showSatellites, setShowSatellites] = useState(false);
-  const [showDeepSky, setShowDeepSky] = useState(true);
+  const [showDeepSky, setShowDeepSky] = useState(() => typeof window !== 'undefined' ? window.innerWidth >= 768 : true);
   const [showDeepSpace, setShowDeepSpace] = useState(false);
   const [selSpacecraft, setSelSpacecraft] = useState<Spacecraft | null>(null);
   const [selConstellation, setSelConstellation] = useState<string | null>(null);

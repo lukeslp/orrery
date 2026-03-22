@@ -7,10 +7,12 @@
 
 // ─── Oort Cloud ────────────────────────────────────────────────────────────────
 
+const _isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
 export const OORT_CLOUD = {
   innerRadius: 2000,    // AU (inner edge, ~Hills Cloud)
   outerRadius: 50000,   // AU (estimated outer edge)
-  particleCount: 5000,  // visual particles (instanced)
+  particleCount: _isMobile ? 1500 : 5000,  // visual particles (instanced)
 };
 
 // ─── Spacecraft ────────────────────────────────────────────────────────────────
