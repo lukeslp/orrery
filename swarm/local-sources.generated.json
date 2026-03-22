@@ -1,7 +1,7 @@
 {
   "name": "swarm-local-sources",
   "version": "0.1.0",
-  "built_at": "2026-03-22T01:07:03.092926+00:00",
+  "built_at": "2026-03-22T01:10:29.586715+00:00",
   "sources": {
     "shared": {
       "root": "/home/coolhand/shared",
