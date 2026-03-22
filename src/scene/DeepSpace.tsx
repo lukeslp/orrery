@@ -198,7 +198,7 @@ function OortCloud() {
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, OORT_CLOUD.particleCount]}>
       <icosahedronGeometry args={[1, 0]} />
-      <meshBasicMaterial color="#aaccff" transparent opacity={0.12} toneMapped={false} />
+      <meshBasicMaterial color="#aaccff" transparent opacity={0.12} toneMapped={false} blending={THREE.AdditiveBlending} depthWrite={false} />
     </instancedMesh>
   );
 }
