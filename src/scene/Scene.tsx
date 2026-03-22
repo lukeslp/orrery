@@ -12,9 +12,7 @@ import type { PlanetDef, NEO, FocusTarget, CamPreset } from '../lib/kepler';
 import { planetXYZ } from '../lib/kepler';
 import { Sun, Planet, OrbitRing, Satellite, SatelliteOrbit } from './Bodies';
 import { AsteroidBelt, NeoDot, AsteroidOrbitLine } from './Asteroids';
-import { StarField, ConstellationLines, ConstellationLabels, MilkyWayBand } from './Stars';
-import { ScaleMarkers, OortCloud, GalaxyDisc } from './DeepSpace';
-import { useTheme } from '../lib/themes';
+import { StarField, ConstellationLines, ConstellationLabels } from './Stars';
 
 // Default home camera position (replaces CAMS[1] "System" view)
 const HOME_POS: [number, number, number] = [0, 30, 40];
@@ -235,7 +233,6 @@ export default function Scene({
   const [hov, setHov] = useState<number | null>(null);
   const [hovMoon, setHovMoon] = useState<number | null>(null);
   const { scene } = useThree();
-  const { theme } = useTheme();
   useEffect(() => { scene.background = new THREE.Color('#000000'); }, [scene]);
 
   const positions = useMemo(() => {
@@ -310,10 +307,6 @@ export default function Scene({
       <StarField visible={showStars} />
       <ConstellationLines visible={showConstellations} focus={constellationFocus} />
       <ConstellationLabels visible={showConstellations} focus={constellationFocus} />
-      <MilkyWayBand visible={showMilkyWay} theme={theme} />
-      {showDeepSpace && <ScaleMarkers />}
-      {showDeepSpace && <OortCloud />}
-      {showDeepSpace && <GalaxyDisc />}
       <CamCtrl
         focusTarget={focusTarget}
         positions={positions}
