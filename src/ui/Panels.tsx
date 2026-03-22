@@ -276,9 +276,67 @@ function SideDrawer({
         padding: '8px 0 0',
       }}
     >
+      {/* ── Speed ── */}
+      <SectionHeader>Speed</SectionHeader>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, padding: '0 16px 8px' }}>
+        {SPEED_PRESETS.map(p => (
+          <button
+            key={p.value}
+            onClick={() => setSpeed(() => p.value)}
+            style={{
+              background: speed === p.value ? `rgba(${accentRgb},0.2)` : 'rgba(255,255,255,0.04)',
+              border: speed === p.value ? `1px solid rgba(${accentRgb},0.3)` : '1px solid rgba(255,255,255,0.08)',
+              color: speed === p.value ? accent : 'rgba(255,255,255,0.5)',
+              fontSize: 12, fontFamily: 'inherit', fontWeight: speed === p.value ? 500 : 300,
+              padding: '5px 10px', borderRadius: 4, cursor: 'pointer',
+              minHeight: mobile ? 36 : 28,
+            }}
+          >{p.label}</button>
+        ))}
+      </div>
+
+      <div style={sectionDivider} />
+
+      {/* ── Go To ── */}
+      <SectionHeader>Go To</SectionHeader>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, padding: '0 16px 8px' }}>
+        {cams.map((cam, i) => (
+          <button
+            key={cam.key}
+            onClick={() => { onPresetSelect(i); onClose(); }}
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              color: 'rgba(255,255,255,0.6)',
+              fontSize: 12, fontFamily: 'inherit', fontWeight: 300,
+              padding: '5px 10px', borderRadius: 4, cursor: 'pointer',
+              minHeight: mobile ? 36 : 28,
+            }}
+          >{cam.label}</button>
+        ))}
+      </div>
+
+      <div style={sectionDivider} />
+
       {/* ── Bodies ── */}
       <SectionHeader>Bodies</SectionHeader>
       <div role="tree" aria-label="Celestial bodies">
+        {/* Sun */}
+        <div role="treeitem">
+          <button
+            onClick={() => { onPresetSelect(cams.findIndex(c => c.label === 'Sun')); onClose(); }}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 8, width: '100%',
+              padding: mobile ? '10px 16px' : '6px 16px',
+              background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+              color: 'rgba(255,220,160,0.9)', fontSize: mobile ? 14 : 13, fontWeight: 400,
+              minHeight: mobile ? 44 : 'auto', textAlign: 'left',
+            }}
+          >
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ffdd88', flexShrink: 0 }} />
+            Sol
+          </button>
+        </div>
         {planets.map((body, idx) => {
           const moons = getMoonsForPlanet(idx);
           return (
