@@ -267,7 +267,7 @@ export default function Scene({
       <ambientLight intensity={0.15} />
       <Sun />
       <AUGrid />
-      {showAsteroidBelt && !showComets && <AsteroidBelt />}
+      {showAsteroidBelt && <AsteroidBelt />}
       {visibleBodies.map((p) => {
         const bodyIdx = ALL_BODIES.indexOf(p);
         return (
