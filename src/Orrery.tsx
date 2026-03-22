@@ -59,21 +59,20 @@ function OrreryInner() {
 
   // ─── Cinematic: continuous zoom cycle through scale levels ──────────────────
   const cinematicSteps = useMemo((): CinematicStep[] => [
-    // 1. Start at the Sun
-    { camPreset: 8, duration: 5000, label: 'Sol',
+    // 1. Start at inner system
+    { camPreset: 0, duration: 5000, label: 'Inner Planets',
       stars: true, constellations: false, constellationFocus: false,
       asteroidBelt: false, milkyWay: false, deepSpace: false, dwarf: false },
-    // 2. Pull out to inner planets
-    { camPreset: 0, duration: 5000, label: 'Inner Planets' },
-    // 3. Zoom to Earth
-    { focusPlanet: 2, duration: 5000, label: 'Earth' },
-    // 4. Pull out to full system
+    // 2. Zoom to Earth
+    { focusPlanet: 2, duration: 5000, label: 'Earth',
+      constellations: true },
+    // 3. Pull out to full system
     { camPreset: 1, duration: 5000, label: 'Solar System',
-      constellations: true, asteroidBelt: true, dwarf: true },
-    // 5. Out to galaxy
+      asteroidBelt: true, dwarf: true },
+    // 4. Out to galaxy
     { camPreset: 7, duration: 6000, label: 'Galaxy',
       milkyWay: true, deepSpace: true },
-    // 6. Dive back to Saturn
+    // 5. Dive back to Saturn
     { focusPlanet: 5, duration: 6000, label: 'Saturn',
       deepSpace: false, milkyWay: false, constellations: false },
   ], []);
