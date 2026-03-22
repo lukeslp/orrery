@@ -137,7 +137,7 @@ function useClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () =
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
     <div style={{
-      color: 'rgba(255,255,255,0.25)', fontSize: 9, letterSpacing: 2,
+      color: 'rgba(255,255,255,0.25)', fontSize: 11, letterSpacing: 2,
       textTransform: 'uppercase', fontWeight: 300,
       padding: '12px 16px 6px',
     }}>
