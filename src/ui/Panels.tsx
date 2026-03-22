@@ -181,6 +181,7 @@ function SideDrawer({
   showComets: boolean; setShowComets: (fn: (p: boolean) => boolean) => void;
   showMeteors: boolean; setShowMeteors: (fn: (p: boolean) => boolean) => void;
   showSatellites: boolean; setShowSatellites: (fn: (p: boolean) => boolean) => void;
+  showDeepSky: boolean; setShowDeepSky: (fn: (p: boolean) => boolean) => void;
 }) {
   const { theme, setTheme } = useTheme();
 
@@ -194,6 +195,7 @@ function SideDrawer({
     { label: 'Stars', key: 'S', on: showStars, fn: () => setShowStars(p => !p) },
     { label: 'Constellations', key: 'L', on: showConstellations, fn: () => setShowConstellations(p => !p) },
     { label: 'Stargazer', key: 'G', on: constellationFocus, fn: () => setConstellationFocus(p => !p) },
+    { label: 'Deep Sky', key: 'K', on: showDeepSky, fn: () => setShowDeepSky(p => !p) },
     { label: 'Dwarf Planets', key: 'D', on: showDwarf, fn: () => setShowDwarf(p => !p) },
     { label: neoLabel, key: 'N', on: showNeo, fn: () => setShowNeo(p => !p) },
     { label: 'Asteroid Belt', key: null, on: showAsteroidBelt, fn: () => setShowAsteroidBelt(p => !p) },
@@ -517,6 +519,7 @@ export interface PanelProps {
   showComets: boolean; setShowComets: (fn: (p: boolean) => boolean) => void;
   showMeteors: boolean; setShowMeteors: (fn: (p: boolean) => boolean) => void;
   showSatellites: boolean; setShowSatellites: (fn: (p: boolean) => boolean) => void;
+  showDeepSky: boolean; setShowDeepSky: (fn: (p: boolean) => boolean) => void;
   drawerOpen: boolean; setDrawerOpen: (fn: boolean | ((p: boolean) => boolean)) => void;
   cinematic: boolean;
   setCinematic: (c: boolean) => void;
@@ -547,6 +550,7 @@ export default function Panels(props: PanelProps) {
     showComets, setShowComets,
     showMeteors, setShowMeteors,
     showSatellites, setShowSatellites,
+    showDeepSky, setShowDeepSky,
     drawerOpen, setDrawerOpen,
     cinematic,
     navStack,
