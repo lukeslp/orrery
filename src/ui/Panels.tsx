@@ -563,14 +563,15 @@ export default function Panels(props: PanelProps) {
   const sp = selPlanet !== null ? ALL_BODIES[selPlanet] : null;
   const drawerRef = useRef<HTMLDivElement>(null);
   const [viewOpen, setViewOpen] = useState(false);
+  const [layersOpen, setLayersOpen] = useState(false);
 
-  // Close view dropdown on click outside
+  // Close dropdowns on click outside
   useEffect(() => {
-    if (!viewOpen) return;
-    const close = () => setViewOpen(false);
+    if (!viewOpen && !layersOpen) return;
+    const close = () => { setViewOpen(false); setLayersOpen(false); };
     const timer = setTimeout(() => document.addEventListener('click', close), 0);
     return () => { clearTimeout(timer); document.removeEventListener('click', close); };
-  }, [viewOpen]);
+  }, [viewOpen, layersOpen]);
 
   // Selected moon info
   const selectedMoon = selPlanet !== null && selMoonIdx !== null
@@ -766,39 +767,67 @@ export default function Panels(props: PanelProps) {
           )}
         </div>
 
-        {/* Layer toggles — compact pills */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap', justifyContent: 'center',
-        }}>
-          {[
-            { label: 'Stars', on: showStars, fn: () => setShowStars((p: boolean) => !p) },
-            { label: 'Const', on: showConstellations, fn: () => setShowConstellations((p: boolean) => !p) },
-            { label: 'Belt', on: showAsteroidBelt, fn: () => setShowAsteroidBelt((p: boolean) => !p) },
-            { label: 'Dwarf', on: showDwarf, fn: () => setShowDwarf((p: boolean) => !p) },
-            { label: 'NEO', on: showNeo, fn: () => setShowNeo((p: boolean) => !p) },
-            { label: 'Comets', on: showComets, fn: () => setShowComets((p: boolean) => !p) },
-            { label: 'Meteors', on: showMeteors, fn: () => setShowMeteors((p: boolean) => !p) },
-            { label: 'Sats', on: showSatellites, fn: () => setShowSatellites((p: boolean) => !p) },
-          ].map(l => (
-            <button
-              key={l.label}
-              onClick={l.fn}
-              aria-pressed={l.on}
-              style={{
-                background: l.on ? `rgba(${accentRgb},0.12)` : 'transparent',
-                border: `1px solid ${l.on ? `rgba(${accentRgb},0.3)` : 'rgba(255,255,255,0.06)'}`,
-                borderRadius: 12, padding: mobile ? '5px 10px' : '3px 8px',
-                fontSize: mobile ? 11 : 10, cursor: 'pointer', fontFamily: 'inherit',
-                color: l.on ? accent : 'rgba(255,255,255,0.35)',
-                fontWeight: l.on ? 400 : 300, letterSpacing: 0.5,
-                minHeight: mobile ? 32 : 'auto',
-                transition: 'all 0.15s',
-              }}
-            >
-              {l.label}
-            </button>
-          ))}
-        </div>
+        {/* Layer toggles — dropdown */}
+        {(() => {
+          const layers = [
+            { label: 'Stars', key: 'S', on: showStars, fn: () => setShowStars((p: boolean) => !p) },
+            { label: 'Constellations', key: 'L', on: showConstellations, fn: () => setShowConstellations((p: boolean) => !p) },
+            { label: 'Asteroid Belt', key: 'B', on: showAsteroidBelt, fn: () => setShowAsteroidBelt((p: boolean) => !p) },
+            { label: 'Dwarf Planets', key: 'D', on: showDwarf, fn: () => setShowDwarf((p: boolean) => !p) },
+            { label: 'Near-Earth', key: 'N', on: showNeo, fn: () => setShowNeo((p: boolean) => !p) },
+            { label: 'Comets', key: 'C', on: showComets, fn: () => setShowComets((p: boolean) => !p) },
+            { label: 'Meteor Showers', key: 'R', on: showMeteors, fn: () => setShowMeteors((p: boolean) => !p) },
+            { label: 'Satellites', key: 'I', on: showSatellites, fn: () => setShowSatellites((p: boolean) => !p) },
+          ];
+          const activeCount = layers.filter(l => l.on).length;
+          return (
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setLayersOpen(v => !v)}
+                aria-label="Toggle layers"
+                aria-expanded={layersOpen}
+                style={{
+                  ...glass, padding: mobile ? '6px 14px' : '5px 14px',
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  cursor: 'pointer', border: '1px solid rgba(255,255,255,0.08)',
+                  fontFamily: 'inherit', fontSize: mobile ? 12 : 13,
+                  color: 'rgba(255,255,255,0.7)', fontWeight: 300, letterSpacing: 0.5,
+                  borderRadius: 4, minHeight: mobile ? 36 : 28,
+                }}
+              >
+                <span style={{ color: accent, fontWeight: 400 }}>Layers ({activeCount})</span>
+                <span style={{ fontSize: 8, opacity: 0.4 }}>{layersOpen ? '\u25b2' : '\u25bc'}</span>
+              </button>
+              {layersOpen && (
+                <div style={{
+                  position: 'absolute', top: '100%', left: 0, marginTop: 4,
+                  ...glass, padding: '4px 0', minWidth: 170, borderRadius: 6,
+                  border: '1px solid rgba(255,255,255,0.1)', zIndex: 50,
+                }}>
+                  {layers.map(l => (
+                    <button
+                      key={l.label}
+                      onClick={(e) => { e.stopPropagation(); l.fn(); }}
+                      aria-pressed={l.on}
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        width: '100%', padding: mobile ? '10px 14px' : '6px 14px',
+                        background: l.on ? `rgba(${accentRgb},0.1)` : 'transparent',
+                        border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+                        fontSize: mobile ? 13 : 12, color: l.on ? accent : 'rgba(255,255,255,0.4)',
+                        fontWeight: l.on ? 400 : 300, textAlign: 'left',
+                        minHeight: mobile ? 40 : 'auto',
+                      }}
+                    >
+                      <span>{l.label}</span>
+                      <span style={{ fontSize: 9, opacity: 0.3, fontWeight: 300 }}>{l.key}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })()}
       </div>
 
       {/* ── Drawer toggle tab ── */}
