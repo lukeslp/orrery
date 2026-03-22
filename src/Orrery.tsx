@@ -60,19 +60,18 @@ function OrreryInner() {
     // 1. Start at inner system
     { camPreset: 0, duration: 5000, label: 'Inner Planets',
       stars: true, constellations: false, constellationFocus: false,
-      asteroidBelt: false, milkyWay: false, deepSpace: false, dwarf: false },
+      asteroidBelt: false, dwarf: false },
     // 2. Zoom to Earth
     { focusPlanet: 2, duration: 5000, label: 'Earth',
       constellations: true },
     // 3. Pull out to full system
     { camPreset: 1, duration: 5000, label: 'Solar System',
       asteroidBelt: true, dwarf: true },
-    // 4. Out to galaxy
-    { camPreset: 7, duration: 6000, label: 'Galaxy',
-      milkyWay: true, deepSpace: true },
-    // 5. Dive back to Saturn
+    // 4. Jupiter and Ganymede
+    { focusPlanet: 4, duration: 6000, label: 'Jupiter' },
+    // 5. Saturn
     { focusPlanet: 5, duration: 6000, label: 'Saturn',
-      deepSpace: false, milkyWay: false, constellations: false },
+      constellations: false },
   ], []);
 
   const cinematicIdx = useRef(0);
@@ -122,8 +121,6 @@ function OrreryInner() {
       setShowStars(() => true);
       setShowConstellations(() => true);
       setShowAsteroidBelt(() => true);
-      setShowMilkyWay(() => true);
-      setShowDeepSpace(() => true);
       setShowDwarf(() => true);
       const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
       setSelPlanet(isMobile ? null : 2);
