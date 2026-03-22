@@ -474,6 +474,7 @@ function OrreryInner() {
         showMeteors={showMeteors} setShowMeteors={setShowMeteors}
         showSatellites={showSatellites} setShowSatellites={setShowSatellites}
         showDeepSky={showDeepSky} setShowDeepSky={setShowDeepSky}
+        showDeepSpace={showDeepSpace} setShowDeepSpace={setShowDeepSpace}
         selConstellation={selConstellation} setSelConstellation={setSelConstellation}
         constellationFocus={constellationFocus} setConstellationFocus={setConstellationFocus}
         drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen}
@@ -491,6 +492,7 @@ function OrreryInner() {
         selComet={selComet} setSelComet={setSelComet}
         selMeteor={selMeteor} setSelMeteor={setSelMeteor}
         selSatellite={selSatellite} setSelSatellite={setSelSatellite}
+        selSpacecraft={selSpacecraft} setSelSpacecraft={setSelSpacecraft}
       />
     </div>
   );

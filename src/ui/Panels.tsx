@@ -205,6 +205,7 @@ function SideDrawer({
     { label: 'Comets', key: 'C', on: showComets, fn: () => setShowComets(p => !p) },
     { label: 'Meteor Showers', key: 'R', on: showMeteors, fn: () => setShowMeteors(p => !p) },
     { label: 'Satellites', key: 'I', on: showSatellites, fn: () => setShowSatellites(p => !p) },
+    { label: 'Deep Space', key: 'O', on: showDeepSpace, fn: () => setShowDeepSpace(p => !p) },
   ];
 
   // Shared styles
@@ -596,6 +597,9 @@ export interface PanelProps {
   selComet: CometDef | null; setSelComet: (c: CometDef | null) => void;
   selMeteor: MeteorShower | null; setSelMeteor: (m: MeteorShower | null) => void;
   selSatellite: SatellitePosition | null; setSelSatellite: (s: SatellitePosition | null) => void;
+  showDeepSpace: boolean; setShowDeepSpace: (fn: (p: boolean) => boolean) => void;
+  selSpacecraft: import('../data/deepspace').Spacecraft | null;
+  setSelSpacecraft: (s: import('../data/deepspace').Spacecraft | null) => void;
 }
 
 export default function Panels(props: PanelProps) {
@@ -620,6 +624,8 @@ export default function Panels(props: PanelProps) {
     cams, camIdx, onPresetSelect,
     onMoonSelect,
     selComet, selMeteor, selSatellite,
+    showDeepSpace, setShowDeepSpace,
+    selSpacecraft, setSelSpacecraft,
   } = props;
 
   const { theme } = useTheme();
