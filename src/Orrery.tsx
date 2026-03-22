@@ -355,6 +355,13 @@ function OrreryInner() {
       setShowStars(true);
       setShowConstellations(true);
     }
+    // Stargazer preset: enable stars, constellations, deep sky in focus mode
+    if (preset.label === 'Stargazer') {
+      setShowStars(true);
+      setShowConstellations(true);
+      setConstellationFocus(true);
+      setShowDeepSky(true);
+    }
   }, []);
 
   // Keyboard shortcuts
