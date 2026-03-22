@@ -1120,6 +1120,9 @@ export default function Panels(props: PanelProps) {
           showDeepSpace={showDeepSpace} setShowDeepSpace={setShowDeepSpace}
           selConstellation={selConstellation} setSelConstellation={setSelConstellation}
           selSpacecraft={selSpacecraft} setSelSpacecraft={setSelSpacecraft}
+          onPresetSelect={onPresetSelect}
+          speed={speed} setSpeed={props.setSpeed}
+          cams={cams}
         />
       </div>
 
