@@ -15,7 +15,6 @@ export interface OrreryTheme {
   uiAccent: string;
   uiAccentRgb: string;          // r,g,b for rgba() usage
   panelBorder: string;
-  milkyWay: string;
   selectedRing: string;         // planet selection ring color
 }
 
@@ -26,7 +25,6 @@ export const THEMES: OrreryTheme[] = [
     uiAccent: '#00ffcc',
     uiAccentRgb: '0,255,204',
     panelBorder: 'rgba(255,255,255,0.08)',
-    milkyWay: '#e8e0d0',
     selectedRing: '#00ffcc',
   },
   {
@@ -35,7 +33,6 @@ export const THEMES: OrreryTheme[] = [
     uiAccent: '#66bbff',
     uiAccentRgb: '102,187,255',
     panelBorder: 'rgba(255,255,255,0.08)',
-    milkyWay: '#c0c8d8',
     selectedRing: '#66bbff',
   },
   {
@@ -44,7 +41,6 @@ export const THEMES: OrreryTheme[] = [
     uiAccent: '#ffff00',
     uiAccentRgb: '255,255,0',
     panelBorder: 'rgba(255,255,255,0.15)',
-    milkyWay: '#ffffff',
     selectedRing: '#ffff00',
   },
   {
@@ -53,7 +49,6 @@ export const THEMES: OrreryTheme[] = [
     uiAccent: '#44ccaa',
     uiAccentRgb: '68,204,170',
     panelBorder: 'rgba(255,255,255,0.08)',
-    milkyWay: '#d8c0a8',
     selectedRing: '#44ccaa',
   },
 ];

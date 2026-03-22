@@ -12,7 +12,6 @@ import { useRef, useState, useEffect, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
-import type { OrreryTheme } from '../lib/themes';
 
 const DEG = Math.PI / 180;
 const ECLIPTIC_TILT = 23.4 * DEG;
@@ -479,91 +478,3 @@ export function ConstellationLabels({ visible, focus }: { visible: boolean; focu
   );
 }
 
-// ─── Milky Way band (procedural shader on celestial sphere) ─────────────────
-
-const mwVertexShader = `
-  varying vec3 vPos;
-  void main() {
-    vPos = position;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-`;
-
-const mwFragmentShader = `
-  uniform vec3 bandColor;
-  uniform float opacity;
-  varying vec3 vPos;
-
-  // Simple hash for noise
-  float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-  }
-
-  void main() {
-    // Convert position on sphere to galactic-like coordinates
-    // The Milky Way band runs roughly along the galactic plane
-    // Galactic plane is tilted ~62.9° from celestial equator, centered at RA ~266°
-    vec3 n = normalize(vPos);
-
-    // Galactic north pole in equatorial coords: RA=192.86°, Dec=27.13°
-    // Simplified: rotate to galactic frame
-    float ra = atan(n.z, n.x); // note: z is -sin(ra)*cos(dec) in our convention
-    float dec = asin(n.y);
-
-    // Approximate galactic latitude: angle from galactic plane
-    // Galactic plane passes through RA~266° dec~-29° with pole at RA~192.86° dec~27.13°
-    float gnpRA = 3.366;   // 192.86° in radians
-    float gnpDec = 0.4735; // 27.13° in radians
-    vec3 gnp = vec3(cos(gnpDec)*cos(gnpRA), sin(gnpDec), -cos(gnpDec)*sin(gnpRA));
-    float galLat = asin(dot(n, gnp));
-
-    // Band intensity: strongest at galactic equator, fading away
-    float bandWidth = 0.22; // radians (~12.6°)
-    float band = exp(-galLat * galLat / (2.0 * bandWidth * bandWidth));
-
-    // Add galactic center brightening (toward Sagittarius)
-    float gcRA = 4.6497;   // 266.4° in radians
-    float gcDec = -0.5065;  // -29.0° in radians
-    vec3 gc = vec3(cos(gcDec)*cos(gcRA), sin(gcDec), -cos(gcDec)*sin(gcRA));
-    float gcAngle = acos(clamp(dot(n, gc), -1.0, 1.0));
-    float bulge = exp(-gcAngle * gcAngle / (2.0 * 0.35 * 0.35)) * 1.5;
-
-    // Noise for structure (dust lanes, star clouds)
-    vec2 nCoord = vec2(ra * 3.0, dec * 6.0);
-    float n1 = hash(nCoord) * 0.4;
-    float n2 = hash(nCoord * 3.7 + vec2(42.0, 17.0)) * 0.2;
-
-    float alpha = (band + bulge * band) * (0.7 + n1 + n2);
-    alpha *= opacity;
-
-    // Slight color shift: warmer toward center, cooler at edges
-    vec3 color = mix(bandColor, bandColor * 1.3, bulge * 0.3);
-
-    gl_FragColor = vec4(color, alpha);
-  }
-`;
-
-export function MilkyWayBand({ visible, theme }: { visible: boolean; theme: OrreryTheme }) {
-  const material = useMemo(() => {
-    const c = new THREE.Color(theme.milkyWay);
-    return new THREE.ShaderMaterial({
-      vertexShader: mwVertexShader,
-      fragmentShader: mwFragmentShader,
-      uniforms: {
-        bandColor: { value: c },
-        opacity: { value: 0.06 },
-      },
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    });
-  }, [theme.milkyWay]);
-
-  return (
-    <CelestialGroup visible={visible}>
-      <mesh material={material}>
-        <sphereGeometry args={[SPHERE_RADIUS * 0.99, 96, 48]} />
-      </mesh>
-    </CelestialGroup>
-  );
-}
