@@ -884,7 +884,6 @@ export default function Panels(props: PanelProps) {
   return (
     <>
     {cinematicOverlay}
-    <>
       {/* ── Top bar: info + presets ── */}
       <div style={{
         position: 'absolute', top: 8, left: 8, right: mobile ? 8 : 40, zIndex: 10,
