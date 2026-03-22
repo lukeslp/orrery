@@ -42,7 +42,6 @@ export const CONSTELLATION_SYMBOLS: Record<string, string> = {
   CrB: '\u2655',  // ♕ Corona Borealis — northern crown
   CMa: '\u2605',  // ★ Canis Major — great dog / Sirius
   CMi: '\u2606',  // ☆ Canis Minor — little dog
-  Gem: '\u264A',  // ♊ (zodiac above, included for completeness)
   Tri: '\u25B3',  // △ Triangulum
   Lyn: '\u2042',  // ⁂ Lynx
   LMi: '\u2606',  // ☆ Leo Minor
