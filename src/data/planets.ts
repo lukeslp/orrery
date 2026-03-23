@@ -13,7 +13,8 @@ import type { PlanetDef, TexKey, CamPreset } from '../lib/kepler';
 
 const B = import.meta.env.BASE_URL + 'textures/';
 const CDN = 'https://d2xsxph8kpxj0f.cloudfront.net/310419663029916604/boBVkWMKnM6d26ztuVrLrs/';
-const RES = '4k';
+const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth < 768;
+const RES = IS_MOBILE ? '2k' : '4k';
 
 export const TEX: Record<string, string> = {
   sun:        B + `sun_${RES}.jpg`,
