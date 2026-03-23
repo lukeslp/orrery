@@ -570,47 +570,11 @@ function SideDrawer({
             Sol
           </button>
         </div>
-        {planets.map((body, idx) => {
-          const moons = getMoonsForPlanet(idx);
-          return (
-            <div key={body.name} role="treeitem">
-              <button
-                onClick={() => setSelPlanet(idx)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 8, width: '100%',
-                  padding: mobile ? '10px 16px' : '6px 16px',
-                  background: selPlanet === idx ? `rgba(${accentRgb},0.08)` : 'transparent',
-                  border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-                  color: selPlanet === idx ? accent : 'rgba(255,255,255,0.7)',
-                  fontSize: mobile ? 14 : 13, fontWeight: selPlanet === idx ? 500 : 300,
-                  minHeight: mobile ? 44 : 'auto', textAlign: 'left',
-                  transition: 'background 0.1s',
-                }}
-              >
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: body.color, flexShrink: 0 }} />
-                {body.name}
-              </button>
-              {moons.map((moon, mIdx) => (
-                <button
-                  key={moon.name}
-                  onClick={() => onMoonSelect?.(idx, mIdx)}
-                  role="treeitem"
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 8, width: '100%',
-                    padding: mobile ? '8px 16px 8px 36px' : '4px 16px 4px 34px',
-                    background: 'transparent', border: 'none', cursor: 'pointer',
-                    fontFamily: 'inherit', color: 'rgba(255,255,255,0.45)',
-                    fontSize: mobile ? 15 : 14, fontStyle: 'italic', fontWeight: 300,
-                    minHeight: mobile ? 40 : 'auto', textAlign: 'left',
-                  }}
-                >
-                  <span style={{ width: 5, height: 5, borderRadius: '50%', background: moon.color, flexShrink: 0 }} />
-                  {moon.name}
-                </button>
-              ))}
-            </div>
-          );
-        })}
+        {planets.map((body, idx) => (
+          <BodyTreeItem key={body.name} body={body} idx={idx} selPlanet={selPlanet}
+            accent={accent} accentRgb={accentRgb} mobile={mobile}
+            setSelPlanet={setSelPlanet} onMoonSelect={onMoonSelect} />
+        ))}
 
         {/* Dwarf planets separator */}
         <div style={{
@@ -619,48 +583,11 @@ function SideDrawer({
         }}>
           Dwarf Planets
         </div>
-        {dwarfs.map((body, i) => {
-          const idx = 8 + i;
-          const moons = getMoonsForPlanet(idx);
-          return (
-            <div key={body.name} role="treeitem">
-              <button
-                onClick={() => setSelPlanet(idx)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 8, width: '100%',
-                  padding: mobile ? '10px 16px' : '6px 16px',
-                  background: selPlanet === idx ? `rgba(${accentRgb},0.08)` : 'transparent',
-                  border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-                  color: selPlanet === idx ? accent : 'rgba(255,255,255,0.7)',
-                  fontSize: mobile ? 14 : 13, fontWeight: selPlanet === idx ? 500 : 300,
-                  minHeight: mobile ? 44 : 'auto', textAlign: 'left',
-                  transition: 'background 0.1s',
-                }}
-              >
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: body.color, flexShrink: 0 }} />
-                {body.name}
-              </button>
-              {moons.map((moon, mIdx) => (
-                <button
-                  key={moon.name}
-                  onClick={() => onMoonSelect?.(idx, mIdx)}
-                  role="treeitem"
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 8, width: '100%',
-                    padding: mobile ? '8px 16px 8px 36px' : '4px 16px 4px 34px',
-                    background: 'transparent', border: 'none', cursor: 'pointer',
-                    fontFamily: 'inherit', color: 'rgba(255,255,255,0.45)',
-                    fontSize: mobile ? 15 : 14, fontStyle: 'italic', fontWeight: 300,
-                    minHeight: mobile ? 40 : 'auto', textAlign: 'left',
-                  }}
-                >
-                  <span style={{ width: 5, height: 5, borderRadius: '50%', background: moon.color, flexShrink: 0 }} />
-                  {moon.name}
-                </button>
-              ))}
-            </div>
-          );
-        })}
+        {dwarfs.map((body, i) => (
+          <BodyTreeItem key={body.name} body={body} idx={8 + i} selPlanet={selPlanet}
+            accent={accent} accentRgb={accentRgb} mobile={mobile}
+            setSelPlanet={setSelPlanet} onMoonSelect={onMoonSelect} />
+        ))}
         </div>
       </AccordionSection>
 
