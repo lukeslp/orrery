@@ -389,9 +389,9 @@ export default function Scene({
         </group>
       ))}
       <StarField visible={showStars} showDesignations={showConstellations} onLoad={() => onLoadComplete?.('stars')} />
-      <ConstellationLines visible={showConstellations} focus={constellationFocus} onLoad={() => onLoadComplete?.('constellationLines')} />
-      <ConstellationLabels visible={showConstellations} focus={constellationFocus} onSelect={onConstellationSelect} onLoad={() => onLoadComplete?.('constellations')} />
-      <AsterismField visible={showAsterisms} />
+      <ConstellationLines visible={showConstellations && cameraDistance < 600} focus={constellationFocus} onLoad={() => onLoadComplete?.('constellationLines')} />
+      <ConstellationLabels visible={showConstellations && cameraDistance < 600} focus={constellationFocus} onSelect={onConstellationSelect} onLoad={() => onLoadComplete?.('constellations')} />
+      <AsterismField visible={showAsterisms && cameraDistance < 600} />
       <DeepSkyField visible={showDeepSky} onLoad={() => onLoadComplete?.('deepsky')} />
       <CometField
         jd={jd}
