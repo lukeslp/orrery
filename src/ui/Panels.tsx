@@ -775,7 +775,7 @@ function SideDrawer({
           <InfoPanel
             sectionTitle="Constellation" title={selConstellation}
             subtitle={`${info.origin} \u00b7 Best: ${info.season}`}
-            description={info.myth} accent={accent}
+            description="" accent={accent}
             onClose={() => setSelConstellation(null)} closeLabel="Close constellation info"
           >
             {info.objects.length > 0 && (
@@ -802,7 +802,7 @@ function SideDrawer({
         <InfoPanel
           sectionTitle="Spacecraft" title={selSpacecraft.name}
           subtitle={`${selSpacecraft.status === 'active' ? 'Active' : 'Inactive'} \u00b7 Launched ${selSpacecraft.launchYear}`}
-          description={selSpacecraft.desc} accent={accent}
+          description="" accent={accent}
           onClose={() => setSelSpacecraft(null)} closeLabel="Close spacecraft info"
         >
           <div style={{
@@ -1229,14 +1229,6 @@ export default function Panels(props: PanelProps) {
             <Btn onClick={() => setSelPlanet(null)} label="Close info card">{'\u2715'}</Btn>
           </div>
 
-          {/* Description */}
-          <p style={{
-            color: 'rgba(255,255,255,0.6)', fontSize: 12, lineHeight: 1.6, fontWeight: 300,
-            margin: '10px 0', fontStyle: 'italic',
-          }}>
-            {selectedMoon ? selectedMoon.desc : sp!.desc}
-          </p>
-
           {/* Stats grid */}
           {!selectedMoon && sp && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px' }}>
@@ -1333,13 +1325,13 @@ export default function Panels(props: PanelProps) {
 
       {/* ── Screen reader announcements ── */}
       <div aria-live="polite" className="sr-only" role="status">
-        {sp ? `Selected ${sp.name}, ${sp.type}. ${sp.desc}` : ''}
-        {selectedMoon ? `Selected moon ${selectedMoon.name}. ${selectedMoon.desc}` : ''}
+        {sp ? `Selected ${sp.name}, ${sp.type}.` : ''}
+        {selectedMoon ? `Selected moon ${selectedMoon.name}.` : ''}
         {selNeo ? `Selected asteroid ${selNeo.name}. Miss distance: ${selNeo.missLunar.toFixed(1)} lunar distances.` : ''}
         {selComet ? `Selected comet ${selComet.name}. Perihelion: ${selComet.q.toFixed(3)} AU.` : ''}
         {selMeteor ? `Selected meteor shower ${selMeteor.name}. Velocity: ${selMeteor.vg.toFixed(1)} km per second.` : ''}
         {selSatellite ? `Selected satellite ${selSatellite.name}. Altitude: ${selSatellite.alt.toFixed(0)} km.` : ''}
-        {selSpacecraft ? `Selected spacecraft ${selSpacecraft.name}. Distance: ${selSpacecraft.distAU} AU. ${selSpacecraft.desc}` : ''}
+        {selSpacecraft ? `Selected spacecraft ${selSpacecraft.name}. Distance: ${selSpacecraft.distAU} AU.` : ''}
         {navStack.length > 1 ? `Navigated to ${navStack[navStack.length - 1]}` : ''}
       </div>
     </>
