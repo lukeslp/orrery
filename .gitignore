@@ -39,3 +39,5 @@ __pycache__/
 # Agent cruft
 HANDOFF.md
 *_RECOMMENDATIONS.md
+.aider*
+swarm/
