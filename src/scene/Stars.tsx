@@ -561,7 +561,8 @@ export function ConstellationLines({ visible, focus, onLoad }: { visible: boolea
     if (!focus) {
       if (dist < 1) opacity = 0.03;
       else if (dist < 5) opacity = base * ((dist - 1) / 4);
-      else if (dist > 500) opacity = 0.09;
+      else if (dist > 800) opacity = 0;
+      else if (dist > 500) opacity = 0.09 * (1 - (dist - 500) / 300);
       else if (dist > 200) opacity = base - (dist - 200) / 300 * (base - 0.09);
     } else {
       // In focus mode, only fade slightly at extremes
