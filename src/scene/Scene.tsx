@@ -30,13 +30,16 @@ const HOME_TGT: [number, number, number] = [0, 0, 0];
 
 // ─── AU reference grid ──────────────────────────────────────────────────────────
 
-function AUGrid() {
+function AUGrid({ cameraDistance = 0 }: { cameraDistance?: number }) {
+  // Fade out at deep-space distances
+  const fade = cameraDistance > 300 ? Math.max(0, 1 - (cameraDistance - 300) / 300) : 1;
+  if (fade <= 0) return null;
   return (
     <group>
       {[1, 2, 5, 10, 20, 30, 50, 100].map(r => (
         <mesh key={r} rotation={[Math.PI / 2, 0, 0]}>
           <ringGeometry args={[r - 0.003, r + 0.003, 128]} />
-          <meshBasicMaterial color="#ffffff" transparent opacity={0.025} side={THREE.DoubleSide} />
+          <meshBasicMaterial color="#ffffff" transparent opacity={0.025 * fade} side={THREE.DoubleSide} />
         </mesh>
       ))}
     </group>
@@ -328,7 +331,7 @@ export default function Scene({
       <color attach="background" args={['#000000']} />
       <ambientLight intensity={0.15} />
       <Sun cameraDistance={cameraDistance} showGlyphOverlay={showBodyGlyphs} />
-      <AUGrid />
+      <AUGrid cameraDistance={cameraDistance} />
       <RealAsteroidBelt jd={jd} visible={showAsteroidBelt} onLoad={() => onLoadComplete?.('asteroids')} />
       {visibleBodies.map((p) => {
         const bodyIdx = ALL_BODIES.indexOf(p);

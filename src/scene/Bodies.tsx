@@ -404,10 +404,12 @@ export function OrbitRing({ planet, T, dim, highlighted, cameraDistance = 0 }: {
   planet: PlanetDef; T: number; dim: boolean; highlighted: boolean; cameraDistance?: number;
 }) {
   const pts = useMemo(() => orbitPath(planet, T), [planet, T]);
+  // Fade out orbit rings when camera is very far (deep space views)
+  const farFade = cameraDistance > 500 ? Math.max(0, 1 - (cameraDistance - 500) / 500) : 1;
+  if (farFade <= 0) return null;
   const glow = Math.min(cameraDistance / 50, 4);
   const baseWidth = highlighted ? 1.2 : dim ? 0.3 : 0.6;
-  const baseOpacity = highlighted ? 0.6 : dim ? 0.08 : 0.25;
-  // Use grayscale: #ffffff for highlighted/active, #888888 for dim
+  const baseOpacity = (highlighted ? 0.6 : dim ? 0.08 : 0.25) * farFade;
   const color = highlighted ? '#ffffff' : '#999999';
   return (
     <Line
