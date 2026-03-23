@@ -69,6 +69,56 @@ const SPEED_PRESETS = [
   { label: '100 yr/s', value: 86400 * 365 * 100 },
 ];
 
+// ─── Zoom controls (dispatches wheel events on the canvas) ──────────────────────
+
+function ZoomControls() {
+  const zoom = useCallback((direction: number) => {
+    const canvas = document.querySelector('canvas');
+    if (!canvas) return;
+    canvas.dispatchEvent(new WheelEvent('wheel', {
+      deltaY: direction * 120,
+      bubbles: true,
+    }));
+  }, []);
+
+  const btnStyle: React.CSSProperties = {
+    background: 'rgba(255,255,255,0.06)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: 6,
+    color: 'rgba(255,255,255,0.5)',
+    width: 36, height: 36,
+    cursor: 'pointer',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    padding: 0,
+    fontFamily: 'inherit',
+    backdropFilter: 'blur(8px)',
+  };
+
+  return (
+    <div style={{
+      position: 'absolute', bottom: 20, right: 14,
+      display: 'flex', flexDirection: 'column', gap: 4,
+      zIndex: 5,
+    }}>
+      <button onClick={() => zoom(-1)} aria-label="Zoom in" style={btnStyle}>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+          <circle cx="7" cy="7" r="5" />
+          <line x1="7" y1="5" x2="7" y2="9" />
+          <line x1="5" y1="7" x2="9" y2="7" />
+          <line x1="10.5" y1="10.5" x2="14" y2="14" />
+        </svg>
+      </button>
+      <button onClick={() => zoom(1)} aria-label="Zoom out" style={btnStyle}>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+          <circle cx="7" cy="7" r="5" />
+          <line x1="5" y1="7" x2="9" y2="7" />
+          <line x1="10.5" y1="10.5" x2="14" y2="14" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
 // ─── Date formatter ─────────────────────────────────────────────────────────────
 
 function fmtDate(d: Date) { return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }); }
