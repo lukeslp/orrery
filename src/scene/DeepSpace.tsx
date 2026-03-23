@@ -69,8 +69,8 @@ function MilkyWayBackdrop() {
                 const p2 = raDecToSphere(ring[i+1][0], ring[i+1][1], DEEP_SPACE_SPHERE_RADIUS);
 
                 positions.push(...centerPos, ...p1, ...p2);
-                // Edge-to-center fade for soft look
-                opacities.push(0.4, 0.1, 0.1);
+                // Edge-to-center fade — edges near zero to hide seams
+                opacities.push(0.35, 0.0, 0.0);
               }
             });
           });
@@ -85,7 +85,7 @@ function MilkyWayBackdrop() {
 
   const uniforms = useMemo(() => ({
     time: { value: 0 },
-    globalOpacity: { value: 0.18 },
+    globalOpacity: { value: 0.12 },
   }), []);
 
   useFrame((state) => {
