@@ -8,7 +8,7 @@
  * No emoji anywhere.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import type { NEO, CamPreset } from '../lib/kepler';
 import { ALL_BODIES } from '../data/planets';
 import { getMoonsForPlanet } from '../data/moons';
