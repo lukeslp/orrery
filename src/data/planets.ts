@@ -52,7 +52,6 @@ export const DWARF_PLANETS: PlanetDef[] = [
     aR: 0, eR: 0, IR: 0, LR: 7829.5, wR: 0, oR: 0,
     radius: 0.015, tex: 'mercury' as TexKey, color: '#a0a0a0', period: 1681,
     isDwarf: true,
-    desc: 'Largest object in the asteroid belt. First dwarf planet visited by spacecraft (Dawn, 2015). Contains water ice beneath its surface.',
     distAU: '2.77', moons: 0, type: 'Dwarf Planet', surfaceTemp: '-106\u00b0C', gravity: '0.28 m/s\u00b2',
   },
   {
@@ -60,7 +59,6 @@ export const DWARF_PLANETS: PlanetDef[] = [
     aR: 0, eR: 0, IR: 0, LR: 145.18, wR: 0, oR: 0,
     radius: 0.02, tex: 'mercury' as TexKey, color: '#c8b89a', period: 90560,
     isDwarf: true,
-    desc: 'Once the ninth planet. Has a heart-shaped nitrogen ice plain (Sputnik Planitia). Five known moons including Charon.',
     distAU: '39.48', moons: 5, type: 'Dwarf Planet', surfaceTemp: '-230\u00b0C', gravity: '0.62 m/s\u00b2',
   },
   {
@@ -68,7 +66,6 @@ export const DWARF_PLANETS: PlanetDef[] = [
     aR: 0, eR: 0, IR: 0, LR: 64.39, wR: 0, oR: 0,
     radius: 0.02, tex: 'mercury' as TexKey, color: '#e0ddd5', period: 203830,
     isDwarf: true,
-    desc: 'Most massive dwarf planet. Its discovery triggered Pluto\'s reclassification. Orbits far beyond Neptune with extreme inclination.',
     distAU: '67.67', moons: 1, type: 'Dwarf Planet', surfaceTemp: '-243\u00b0C', gravity: '0.82 m/s\u00b2',
   },
 ];
