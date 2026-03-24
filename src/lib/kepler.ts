@@ -146,19 +146,22 @@ export function neoXYZ(
   a: number, e: number, I_deg: number, Om_deg: number, w_deg: number,
   ma_deg: number, epoch_jd: number, current_jd: number,
 ): [number, number, number] {
+  if (!isFinite(a) || a <= 0 || !isFinite(e) || e < 0 || e >= 1) return [0, 0, 0];
   // Propagate mean anomaly: n = 0.9856076686 / sqrt(a^3) deg/day
   const n = 0.9856076686 / Math.sqrt(a * a * a);
   const dt = current_jd - epoch_jd;
   const M = ma_deg + n * dt;
 
   const I = I_deg * DEG, Om = Om_deg * DEG, w = w_deg * DEG;
-  const E = solveKepler(M, e);
-  const xp = a * (Math.cos(E) - e);
-  const yp = a * Math.sqrt(1 - e * e) * Math.sin(E);
+  const E = solveKepler(M, Math.min(e, 0.99));
+  const ec = Math.min(e, 0.99);
+  const xp = a * (Math.cos(E) - ec);
+  const yp = a * Math.sqrt(1 - ec * ec) * Math.sin(E);
   const cw = Math.cos(w), sw = Math.sin(w), co = Math.cos(Om), so = Math.sin(Om), ci = Math.cos(I), si = Math.sin(I);
   const x = (cw * co - sw * so * ci) * xp + (-sw * co - cw * so * ci) * yp;
   const y = (cw * so + sw * co * ci) * xp + (-sw * so + cw * co * ci) * yp;
   const z = (sw * si) * xp + (cw * si) * yp;
+  if (!isFinite(x) || !isFinite(y) || !isFinite(z)) return [0, 0, 0];
   return [x, z, -y];
 }
 
