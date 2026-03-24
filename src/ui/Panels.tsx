@@ -1518,19 +1518,6 @@ export default function Panels(props: PanelProps) {
               backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
             }}
           >{'\u2726'}</button>
-          <button
-            onClick={() => setShowInfo(p => !p)}
-            aria-label="About this orrery"
-            style={{
-              padding: '6px 8px',
-              fontSize: 12, fontFamily: 'inherit', fontWeight: showInfo ? 600 : 400,
-              color: showInfo ? accent : 'rgba(255,255,255,0.7)',
-              background: showInfo ? `rgba(${accentRgb},0.15)` : 'rgba(0,0,0,0.4)',
-              border: `1px solid ${showInfo ? `rgba(${accentRgb},0.25)` : 'rgba(255,255,255,0.06)'}`,
-              borderRadius: 3, cursor: 'pointer',
-              backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
-            }}
-          >?</button>
         </div>
       )}
 
