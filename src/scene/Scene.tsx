@@ -54,7 +54,6 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, cinematicRotate
   cinematic: boolean;
   camPreset?: CamPreset | null;
   cinematicRotateSpeed: number;
-  stepDuration: number;
   onCameraDistance?: (d: number) => void;
 }) {
   const { camera } = useThree();
