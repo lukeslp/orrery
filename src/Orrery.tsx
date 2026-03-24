@@ -312,7 +312,7 @@ function OrreryInner() {
     }, 500);
 
     return () => clearInterval(id);
-  }, [cinematic, sceneReady, applyCinematicStep, cinematicSteps]);
+  }, [cinematic, sceneReady, applyCinematicStep, cinematicSteps, exitCinematicToInteractive]);
 
   // Prefetch tour-essential datasets when cinematic starts
   useEffect(() => {
