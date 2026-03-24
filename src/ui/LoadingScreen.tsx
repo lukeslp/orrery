@@ -33,7 +33,7 @@ export default function LoadingScreen({ ready, progress = 0 }: { ready: boolean;
       }}
     >
       <div style={{
-        color: 'rgba(255,255,255,0.35)',
+        color: 'rgba(255,255,255,0.55)',
         fontSize: 32, letterSpacing: 12,
         textTransform: 'uppercase', fontWeight: 300,
         marginBottom: 14,
@@ -42,7 +42,7 @@ export default function LoadingScreen({ ready, progress = 0 }: { ready: boolean;
       </div>
 
       <div style={{
-        color: 'rgba(255,255,255,0.2)',
+        color: 'rgba(255,255,255,0.4)',
         fontSize: 18, fontStyle: 'italic',
         fontWeight: 300, letterSpacing: 2,
         marginBottom: 32,
