@@ -1038,6 +1038,7 @@ export default function Panels(props: PanelProps) {
   const mobile = useIsMobile();
   const [panelPeek, setPanelPeek] = useState(false);
   const [cardMinimized, setCardMinimized] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
   const [panelNudge, setPanelNudge] = useState(false);
   const [panelFontScale, setPanelFontScale] = useState(loadPanelFontScale);
   const sp = selPlanet !== null ? ALL_BODIES[selPlanet] : null;
