@@ -24,7 +24,8 @@
       "Read(//usr/local/lib/python3.10/dist-packages/**)",
       "Bash(aider --version)",
       "Bash(sudo caddy:*)",
-      "mcp__plugin_playwright_playwright__browser_evaluate"
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "mcp__plugin_playwright_playwright__browser_run_code"
     ]
   },
   "enableAllProjectMcpServers": true,
