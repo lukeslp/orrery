@@ -227,8 +227,7 @@ function OrreryInner() {
     setCinematic(false);
     setShowStars(true);
     setShowConstellations(true);
-    // Don't enable heavy layers on exit — prevents GPU spike / browser crash
-    // User can enable via presets (Oort auto-enables deep space) or keyboard
+    setShowDeepSky(true);
     setSelPlanet(2);
     setCamIdx(-1);
     setSelMoonIdx(null);
