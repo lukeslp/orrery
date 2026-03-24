@@ -483,16 +483,16 @@ function OrreryInner() {
   const handlePlanetSelect = useCallback((idx: number | null) => {
     if (cinematic) return;
 
-    setSelPlanet(idx);
-    setSelMoonIdx(null);
-    setCamIdx(-1);
     if (idx !== null) {
+      setSelPlanet(idx);
+      setSelMoonIdx(null);
+      setCamIdx(-1);
       const pos = positionsRef.current.get(idx);
       if (pos) setFocusTarget({ planetIdx: idx, pos });
       setNavStack(['Solar System', ALL_BODIES[idx].name]);
     } else {
-      setFocusTarget(null);
-      setNavStack(['Solar System']);
+      // Deselecting — zoom back to appropriate level
+      navigateBack();
     }
   }, [cinematic]);
 
