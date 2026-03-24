@@ -1540,7 +1540,18 @@ export default function Panels(props: PanelProps) {
               <a href="https://datapoems.io" target="_blank" rel="noopener noreferrer" style={{ color: accent, fontSize: 14, textDecoration: 'none', fontWeight: 400 }}>datapoems.io</a>
             </div>
 
-            <div style={{ marginTop: 20, textAlign: 'center' }}>
+            {/* Easter egg */}
+            <div style={{ marginTop: 28, padding: '12px 0', borderTop: '1px solid rgba(255,255,255,0.04)', textAlign: 'center' }}>
+              <div style={{ color: 'rgba(255,255,255,0.12)', fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 6 }}>Galactic Center</div>
+              <div style={{ color: 'rgba(255,255,255,0.18)', fontSize: 11, fontStyle: 'italic', fontWeight: 300, lineHeight: 1.6 }}>
+                Sagittarius A* {'\u00b7'} 26,000 light-years {'\u00b7'} 4 million solar masses
+              </div>
+              <div style={{ color: 'rgba(255,255,255,0.10)', fontSize: 9, fontStyle: 'italic', fontWeight: 300, marginTop: 4 }}>
+                You are here.
+              </div>
+            </div>
+
+            <div style={{ marginTop: 12, textAlign: 'center' }}>
               <button onClick={() => setShowInfo(false)} style={{
                 background: 'none', border: `1px solid rgba(${accentRgb},0.2)`, color: 'rgba(255,255,255,0.4)',
                 fontSize: 12, fontFamily: 'inherit', padding: '8px 20px', borderRadius: 4, cursor: 'pointer',
