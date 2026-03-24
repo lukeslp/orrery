@@ -47,13 +47,14 @@ interface MwGeoJson {
 
 function MilkyWayBackdrop() {
   const [geometry, setGeometry] = useState<THREE.BufferGeometry | null>(null);
+  const materialRef = useRef<THREE.ShaderMaterial | null>(null);
 
   useEffect(() => {
     fetch(MW_DATA_PATH)
       .then(r => r.json())
       .then((data: MwGeoJson) => {
-        const pts: number[] = [];
-        const sizes: number[] = [];
+        const positions: number[] = [];
+        const opacities: number[] = [];
 
         data.features.forEach((feature) => {
           feature.geometry.coordinates.forEach((polygon) => {
@@ -61,75 +62,79 @@ function MilkyWayBackdrop() {
               if (ring.length < 3) return;
               const centerRa = ring.reduce((sum, p) => sum + p[0], 0) / ring.length;
               const centerDec = ring.reduce((sum, p) => sum + p[1], 0) / ring.length;
-
-              // Center point (brighter)
-              const cp = raDecToSphere(centerRa, centerDec, DEEP_SPACE_SPHERE_RADIUS);
-              pts.push(...cp);
-              sizes.push(5.0 + Math.random() * 3.0);
+              const centerPos = raDecToSphere(centerRa, centerDec, DEEP_SPACE_SPHERE_RADIUS);
 
               for (let i = 0; i < ring.length - 1; i++) {
-                const [ra1, dec1] = ring[i];
-                const [ra2, dec2] = ring[i + 1];
+                const p1 = raDecToSphere(ring[i][0], ring[i][1], DEEP_SPACE_SPHERE_RADIUS);
+                const p2 = raDecToSphere(ring[i + 1][0], ring[i + 1][1], DEEP_SPACE_SPHERE_RADIUS);
 
-                // Points along edges
-                const steps = 4;
-                for (let s = 0; s <= steps; s++) {
-                  const t = s / steps;
-                  const ra = ra1 + (ra2 - ra1) * t;
-                  const dec = dec1 + (dec2 - dec1) * t;
-                  pts.push(...raDecToSphere(ra, dec, DEEP_SPACE_SPHERE_RADIUS));
-                  sizes.push(2.5 + Math.random() * 3.5);
-                }
-
-                // Interior fill: random points between center and edge
-                for (let f = 0; f < 2; f++) {
-                  const blend = 0.2 + Math.random() * 0.6;
-                  const edgeT = Math.random();
-                  const ra = centerRa + (ra1 + (ra2 - ra1) * edgeT - centerRa) * blend;
-                  const dec = centerDec + (dec1 + (dec2 - dec1) * edgeT - centerDec) * blend;
-                  pts.push(...raDecToSphere(ra, dec, DEEP_SPACE_SPHERE_RADIUS));
-                  sizes.push(2.0 + Math.random() * 4.0);
-                }
+                positions.push(...centerPos, ...p1, ...p2);
+                // Uniform opacity across all vertices — no gradient = no seam lines
+                opacities.push(0.15, 0.15, 0.15);
               }
             });
           });
         });
 
         const geo = new THREE.BufferGeometry();
-        geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pts), 3));
-        geo.setAttribute('size', new THREE.BufferAttribute(new Float32Array(sizes), 1));
+        geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+        geo.setAttribute('opacity', new THREE.BufferAttribute(new Float32Array(opacities), 1));
         setGeometry(geo);
       });
   }, []);
 
-  const material = useMemo(() => new THREE.ShaderMaterial({
-    vertexShader: `
-      attribute float size;
-      void main() {
-        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-        gl_PointSize = size;
-        gl_Position = projectionMatrix * mvPosition;
-      }
-    `,
-    fragmentShader: `
-      void main() {
-        float d = length(gl_PointCoord - vec2(0.5));
-        if (d > 0.5) discard;
-        float alpha = 0.10 * smoothstep(0.5, 0.0, d);
-        vec3 color = mix(vec3(0.1, 0.12, 0.2), vec3(0.8, 0.85, 1.0), smoothstep(0.4, 0.0, d));
-        gl_FragColor = vec4(color, alpha);
-      }
-    `,
-    transparent: true,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
+  const uniforms = useMemo(() => ({
+    time: { value: 0 },
+    globalOpacity: { value: 0.18 },
   }), []);
+
+  useFrame((state) => {
+    if (materialRef.current) {
+      materialRef.current.uniforms.time.value = state.clock.elapsedTime;
+    }
+  });
 
   if (!geometry) return null;
 
   return (
     <group rotation={[ECLIPTIC_TILT, 0, 0]}>
-      <points geometry={geometry} material={material} />
+      <mesh geometry={geometry}>
+        <shaderMaterial
+          ref={materialRef}
+          transparent
+          depthWrite={false}
+          blending={THREE.NormalBlending}
+          side={THREE.FrontSide}
+          uniforms={uniforms}
+          vertexShader={`
+            attribute float opacity;
+            varying float vOpacity;
+            varying vec3 vNormal;
+            void main() {
+              vOpacity = opacity;
+              vNormal = normalize(position);
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `}
+          fragmentShader={`
+            varying float vOpacity;
+            varying vec3 vNormal;
+            uniform float time;
+            uniform float globalOpacity;
+
+            float noise(vec3 p) {
+              return fract(sin(dot(p, vec3(12.9898, 78.233, 45.164))) * 43758.5453);
+            }
+
+            void main() {
+              float n = noise(vNormal * 100.0 + time * 0.05);
+              float finalAlpha = vOpacity * globalOpacity * (0.8 + 0.2 * n);
+              vec3 color = mix(vec3(0.05, 0.08, 0.15), vec3(0.85, 0.9, 1.0), vOpacity * 1.5);
+              gl_FragColor = vec4(color, finalAlpha);
+            }
+          `}
+        />
+      </mesh>
     </group>
   );
 }
