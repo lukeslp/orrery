@@ -1379,6 +1379,28 @@ export default function Panels(props: PanelProps) {
                   </span>
                 ))}
               </div>
+              {/* Stargazer toggle in card */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setConstellationFocus(p => !p);
+                    if (!constellationFocus) {
+                      setShowStars(() => true);
+                      setShowConstellations(() => true);
+                      setShowDeepSky(() => true);
+                    }
+                  }}
+                  style={{
+                    background: constellationFocus ? `rgba(${accentRgb},0.15)` : 'transparent',
+                    border: `1px solid ${constellationFocus ? `rgba(${accentRgb},0.3)` : 'rgba(255,255,255,0.1)'}`,
+                    borderRadius: 4, padding: '4px 10px',
+                    color: constellationFocus ? accent : 'rgba(255,255,255,0.5)',
+                    fontSize: 11, fontFamily: 'inherit', fontWeight: 300,
+                    cursor: 'pointer',
+                  }}
+                >{'\u2726'} Stargazer</button>
+              </div>
             </>
           )}
         </div>
