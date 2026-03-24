@@ -530,6 +530,22 @@ function OrreryInner() {
       setConstellationFocus(true);
       setShowDeepSky(true);
     }
+    // Deep-space presets: auto-enable required layers
+    if (preset.label === 'Oort') {
+      setShowDeepSpace(true);
+      setShowDeepSky(true);
+      setShowDwarf(true);
+    }
+    if (preset.label === 'Kuiper') {
+      setShowDwarf(true);
+      setShowDeepSky(true);
+    }
+    if (preset.label === 'Outer') {
+      setShowDwarf(true);
+    }
+    if (preset.label === 'Belt') {
+      setShowAsteroidBelt(true);
+    }
   }, []);
 
   // Keyboard shortcuts
