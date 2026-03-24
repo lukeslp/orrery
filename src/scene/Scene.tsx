@@ -423,7 +423,6 @@ export default function Scene({
         cinematic={cinematic}
         camPreset={camPreset}
         cinematicRotateSpeed={cinematicRotateSpeed}
-        stepDuration={stepDuration}
         onCameraDistance={handleCameraDistance}
       />
     </>
