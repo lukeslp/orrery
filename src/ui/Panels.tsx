@@ -1431,10 +1431,13 @@ export default function Panels(props: PanelProps) {
       )}
 
 
-      {/* ── Title watermark ── */}
+      {/* ── Title watermark (clickable → info overlay) ── */}
       <div
-        aria-hidden="true"
-        style={{ position: 'absolute', top: 14, left: 14, color: 'rgba(255,255,255,0.15)', fontSize: mobile ? 14 : 15, letterSpacing: 5, textTransform: 'uppercase', zIndex: 5, fontWeight: 300 }}
+        role="button"
+        tabIndex={0}
+        onClick={() => setShowInfo(p => !p)}
+        onKeyDown={e => { if (e.key === 'Enter') setShowInfo(p => !p); }}
+        style={{ position: 'absolute', top: 14, left: 14, color: 'rgba(255,255,255,0.15)', fontSize: mobile ? 14 : 15, letterSpacing: 5, textTransform: 'uppercase', zIndex: 5, fontWeight: 300, cursor: 'pointer' }}
       >
         Orrery
       </div>
