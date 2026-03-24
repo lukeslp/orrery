@@ -1305,12 +1305,12 @@ export default function Panels(props: PanelProps) {
             zIndex: 20,
           }}
         >
-          {/* Header — tap to collapse/expand */}
-          <div
-            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: 'pointer' }}
-            onClick={(e) => { e.stopPropagation(); setCardMinimized(m => !m); }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* Header with back button */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div
+              style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', flex: 1 }}
+              onClick={(e) => { e.stopPropagation(); setCardMinimized(m => !m); }}
+            >
               <span style={{
                 width: 12, height: 12, borderRadius: '50%',
                 background: selectedMoon ? selectedMoon.color : sp!.color,
@@ -1328,7 +1328,20 @@ export default function Panels(props: PanelProps) {
                 )}
               </div>
             </div>
-            <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, padding: '4px 8px', fontWeight: 300 }}>{cardMinimized ? '\u25b8' : '\u25be'}</span>
+            <button
+              onClick={(e) => { e.stopPropagation(); props.navigateBack(); }}
+              style={{
+                background: `rgba(${accentRgb},0.12)`,
+                border: `1px solid rgba(${accentRgb},0.25)`,
+                borderRadius: 4, padding: mobile ? '8px 14px' : '6px 12px',
+                color: accent, fontSize: mobile ? 13 : 12,
+                fontFamily: 'inherit', fontWeight: 400, letterSpacing: 0.5,
+                cursor: 'pointer', whiteSpace: 'nowrap',
+                minHeight: mobile ? 40 : 32,
+              }}
+            >
+              {'\u2190'} Back
+            </button>
           </div>
 
           {/* Collapsible body */}
