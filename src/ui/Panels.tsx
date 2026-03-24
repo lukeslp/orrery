@@ -1504,7 +1504,7 @@ export default function Panels(props: PanelProps) {
       )}
 
       {/* ── Info overlay (mobile ? button) ── */}
-      {showInfo && mobile && (
+      {showInfo && (
         <div
           onClick={() => setShowInfo(false)}
           style={{
@@ -1552,13 +1552,13 @@ export default function Panels(props: PanelProps) {
               <a href="https://datapoems.io" target="_blank" rel="noopener noreferrer" style={{ color: accent, fontSize: 14, textDecoration: 'none', fontWeight: 400 }}>datapoems.io</a>
             </div>
 
-            {/* Easter egg */}
-            <div style={{ marginTop: 28, padding: '12px 0', borderTop: '1px solid rgba(255,255,255,0.04)', textAlign: 'center' }}>
-              <div style={{ color: 'rgba(255,255,255,0.12)', fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 6 }}>Galactic Center</div>
-              <div style={{ color: 'rgba(255,255,255,0.18)', fontSize: 11, fontStyle: 'italic', fontWeight: 300, lineHeight: 1.6 }}>
-                Sagittarius A* {'\u00b7'} 26,000 light-years {'\u00b7'} 4 million solar masses
+            {/* Galactic Center */}
+            <div style={{ marginTop: 28, padding: '14px 0', borderTop: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }}>
+              <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 10, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 }}>Galactic Center</div>
+              <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, fontStyle: 'italic', fontWeight: 300, lineHeight: 1.6 }}>
+                Sagittarius A* {'\u00b7'} 26,000 ly {'\u00b7'} 4M solar masses
               </div>
-              <div style={{ color: 'rgba(255,255,255,0.10)', fontSize: 9, fontStyle: 'italic', fontWeight: 300, marginTop: 4 }}>
+              <div style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11, fontStyle: 'italic', fontWeight: 300, marginTop: 6 }}>
                 You are here.
               </div>
             </div>
