@@ -685,7 +685,7 @@ function OrreryInner() {
             showSatellites={showSatellites}
             showDeepSky={showDeepSky}
             showDeepSpace={showDeepSpace}
-            onConstellationSelect={(id) => { setSelConstellation(id); setPanelOpen(true); }}
+            onConstellationSelect={(id) => { setSelConstellation(id); }}
             constellationFocus={constellationFocus}
             cinematic={cinematic}
             cinematicRotateSpeed={cinematicRotateSpeed}
