@@ -223,16 +223,13 @@ function OrreryInner() {
   }, []);
 
   const exitCinematicToInteractive = useCallback(() => {
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     const earthPos = positionsRef.current.get(2);
 
     setCinematic(false);
     setShowStars(true);
     setShowConstellations(true);
-    setShowAsteroidBelt(true);
-    setShowDwarf(true);
-    setShowDeepSky(!isMobile);
-    setShowDeepSpace(!isMobile);
+    // Don't enable heavy layers on exit — prevents GPU spike / browser crash
+    // User can enable via presets (Oort auto-enables deep space) or keyboard
     setSelPlanet(2);
     setCamIdx(-1);
     setSelMoonIdx(null);
