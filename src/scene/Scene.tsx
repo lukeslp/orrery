@@ -343,7 +343,7 @@ export default function Scene({
             <Planet
               planet={p} T={T}
               selected={selPlanet === bodyIdx}
-              onSelect={() => setSelPlanet(selPlanet === bodyIdx ? null : bodyIdx)}
+              onSelect={() => setSelPlanet(bodyIdx)}
               hovered={hov === bodyIdx}
               onHover={h => setHov(h ? bodyIdx : null)}
               moonFocused={focusTarget?.planetIdx === bodyIdx && focusTarget?.moonIdx !== undefined}
