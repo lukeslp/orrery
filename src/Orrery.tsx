@@ -587,6 +587,10 @@ function OrreryInner() {
         handlePresetSelect(10);
         return;
       }
+      if (e.key === '=') {
+        handlePresetSelect(11);
+        return;
+      }
 
       if (k === 'm') { setPanelOpen(p => !p); return; }
       if (k === 'n') setShowNeo(p => !p);
