@@ -1362,7 +1362,7 @@ export default function Panels(props: PanelProps) {
           role="dialog"
           aria-label={`${selNeo.name} details`}
           style={{
-            position: 'absolute', bottom: mobile ? (panelOpen ? `calc(${mobilePanelHeight} + 16px)` : 16) : 56,
+            position: 'absolute', bottom: mobile ? (panelOpen ? `calc(${mobilePanelHeight} + 16px)` : 64) : 56,
             left: '50%', transform: 'translateX(-50%)',
             ...bokehCard, padding: '12px 18px', maxWidth: 420,
             width: mobile ? 'calc(100vw - 16px)' : '90%', zIndex: 20,
