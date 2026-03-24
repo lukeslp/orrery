@@ -1124,8 +1124,8 @@ export default function Panels(props: PanelProps) {
           </div>
           {/* Current zoom label -- below time cluster */}
           <div style={{
-            marginTop: mobile ? 8 : 12,
-            fontSize: mobile ? 14 : 18, fontWeight: 300, letterSpacing: 4,
+            marginTop: mobile ? 10 : 14,
+            fontSize: mobile ? 18 : 22, fontWeight: 300, letterSpacing: 5,
             color: 'rgba(255,255,255,0.35)',
             textTransform: 'uppercase',
           }}>
@@ -1135,11 +1135,11 @@ export default function Panels(props: PanelProps) {
 
         {/* Exit hint */}
         <div style={{
-          position: 'absolute', bottom: mobile ? (panelVisible ? `calc(${mobilePanelHeight} + 16px)` : 60) : 56,
-          color: 'rgba(255,255,255,0.3)', fontSize: 11,
-          letterSpacing: 2, fontWeight: 300, fontStyle: 'italic',
+          position: 'absolute', bottom: mobile ? 48 : 56,
+          color: 'rgba(255,255,255,0.35)', fontSize: mobile ? 16 : 18,
+          letterSpacing: 3, fontWeight: 300, fontStyle: 'italic',
         }}>
-          click or press any key to explore
+          tap to explore
         </div>
         {/* Watermark */}
         <div style={{
