@@ -306,7 +306,7 @@ export function Satellite({ moon, parentPos, jd, selected, onSelect, hovered, on
 
   useFrame((_, dt) => { if (ref.current) ref.current.rotation.y += dt * 0.05; });
 
-  const moonHitRadius = Math.max(moon.radius * 5, 0.02);
+  const moonHitRadius = Math.max(moon.radius * 8, 0.04);
 
   return (
     <group>
