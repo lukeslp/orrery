@@ -352,7 +352,6 @@ export default function Scene({
               hovered={hov === bodyIdx}
               onHover={h => setHov(h ? bodyIdx : null)}
               moonFocused={focusTarget?.planetIdx === bodyIdx && focusTarget?.moonIdx !== undefined}
-              cameraDistance={cameraDistance}
               showGlyphOverlay={showBodyGlyphs}
             />
           </group>
