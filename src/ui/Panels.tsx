@@ -953,6 +953,26 @@ function SideDrawer({
         </MiniAccordion>
         </div>
       </AccordionSection>
+
+      {/* Built By — always visible, not collapsible */}
+      <div style={{ padding: '12px 16px 6px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+        <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, fontWeight: 400 }}>Luke Steuber</div>
+        <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
+          <a href="https://lukesteuber.com" target="_blank" rel="noopener noreferrer" style={{ color: accent, fontSize: 11, textDecoration: 'none', fontWeight: 300 }}>lukesteuber.com</a>
+          <a href="https://datapoems.io" target="_blank" rel="noopener noreferrer" style={{ color: accent, fontSize: 11, textDecoration: 'none', fontWeight: 300 }}>datapoems.io</a>
+        </div>
+      </div>
+
+      {/* Galactic Center — always visible */}
+      <div style={{ padding: '8px 16px 16px', textAlign: 'center' }}>
+        <div style={{ color: 'rgba(255,255,255,0.2)', fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>Galactic Center</div>
+        <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 10, fontStyle: 'italic', fontWeight: 300 }}>
+          Sgr A* {'\u00b7'} 26,000 ly {'\u00b7'} 4M M{'\u2609'}
+        </div>
+        <div style={{ color: 'rgba(255,255,255,0.15)', fontSize: 9, fontStyle: 'italic', fontWeight: 300, marginTop: 2 }}>
+          You are here.
+        </div>
+      </div>
       </>
       )}
     </div>
