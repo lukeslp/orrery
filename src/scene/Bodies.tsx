@@ -85,13 +85,6 @@ export function Sun({ cameraDistance = 0, showGlyphOverlay = false }: { cameraDi
         <sphereGeometry args={[0.15, 48, 48]} />
         <meshBasicMaterial map={tex} toneMapped={false} />
       </mesh>
-      {/* Distance-adaptive glow — keeps Sun visible as a bright dot at far zoom */}
-      {cameraDistance > 5 && (
-        <mesh>
-          <sphereGeometry args={[Math.min(cameraDistance / 60, 2.5) * 0.15, 32, 32]} />
-          <meshBasicMaterial color="#ffcc66" transparent opacity={0.25} blending={THREE.AdditiveBlending} toneMapped={false} depthWrite={false} />
-        </mesh>
-      )}
       {showGlyphOverlay && (
         <BodyGlyph symbolKey="Sol" color="rgba(255,196,108,0.95)" distanceFactor={0.86} size={92} />
       )}
