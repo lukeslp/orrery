@@ -491,10 +491,22 @@ function OrreryInner() {
       if (pos) setFocusTarget({ planetIdx: idx, pos });
       setNavStack(['Solar System', ALL_BODIES[idx].name]);
     } else {
-      // Deselecting — zoom back to appropriate level
-      navigateBack();
+      // Deselecting — zoom back to appropriate level for the current planet
+      const prev = selPlanet;
+      let camTarget = 0; // Inner
+      if (prev !== null) {
+        const a = ALL_BODIES[prev].a;
+        if (a > 5) camTarget = 1;
+        if (a > 20) camTarget = 4;
+        if (a > 40) camTarget = 5;
+      }
+      setSelPlanet(null);
+      setFocusTarget(null);
+      setSelMoonIdx(null);
+      setCamIdx(camTarget);
+      setNavStack(['Solar System']);
     }
-  }, [cinematic]);
+  }, [cinematic, selPlanet]);
 
   // Moon selection drill-down
   const handleMoonSelect = useCallback((planetIdx: number, moonIdx: number) => {
