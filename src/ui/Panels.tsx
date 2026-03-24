@@ -609,7 +609,7 @@ function SideDrawer({
         const groups: { title: string; items: { label: string; idx: number }[] }[] = [
           { title: 'Close', items: ['Sun', 'Inner', 'Belt'].map(l => ({ label: l, idx: cams.findIndex(c => c.label === l) })).filter(x => x.idx >= 0) },
           { title: 'System', items: ['System', 'Top', 'Ecliptic'].map(l => ({ label: l, idx: cams.findIndex(c => c.label === l) })).filter(x => x.idx >= 0) },
-          { title: 'Deep', items: ['Outer', 'Kuiper', 'Oort'].map(l => ({ label: l, idx: cams.findIndex(c => c.label === l) })).filter(x => x.idx >= 0) },
+          { title: 'Deep', items: ['Outer', 'Kuiper', 'Oort', 'Stellar'].map(l => ({ label: l, idx: cams.findIndex(c => c.label === l) })).filter(x => x.idx >= 0) },
           { title: 'Views', items: ['Screensaver', 'Stargazer'].map(l => ({ label: l, idx: cams.findIndex(c => c.label === l) })).filter(x => x.idx >= 0) },
         ];
         const btnStyle = {
