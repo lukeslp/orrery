@@ -1121,10 +1121,10 @@ export default function Panels(props: PanelProps) {
             {fmtDate(simTime)}
           </span>
           <div style={{
-            display: 'flex', alignItems: 'center', gap: mobile ? 10 : 16,
-            marginTop: 6,
+            display: 'flex', alignItems: 'center', gap: mobile ? 8 : 12,
+            marginTop: 4, opacity: 0.4,
           }}>
-            <span style={dim}>{moon.name}, {moon.ill}%</span>
+            <span style={{ ...dim, fontSize: mobile ? 11 : 12 }}>{moon.name}, {moon.ill}%</span>
             {solarWind && (
               <>
                 <span style={{ ...dim, color: 'rgba(255,255,255,0.12)' }}>{'\u00b7'}</span>
