@@ -213,7 +213,6 @@ export function Planet({ planet, T, selected, onSelect, hovered, onHover, moonFo
   const pos = useMemo(() => planetXYZ(planet, T), [planet, T]);
   const tex = useLoader(THREE.TextureLoader, TEX[planet.tex]);
   const r = planet.radius;
-  const glow = Math.min(cameraDistance / 80, 1.8);
   const labelScale = planetLabelScale(r);
   const labelDistanceFactor = THREE.MathUtils.lerp(1.2, 3, labelScale / 1.5);
   const labelFontSize = THREE.MathUtils.lerp(5.2, 9.4, labelScale / 1.5);

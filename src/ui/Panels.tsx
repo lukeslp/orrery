@@ -1076,20 +1076,16 @@ export default function Panels(props: PanelProps) {
 
   // Rotating data facts for cinematic
   const TOUR_FACTS = [
-    '41,119 stars \u00b7 HYG Database \u00b7 plotted by magnitude, B\u2013V color index',
-    '88 constellations \u00b7 IAU stick figures \u00b7 d3-celestial GeoJSON',
-    '8 planets + 3 dwarfs \u00b7 JPL Keplerian elements \u00b7 J2000 epoch with secular rates',
-    '32 moons \u00b7 real orbital periods, semi-major axes, and inclinations',
-    '3,000 main-belt asteroids \u00b7 Kirkwood gaps at 2.50, 2.82, 2.95 AU',
-    '110+ deep sky objects \u00b7 Messier + bright NGC/IC \u00b7 OpenNGC catalog',
-    'Live near-Earth objects \u00b7 NASA NeoWs API \u00b7 updated daily',
-    'Asteroid orbits on demand \u00b7 JPL Small-Body Database \u00b7 6 orbital elements',
-    'Live solar wind \u00b7 NOAA Space Weather Prediction Center',
-    'Satellite TLEs \u00b7 CelesTrak \u00b7 ISS + active stations propagated via SGP4',
-    '14 meteor showers \u00b7 IAU Meteor Data Center \u00b7 solar longitude activity windows',
-    '20+ comets \u00b7 Minor Planet Center \u00b7 perihelion, eccentricity, inclination',
-    '5 interstellar spacecraft \u00b7 Voyager 1 at 165 AU \u00b7 Voyager 2 at 139 AU',
-    'Planet textures \u00b7 Solar System Scope \u00b7 2K mobile / 4K desktop \u00b7 CC BY 4.0',
+    '41,119 stars \u00b7 88 constellations \u00b7 HYG Database + d3-celestial',
+    '8 planets \u00b7 3 dwarf planets \u00b7 32 moons \u00b7 JPL Horizons',
+    '3,000 main-belt asteroids \u00b7 20+ comets \u00b7 Minor Planet Center',
+    '110+ deep sky objects \u00b7 14 meteor showers \u00b7 OpenNGC + IAU MDC',
+    '5 spacecraft \u00b7 Voyager 1 at 165 AU \u00b7 New Horizons at 63 AU',
+    'Live: near-Earth objects \u00b7 NASA NeoWs \u00b7 updated daily',
+    'Live: solar wind speed \u00b7 NOAA Space Weather Prediction Center',
+    'Live: satellite positions \u00b7 CelesTrak TLEs \u00b7 SGP4 propagation',
+    'Live: asteroid orbits on demand \u00b7 JPL Small-Body Database',
+    '2K/4K planet textures \u00b7 Solar System Scope \u00b7 CC BY 4.0',
   ];
   const [factIdx, setFactIdx] = useState(0);
   useEffect(() => {
