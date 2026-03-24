@@ -141,7 +141,7 @@ export function DeepSkyField({ visible, onLoad }: { visible: boolean; onLoad?: (
       void main() {
         float d = length(gl_PointCoord - vec2(0.5));
         if (d > 0.5) discard;
-        float alpha = 0.7 * smoothstep(0.5, 0.05, d);
+        float alpha = 0.35 * smoothstep(0.5, 0.05, d);
         gl_FragColor = vec4(vColor, alpha);
       }
     `,

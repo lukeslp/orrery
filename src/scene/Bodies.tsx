@@ -88,7 +88,7 @@ export function Sun({ cameraDistance = 0, showGlyphOverlay = false }: { cameraDi
       {/* Main textured photosphere */}
       <mesh ref={ref}>
         <sphereGeometry args={[0.146, 64, 64]} />
-        <meshBasicMaterial map={tex} toneMapped={false} color="#fff7ec" transparent opacity={0.96} depthWrite={false} />
+        <meshBasicMaterial map={tex} toneMapped={false} color="#fff7ec" />
       </mesh>
       {/* Thin chromosphere tint */}
       <mesh>
