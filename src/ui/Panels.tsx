@@ -1143,10 +1143,9 @@ export default function Panels(props: PanelProps) {
         </div>
         {/* Watermark */}
         <div style={{
-          position: 'absolute', bottom: 32,
-          color: 'rgba(255,255,255,0.12)', fontSize: 11,
-          letterSpacing: 6, textTransform: 'uppercase', fontWeight: 300,
-          display: mobile ? 'none' : 'block',
+          position: 'absolute', bottom: mobile ? 20 : 28,
+          color: 'rgba(255,255,255,0.12)', fontSize: mobile ? 14 : 16,
+          letterSpacing: 8, textTransform: 'uppercase', fontWeight: 300,
         }}>
           Orrery
         </div>
@@ -1418,7 +1417,7 @@ export default function Panels(props: PanelProps) {
       {/* ── Title watermark ── */}
       <div
         aria-hidden="true"
-        style={{ position: 'absolute', top: 14, left: 14, color: 'rgba(255,255,255,0.15)', fontSize: 11, letterSpacing: 4, textTransform: 'uppercase', zIndex: 5, fontWeight: 300 }}
+        style={{ position: 'absolute', top: 14, left: 14, color: 'rgba(255,255,255,0.15)', fontSize: mobile ? 14 : 15, letterSpacing: 5, textTransform: 'uppercase', zIndex: 5, fontWeight: 300 }}
       >
         Orrery
       </div>
