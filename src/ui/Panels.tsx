@@ -1074,6 +1074,32 @@ export default function Panels(props: PanelProps) {
   // Current body label from nav stack
   const cinematicLabel = navStack[navStack.length - 1] || '';
 
+  // Rotating data facts for cinematic
+  const TOUR_FACTS = [
+    'Positions computed from JPL Keplerian elements (J2000 epoch)',
+    '41,000 stars from the HYG database plotted by magnitude and color',
+    '88 constellations with IAU boundary lines',
+    'Near-Earth objects fetched live from NASA NeoWs API',
+    'Asteroid orbital elements from JPL Small-Body Database',
+    'Solar wind speed from NOAA Space Weather Prediction Center',
+    '32 moons with real orbital periods and inclinations',
+    '3,000 main-belt asteroids with Kirkwood gap distribution',
+    'Milky Way outline from d3-celestial GeoJSON catalog',
+    'Satellite positions propagated from CelesTrak TLE data',
+    'Comet orbits computed from Minor Planet Center elements',
+    'Planet textures: Solar System Scope (CC BY 4.0)',
+    'Deep sky: Messier and bright NGC/IC objects from OpenNGC',
+    'Meteor shower radiants from IAU Meteor Data Center',
+  ];
+  const [factIdx, setFactIdx] = useState(0);
+  useEffect(() => {
+    if (!cinematic) return;
+    setFactIdx(Math.floor(Math.random() * TOUR_FACTS.length));
+    const id = setInterval(() => setFactIdx(i => (i + 1) % TOUR_FACTS.length), 4000);
+    return () => clearInterval(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cinematic]);
+
   // ─── Cinematic overlay (rendered above main UI when active) ──────────────────
   const cinematicOverlay = cinematic ? (() => {
     const dim: React.CSSProperties = {
