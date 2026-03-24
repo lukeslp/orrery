@@ -1498,10 +1498,10 @@ export default function Panels(props: PanelProps) {
             aria-pressed={constellationFocus}
             style={{
               padding: '6px 10px',
-              fontSize: 9, fontFamily: 'inherit', fontWeight: constellationFocus ? 500 : 300,
-              color: constellationFocus ? accent : 'rgba(255,255,255,0.4)',
-              background: constellationFocus ? `rgba(${accentRgb},0.12)` : 'rgba(0,0,0,0.3)',
-              border: `1px solid ${constellationFocus ? `rgba(${accentRgb},0.25)` : 'rgba(255,255,255,0.06)'}`,
+              fontSize: 12, fontFamily: 'inherit', fontWeight: constellationFocus ? 600 : 400,
+              color: constellationFocus ? accent : 'rgba(255,255,255,0.7)',
+              background: constellationFocus ? `rgba(${accentRgb},0.15)` : 'rgba(0,0,0,0.4)',
+              border: `1px solid ${constellationFocus ? `rgba(${accentRgb},0.3)` : 'rgba(255,255,255,0.1)'}`,
               borderRadius: 3, cursor: 'pointer',
               backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
             }}
