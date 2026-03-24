@@ -232,7 +232,7 @@ function OrreryInner() {
     setShowDwarf(true);
     setShowDeepSky(!isMobile);
     setShowDeepSpace(!isMobile);
-    setSelPlanet(isMobile ? null : 2);
+    setSelPlanet(2);
     setCamIdx(-1);
     setSelMoonIdx(null);
     setSelNeo(null);
@@ -241,8 +241,8 @@ function OrreryInner() {
     setSelSatellite(null);
     setSelConstellation(null);
     setSelSpacecraft(null);
-    setFocusTarget(!isMobile && earthPos ? { planetIdx: 2, pos: earthPos } : null);
-    setNavStack(isMobile ? ['Solar System'] : ['Solar System', 'Earth']);
+    setFocusTarget(earthPos ? { planetIdx: 2, pos: earthPos } : null);
+    setNavStack(['Solar System', 'Earth']);
   }, []);
 
   // Apply a cinematic step (camera preset + layers)
