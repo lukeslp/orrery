@@ -1298,8 +1298,11 @@ export default function Panels(props: PanelProps) {
             zIndex: 20,
           }}
         >
-          {/* Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          {/* Header — tap to collapse/expand */}
+          <div
+            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: 'pointer' }}
+            onClick={(e) => { e.stopPropagation(); setCardMinimized(m => !m); }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{
                 width: 12, height: 12, borderRadius: '50%',
@@ -1311,46 +1314,53 @@ export default function Panels(props: PanelProps) {
                 <div style={{ color: '#fff', fontSize: 16, fontWeight: 600, letterSpacing: 1 }}>
                   {selectedMoon ? selectedMoon.name : sp!.name}
                 </div>
-                <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 10, fontWeight: 300, fontStyle: 'italic', letterSpacing: 0.5 }}>
-                  {selectedMoon ? `Moon of ${sp!.name}` : sp!.type}
-                </div>
+                {!cardMinimized && (
+                  <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 10, fontWeight: 300, fontStyle: 'italic', letterSpacing: 0.5 }}>
+                    {selectedMoon ? `Moon of ${sp!.name}` : sp!.type}
+                  </div>
+                )}
               </div>
             </div>
-            <Btn onClick={() => setSelPlanet(null)} label="Close info card">{'\u2715'}</Btn>
+            <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, padding: '4px 8px', fontWeight: 300 }}>{cardMinimized ? '\u25b8' : '\u25be'}</span>
           </div>
 
-          {/* Stats grid */}
-          {!selectedMoon && sp && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px' }}>
-              <Stat label="Distance" val={`${sp.distAU} AU`} />
-              <Stat label="Period" val={sp.period < 365 ? `${sp.period.toFixed(0)} days` : `${(sp.period / 365.25).toFixed(1)} years`} />
-              {sp.surfaceTemp && <Stat label="Surface temp" val={sp.surfaceTemp} />}
-              {sp.gravity && <Stat label="Gravity" val={sp.gravity} />}
-              <Stat label="Moons" val={sp.moons} />
-            </div>
-          )}
-          {selectedMoon && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px' }}>
-              <Stat label="Orbital period" val={selectedMoon.period < 1 ? `${(selectedMoon.period * 24).toFixed(1)} hours` : `${selectedMoon.period.toFixed(1)} days`} />
-              <Stat label="Parent" val={sp!.name} />
-            </div>
-          )}
+          {/* Collapsible body */}
+          {!cardMinimized && (
+            <>
+              {/* Stats grid */}
+              {!selectedMoon && sp && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px' }}>
+                  <Stat label="Distance" val={`${sp.distAU} AU`} />
+                  <Stat label="Period" val={sp.period < 365 ? `${sp.period.toFixed(0)} days` : `${(sp.period / 365.25).toFixed(1)} years`} />
+                  {sp.surfaceTemp && <Stat label="Surface temp" val={sp.surfaceTemp} />}
+                  {sp.gravity && <Stat label="Gravity" val={sp.gravity} />}
+                  <Stat label="Moons" val={sp.moons} />
+                </div>
+              )}
+              {selectedMoon && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 16px' }}>
+                  <Stat label="Orbital period" val={selectedMoon.period < 1 ? `${(selectedMoon.period * 24).toFixed(1)} hours` : `${selectedMoon.period.toFixed(1)} days`} />
+                  <Stat label="Parent" val={sp!.name} />
+                </div>
+              )}
 
-          {/* Breadcrumb nav */}
-          <div style={{ display: 'flex', gap: 4, marginTop: 10, flexWrap: 'wrap' }}>
-            {navStack.map((crumb, i) => (
-              <span key={i} style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', fontWeight: 300 }}>
-                {i > 0 && <span style={{ margin: '0 4px' }}>{'\u203a'}</span>}
-                <span
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => props.navigateToLevel(i)}
-                  onKeyDown={e => { if (e.key === 'Enter') props.navigateToLevel(i); }}
-                  style={{ cursor: i < navStack.length - 1 ? 'pointer' : 'default', color: i === navStack.length - 1 ? accent : 'rgba(255,255,255,0.25)' }}
-                >{crumb}</span>
-              </span>
-            ))}
-          </div>
+              {/* Breadcrumb nav */}
+              <div style={{ display: 'flex', gap: 4, marginTop: 10, flexWrap: 'wrap' }}>
+                {navStack.map((crumb, i) => (
+                  <span key={i} style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', fontWeight: 300 }}>
+                    {i > 0 && <span style={{ margin: '0 4px' }}>{'\u203a'}</span>}
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={(e) => { e.stopPropagation(); props.navigateToLevel(i); }}
+                      onKeyDown={e => { if (e.key === 'Enter') props.navigateToLevel(i); }}
+                      style={{ cursor: i < navStack.length - 1 ? 'pointer' : 'default', color: i === navStack.length - 1 ? accent : 'rgba(255,255,255,0.25)' }}
+                    >{crumb}</span>
+                  </span>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       )}
 
