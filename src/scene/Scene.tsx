@@ -135,7 +135,8 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, cinematicRotate
       tPos.current.set(...HOME_POS);
       tLook.current.set(...HOME_TGT);
     }
-  }, [focusTarget, camPreset, cinematic, computeFocusOffset, computePresetFollowOffset, positions]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- positions excluded intentionally: useFrame handles orbital tracking
+  }, [focusTarget, camPreset, cinematic, computeFocusOffset, computePresetFollowOffset]);
 
   // Stop transition when user grabs orbit controls
   useEffect(() => {
@@ -159,7 +160,7 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, cinematicRotate
 
     // Smooth factor: for cinematic, we want it to take most of the duration
     // For interactive, we want it snappy (2.2).
-    let smoothBase = cinematic ? 0.45 : 2.2;
+    let smoothBase = cinematic ? 0.45 : 1.0;
 
     if (cinematic) {
       // Ease in the transition to avoid the "jerk"
