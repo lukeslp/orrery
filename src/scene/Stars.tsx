@@ -728,7 +728,7 @@ export function ConstellationLabels({ visible, focus, onSelect, onLoad }: { visi
                   style={{
                     color: c.color,
                     opacity: labelOpacity,
-                    fontSize: focus ? 12 : 10,
+                    fontSize: focus ? 16 : 10,
                     fontFamily: "'Cormorant Garamond', serif",
                     fontStyle: 'italic',
                     fontWeight: 400,
