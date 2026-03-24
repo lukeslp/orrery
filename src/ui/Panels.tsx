@@ -1127,8 +1127,8 @@ export default function Panels(props: PanelProps) {
             <span style={{ ...dim, fontSize: mobile ? 11 : 12 }}>{moon.name}, {moon.ill}%</span>
             {solarWind && (
               <>
-                <span style={{ ...dim, color: 'rgba(255,255,255,0.12)' }}>{'\u00b7'}</span>
-                <span style={dim}>Solar wind {solarWind}</span>
+                <span style={{ ...dim, fontSize: mobile ? 11 : 12, color: 'rgba(255,255,255,0.12)' }}>{'\u00b7'}</span>
+                <span style={{ ...dim, fontSize: mobile ? 11 : 12 }}>{solarWind}</span>
               </>
             )}
           </div>
