@@ -649,6 +649,10 @@ function OrreryInner() {
           setCanvasCreated(true);
           if (cinematic) startCinematicTour();
         }}
+        onPointerMissed={() => {
+          if (cinematic) return;
+          navigateBack();
+        }}
       >
         <Suspense fallback={null}>
           <Scene
