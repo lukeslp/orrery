@@ -1448,8 +1448,32 @@ export default function Panels(props: PanelProps) {
         Orrery
       </div>
 
-      {/* ── Zoom controls (desktop only) ── */}
+      {/* ── Zoom controls + stargazer toggle (desktop only) ── */}
       {!mobile && <ZoomControls />}
+      {!mobile && !cinematic && (
+        <button
+          onClick={() => {
+            setConstellationFocus(p => !p);
+            if (!constellationFocus) {
+              setShowStars(() => true);
+              setShowConstellations(() => true);
+              setShowDeepSky(() => true);
+            }
+          }}
+          aria-label="Stargazer mode"
+          aria-pressed={constellationFocus}
+          style={{
+            position: 'absolute', bottom: 80, right: 14,
+            background: constellationFocus ? `rgba(${accentRgb},0.15)` : 'rgba(255,255,255,0.06)',
+            border: `1px solid ${constellationFocus ? `rgba(${accentRgb},0.3)` : 'rgba(255,255,255,0.08)'}`,
+            borderRadius: 6, width: 36, height: 36,
+            color: constellationFocus ? accent : 'rgba(255,255,255,0.5)',
+            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: 'inherit', fontSize: 14, zIndex: 5,
+            backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+          }}
+        >{'\u2726'}</button>
+      )}
 
       {/* ── Mobile floating top controls ── */}
       {mobile && !cinematic && (
