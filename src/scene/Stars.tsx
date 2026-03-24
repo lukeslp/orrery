@@ -728,7 +728,7 @@ export function ConstellationLabels({ visible, focus, onSelect, onLoad }: { visi
                   style={{
                     color: c.color,
                     opacity: labelOpacity,
-                    fontSize: focus ? 48 : 10,
+                    fontSize: focus ? 96 : 10,
                     fontFamily: "'Cormorant Garamond', serif",
                     fontStyle: 'italic',
                     fontWeight: 400,
@@ -794,8 +794,8 @@ export function ConstellationLabels({ visible, focus, onSelect, onLoad }: { visi
                       </g>
                     </svg>
                   )}
-                  <span style={{ display: 'block', fontSize: focus ? 48 : 10, fontWeight: 400, fontStyle: 'normal', letterSpacing: focus ? 6 : 2, textTransform: 'uppercase' }}>{c.latin}</span>
-                  {c.english && <span style={{ display: 'block', fontSize: focus ? 28 : 7, opacity: 0.68, marginTop: focus ? 6 : 2 }}>{c.english}</span>}
+                  <span style={{ display: 'block', fontSize: focus ? 96 : 10, fontWeight: 400, fontStyle: 'normal', letterSpacing: focus ? 6 : 2, textTransform: 'uppercase' }}>{c.latin}</span>
+                  {c.english && <span style={{ display: 'block', fontSize: focus ? 56 : 7, opacity: 0.68, marginTop: focus ? 10 : 2 }}>{c.english}</span>}
                 </div>
               </Html>
             )}
