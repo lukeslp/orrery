@@ -1077,7 +1077,7 @@ export default function Panels(props: PanelProps) {
   // ─── Cinematic overlay (rendered above main UI when active) ──────────────────
   const cinematicOverlay = cinematic ? (() => {
     const dim: React.CSSProperties = {
-      color: 'rgba(255,255,255,0.5)', fontSize: 15, fontWeight: 300,
+      color: 'rgba(255,255,255,0.5)', fontSize: mobile ? 16 : 18, fontWeight: 300,
       letterSpacing: 1.5, fontStyle: 'italic',
     };
     return (
