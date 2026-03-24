@@ -1076,20 +1076,20 @@ export default function Panels(props: PanelProps) {
 
   // Rotating data facts for cinematic
   const TOUR_FACTS = [
-    'Positions computed from JPL Keplerian elements (J2000 epoch)',
-    '41,000 stars from the HYG database plotted by magnitude and color',
-    '88 constellations with IAU boundary lines',
-    'Near-Earth objects fetched live from NASA NeoWs API',
-    'Asteroid orbital elements from JPL Small-Body Database',
-    'Solar wind speed from NOAA Space Weather Prediction Center',
-    '32 moons with real orbital periods and inclinations',
-    '3,000 main-belt asteroids with Kirkwood gap distribution',
-    'Milky Way outline from d3-celestial GeoJSON catalog',
-    'Satellite positions propagated from CelesTrak TLE data',
-    'Comet orbits computed from Minor Planet Center elements',
-    'Planet textures: Solar System Scope (CC BY 4.0)',
-    'Deep sky: Messier and bright NGC/IC objects from OpenNGC',
-    'Meteor shower radiants from IAU Meteor Data Center',
+    '41,119 stars \u00b7 HYG Database \u00b7 plotted by magnitude, B\u2013V color index',
+    '88 constellations \u00b7 IAU stick figures \u00b7 d3-celestial GeoJSON',
+    '8 planets + 3 dwarfs \u00b7 JPL Keplerian elements \u00b7 J2000 epoch with secular rates',
+    '32 moons \u00b7 real orbital periods, semi-major axes, and inclinations',
+    '3,000 main-belt asteroids \u00b7 Kirkwood gaps at 2.50, 2.82, 2.95 AU',
+    '110+ deep sky objects \u00b7 Messier + bright NGC/IC \u00b7 OpenNGC catalog',
+    'Live near-Earth objects \u00b7 NASA NeoWs API \u00b7 updated daily',
+    'Asteroid orbits on demand \u00b7 JPL Small-Body Database \u00b7 6 orbital elements',
+    'Live solar wind \u00b7 NOAA Space Weather Prediction Center',
+    'Satellite TLEs \u00b7 CelesTrak \u00b7 ISS + active stations propagated via SGP4',
+    '14 meteor showers \u00b7 IAU Meteor Data Center \u00b7 solar longitude activity windows',
+    '20+ comets \u00b7 Minor Planet Center \u00b7 perihelion, eccentricity, inclination',
+    '5 interstellar spacecraft \u00b7 Voyager 1 at 165 AU \u00b7 Voyager 2 at 139 AU',
+    'Planet textures \u00b7 Solar System Scope \u00b7 2K mobile / 4K desktop \u00b7 CC BY 4.0',
   ];
   const [factIdx, setFactIdx] = useState(0);
   useEffect(() => {
