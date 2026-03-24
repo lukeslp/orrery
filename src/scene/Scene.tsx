@@ -163,14 +163,15 @@ function CamCtrl({ focusTarget, positions, cinematic, camPreset, cinematicRotate
     let smoothBase = cinematic ? 0.45 : 1.0;
 
     if (cinematic) {
-      // Ease in the transition to avoid the "jerk"
-      // We want to accelerate slowly then glide
+      // Smooth ease in/out for cinematic — gentle acceleration then cruise
       const progress = Math.min(1, elapsed / stepDuration);
       const ease = progress * progress * (3 - 2 * progress); // cubic ease
-      smoothBase = 0.2 + ease * 1.25;
+      smoothBase = 0.15 + ease * 0.85;
     }
 
-    const smoothBoost = remainDist > 10000 ? 1.15 : remainDist > 1000 ? 0.75 : remainDist > 100 ? 0.35 : 0;
+    const smoothBoost = cinematic
+      ? (remainDist > 10000 ? 0.4 : remainDist > 1000 ? 0.25 : remainDist > 100 ? 0.1 : 0)
+      : (remainDist > 10000 ? 0.8 : remainDist > 1000 ? 0.5 : remainDist > 100 ? 0.2 : 0);
     const posAlpha = 1 - Math.exp(-(smoothBase + smoothBoost) * dt);
     const lookAlpha = 1 - Math.exp(-(smoothBase + smoothBoost * 0.7) * dt);
     const settleThreshold = remainDist > 10000 ? 120 : remainDist > 1000 ? 32 : remainDist > 100 ? 3 : 0.035;
