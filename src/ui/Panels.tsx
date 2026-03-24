@@ -677,7 +677,7 @@ function SideDrawer({
 
       <AccordionSection title="Layers" accent={accent} defaultOpen={openCore}>
         <div role="group" aria-label="Display layers">
-        {layers.map(l => (
+        {layers.filter(l => !mobile || ['Stars', 'Constellations', 'Deep Sky', 'Deep Space'].includes(l.label) || l.label.startsWith('NEO')).map(l => (
           <button
             key={l.label}
             onClick={l.fn}
