@@ -963,16 +963,6 @@ function SideDrawer({
         </div>
       </div>
 
-      {/* Galactic Center — always visible */}
-      <div style={{ padding: '8px 16px 16px', textAlign: 'center' }}>
-        <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 9, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>Galactic Center</div>
-        <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 10, fontStyle: 'italic', fontWeight: 300 }}>
-          Sgr A* {'\u00b7'} 26,000 ly {'\u00b7'} 4M M{'\u2609'}
-        </div>
-        <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 9, fontStyle: 'italic', fontWeight: 300, marginTop: 2 }}>
-          You are here.
-        </div>
-      </div>
       </>
       )}
     </div>
