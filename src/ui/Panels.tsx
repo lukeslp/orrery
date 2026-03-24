@@ -941,7 +941,19 @@ function SideDrawer({
 
         <MiniAccordion title="Built By" defaultOpen={false}>
           <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, fontWeight: 400 }}>Luke Steuber</div>
-          <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, fontWeight: 300, fontStyle: 'italic' }}>lukesteuber.com</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 4 }}>
+            <a href="https://lukesteuber.com" target="_blank" rel="noopener noreferrer" style={{ ...sourceLink, fontSize: 11 }}>lukesteuber.com</a>
+            <a href="https://datapoems.io" target="_blank" rel="noopener noreferrer" style={{ ...sourceLink, fontSize: 11 }}>datapoems.io</a>
+          </div>
+        </MiniAccordion>
+
+        <MiniAccordion title="Galactic Center" defaultOpen={false}>
+          <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, fontStyle: 'italic', fontWeight: 300, lineHeight: 1.6 }}>
+            Sagittarius A* {'\u00b7'} 26,000 light-years {'\u00b7'} 4 million solar masses
+          </div>
+          <div style={{ color: 'rgba(255,255,255,0.15)', fontSize: 9, fontStyle: 'italic', fontWeight: 300, marginTop: 6 }}>
+            You are here.
+          </div>
         </MiniAccordion>
 
         <MiniAccordion title="Keyboard Shortcuts" defaultOpen={false}>
