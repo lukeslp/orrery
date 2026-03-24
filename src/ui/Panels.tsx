@@ -1159,7 +1159,7 @@ export default function Panels(props: PanelProps) {
           color: 'rgba(255,255,255,0.35)', fontSize: mobile ? 16 : 18,
           letterSpacing: 3, fontWeight: 300, fontStyle: 'italic',
         }}>
-          tap to explore
+          {mobile ? 'tap' : 'click'} to explore
         </div>
         {/* Watermark */}
         <div style={{
