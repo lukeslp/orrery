@@ -47,7 +47,7 @@ export default function LoadingScreen({ ready, progress = 0 }: { ready: boolean;
         fontWeight: 300, letterSpacing: 2,
         marginBottom: 32,
       }}>
-        Real data. Real orbits.
+        Real data. Real time.
       </div>
 
       <div style={{
