@@ -545,6 +545,12 @@ function OrreryInner() {
     if (preset.label === 'Belt') {
       setShowAsteroidBelt(true);
     }
+    if (preset.label === 'Stellar') {
+      setShowDeepSpace(true);
+      setShowDeepSky(true);
+      setShowDwarf(true);
+      setShowStars(true);
+    }
   }, []);
 
   // Keyboard shortcuts
@@ -553,7 +559,7 @@ function OrreryInner() {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
       const k = e.key.toLowerCase();
-      const isPresetKey = (e.key >= '1' && e.key <= '9') || e.key === '0' || e.key === '-';
+      const isPresetKey = (e.key >= '1' && e.key <= '9') || e.key === '0' || e.key === '-' || e.key === '=';
       const isInteractiveShortcut = isPresetKey || ['m', 'n', 'd', 's', 'l', 'a', 'g', 'k', 'c', 'r', 'i', 'o', 'escape', ' '].includes(k);
 
       if (k === 'f') {
