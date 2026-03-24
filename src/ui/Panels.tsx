@@ -441,8 +441,8 @@ function SideDrawer({
   showNeo: boolean; setShowNeo: (fn: (p: boolean) => boolean) => void;
   showStars: boolean; setShowStars: (fn: (p: boolean) => boolean) => void;
   showConstellations: boolean; setShowConstellations: (fn: (p: boolean) => boolean) => void;
-  showAsterisms?: boolean; setShowAsterisms?: (fn: (p: boolean) => boolean) => void;
-  constellationFocus?: boolean; setConstellationFocus?: (fn: (p: boolean) => boolean) => void;
+  showAsterisms: boolean; setShowAsterisms: (fn: (p: boolean) => boolean) => void;
+  constellationFocus: boolean; setConstellationFocus: (fn: (p: boolean) => boolean) => void;
   showDwarf: boolean; setShowDwarf: (fn: (p: boolean) => boolean) => void;
   showAsteroidBelt: boolean; setShowAsteroidBelt: (fn: (p: boolean) => boolean) => void;
   showComets: boolean; setShowComets: (fn: (p: boolean) => boolean) => void;
@@ -979,8 +979,8 @@ export interface PanelProps {
   showDwarf: boolean; setShowDwarf: (fn: (p: boolean) => boolean) => void;
   showStars: boolean; setShowStars: (fn: (p: boolean) => boolean) => void;
   showConstellations: boolean; setShowConstellations: (fn: (p: boolean) => boolean) => void;
-  showAsterisms?: boolean; setShowAsterisms?: (fn: (p: boolean) => boolean) => void;
-  constellationFocus?: boolean; setConstellationFocus?: (fn: (p: boolean) => boolean) => void;
+  showAsterisms: boolean; setShowAsterisms: (fn: (p: boolean) => boolean) => void;
+  constellationFocus: boolean; setConstellationFocus: (fn: (p: boolean) => boolean) => void;
   showAsteroidBelt: boolean; setShowAsteroidBelt: (fn: (p: boolean) => boolean) => void;
   showComets: boolean; setShowComets: (fn: (p: boolean) => boolean) => void;
   showMeteors: boolean; setShowMeteors: (fn: (p: boolean) => boolean) => void;
